@@ -16,6 +16,8 @@ In this repository you will find three different compose files:
  
 ## Deploying
 
+**IMPORTANT NOTE**: in this documentation, UUID **must not contain** the `nuvlabox/` prefix  
+
 ### Prerequisites 
 
 To install the NuvlaBox Engine, you'll need:
