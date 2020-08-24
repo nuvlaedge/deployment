@@ -10,6 +10,15 @@ x-common: &common
     - "nuvlabox.component=True"
     - "nuvlabox.deployment=production"
 
+x-proxy: &proxy
+  environment:
+    - RSYNC_PROXY
+    - HTTPS_PROXY
+    - HTTP_PROXY
+    - FTP_PROXY
+    - ALL_PROXY
+    - NO_PROXY
+
 volumes:
   nuvlabox-db:
     driver: local
@@ -76,6 +85,7 @@ services:
 
   agent:
     <<: *common
+    <<: *proxy
     image: nuvlabox/agent:1.7.0
     restart: on-failure
     privileged: true
