@@ -1,0 +1,48 @@
+#!/bin/sh
+
+set -e
+
+compose_files=${compose_files:-$1}
+target_version=${target_version:-$2}
+quiet=${quiet:-${3:-0}}
+on_update_failure=${on_update_failure:-$4}
+environment=${environment:-$5}
+project=${project:-$6}
+github_releases=${github_releases:-${7:-"https://github.com/nuvlabox/deployment/releases"}}
+save_dir=$(pwd)
+nuvlabox-engine-printer "Updating NuvlaBox Engine to version ${target_version}" ${quiet} "NONE" yes
+
+if [[ -z ${project} ]]
+then
+  nuvlabox-engine-printer "Update failed! Cannot update without a project name." 0 "ERROR" "no"
+  exit 1
+fi
+
+if [[ ! -z ${environment} ]]
+then
+  env_file="${save_dir}/.env"
+  nuvlabox-engine-printer "Setting environment for update, at ${env_file}" ${quiet} "INFO" "no"
+
+  env_lines=$(echo ${environment} | sed 's/,/\\n/g')
+  nuvlabox-engine-printer "Environment variables are:\n ${env_lines}" ${quiet} "DEBUG" "no"
+
+  echo "${env_lines}" > ${env_file}
+
+  if [[ $? -ne 0 ]]
+  then
+    nuvlabox-engine-printer "Update failed! Unable to store enviroment ${env_lines} in ${env_file}." 0 "ERROR" "no"
+    exit 1
+  fi
+fi
+
+source_code_url="${github_releases}/download/${target_version}"
+
+nuvlabox-engine-printer "Downloading config files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
+download=$(nuvlabox-engine-download-configs "${compose_files}" "${save_dir}" "${source_code_url}" 2>&1)
+
+if [[ $? -ne 0 ]]
+then
+  nuvlabox-engine-printer "Update failed! Unable to retrieve files ${compose_files}: ${download}" 0 "ERROR" "no"
+  exit 1
+fi
+

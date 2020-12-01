@@ -1,0 +1,116 @@
+#!/bin/sh
+
+command="${1}"
+on_update_failure="rollback"
+on_update_failure_options="('rollback' 'ignore' 'retry')"
+export quiet=0
+export github_releases="https://github.com/nuvlabox/deployment/releases"
+
+usage()
+{
+  echo -e ""
+  echo -e " -- NuvlaBox Engine installer -- "
+  echo -e ""
+  echo -e "Usage: $0 [COMMAND] [OPTIONS]"
+  echo -e ""
+  echo -e " -h --help\t\t\t\tShow this help information"
+  echo -e ""
+  echo -e "COMMANDS:"
+  echo -e " install\t\t\t\tInstall the NuvlaBox Engine"
+  echo -e " update\t\t\t\t\tUpdate an existing NuvlaBox Engine installation"
+  echo -e " uninstall\t\t\t\tShutdown (and optionally delete) an existing NuvlaBox Engine installation"
+  echo -e ""
+  echo -e "INSTALL options:"
+  echo -e " (not implemented yet)"
+  echo -e ""
+  echo -e "UDPATE options:"
+  echo -e " --compose-files=<list>\t\t\tComma-separated list of compose files to deploy"
+  echo -e " --environment=<list>\t\t\tComma-separated list of ENV=VALUE keypairs"
+  echo -e " --on-update-failure=<string>\t\tAction be take in case the update fails ${on_update_failure_options}. Default: ${on_update_failure}"
+  echo -e " --project=<string>\t\t\tProject name used during the first installation"
+  echo -e " --quiet\t\t\t\tOnly print final status message"
+  echo -e " --target-version=<string>\t\tNuvlaBox Engine version to be installed. Must match a release from ${github_releases}"
+  echo -e ""
+  echo -e "UNINSTALL options:"
+  echo -e " (not implemented yet)"
+}
+
+banner_intro()
+{
+  nuvlabox-engine-printer "" ${1}
+  nuvlabox-engine-printer " ______              _       ______                _______             _             " ${1}
+  nuvlabox-engine-printer "|  ___ \            | |     (____  \              (_______)           (_)            " ${1}
+  nuvlabox-engine-printer "| |   | |_   _ _   _| | ____ ____)  ) ___ _   _    _____   ____   ____ _ ____   ____ " ${1}
+  nuvlabox-engine-printer "| |   | | | | | | | | |/ _  |  __  ( / _ ( \ / )  |  ___) |  _ \ / _  | |  _ \ / _  )" ${1}
+  nuvlabox-engine-printer "| |   | | |_| |\ V /| ( ( | | |__)  ) |_| ) X (   | |_____| | | ( ( | | | | | ( (/ / " ${1}
+  nuvlabox-engine-printer "|_|   |_|\____| \_/ |_|\_||_|______/ \___(_/ \_)  |_______)_| |_|\_|| |_|_| |_|\____)" ${1}
+  nuvlabox-engine-printer "                                                                (_____|              " ${1}
+  nuvlabox-engine-printer "" ${1}
+}
+
+case ${command} in
+    -h | --help)
+      usage
+      exit
+      ;;
+    update)
+      shift
+      while [ "$1" != "" ]; do
+        PARAM=`echo -e $1 | awk -F= '{print $1}'`
+        VALUE=`echo -e $1 | cut -d "=" -f 2-`
+        case $PARAM in
+            -h | --help)
+              usage
+              exit
+              ;;
+            --compose-files)
+              export compose_files=${VALUE}
+              ;;
+            --target-version)
+              export target_version=${VALUE}
+              ;;
+            --quiet)
+              export quiet=1
+              ;;
+            --on-update-failure)
+              if [[ "${on_update_failure_options}" == *"${VALUE}"* ]]
+              then
+                export on_update_failure=${VALUE}
+              else
+                echo -e "${command} ERROR: unsupported value ${VALUE} for ${PARAM}. Must be one of ${on_update_failure_options}"
+                exit 1
+              fi
+              ;;
+            --environment)
+              export environment=${VALUE}
+              ;;
+            --project)
+              export project=${VALUE}
+              ;;
+            *)
+              echo -e "${command} ERROR: unknown option $PARAM"
+              usage
+              exit 1
+              ;;
+        esac
+        shift
+      done
+      banner_intro ${quiet}
+      output=$(nuvlabox-engine-update 2>&1)
+      ;;
+    uninstall)
+      echo -e "NOT IMPLEMENTED"
+      exit 0
+      ;;
+    install)
+      echo -e "NOT IMPLEMENTED"
+      exit 0
+      ;;
+    *)
+      echo -e "ERROR: unknown command ${command}"
+      usage
+      exit 1
+      ;;
+esac
+
+
