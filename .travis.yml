@@ -1,5 +1,5 @@
-language: generic
-dist: trusty
+language: java
+dist: xenial
 services:
 - docker
 before_install:
