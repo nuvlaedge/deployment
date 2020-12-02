@@ -1,0 +1,52 @@
+#!/bin/sh
+
+#
+# Generic client to PUT a payload to Nuvla
+#
+
+message="$1"
+category="action"
+severity="$2"
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+name="NuvlaBox Engine Installer - $3 | $category"
+
+set -e
+
+login() {
+  # Then we have to login first
+  session_template='{
+      "template": {
+          "href": "session-template/api-key",
+          "key": "'${NUVLA_API_KEY}'",
+          "secret": "'${NUVLA_API_SECRET}'"
+      }
+  }'
+
+  curl -XPOST --fail \
+      ${NUVLA_ENDPOINT}/api/session \
+      -H content-type:application/json \
+      -H accept:application/json \
+      -k \
+      -d "${session_template}" | jq -e '.status==201' &>/dev/null
+}
+
+login
+
+payload="{
+\"name\": \"${name}\",
+\"severity\": \"${severity}\",
+\"category\": \"${category}\",
+\"timestamp\": \"${timestamp}\",
+\"content\": \"{\"resource\": {\"href\": \"${NUVLABOX_ID}\"}, \"state\": \"${message}\"}\"
+}"
+
+resource="event"
+
+# Now we can push the resource
+(curl -XPOST --fail \
+    ${NUVLA_ENDPOINT}/api/${resource} \
+    -H content-type:application/json \
+    -H accept:application/json \
+    -k \
+    -d "${payload}" | jq -re '."resource-id"')
+
