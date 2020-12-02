@@ -32,4 +32,4 @@ jobs:
     - stage: installer
       if: branch = nb-installer
       install: skip # bundle install is not required
-      script: ./nuvlabox-engine-installer/container-build.sh
+      script: cd nuvlabox-engine-installer && ./container-build.sh
