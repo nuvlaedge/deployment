@@ -1,7 +1,12 @@
 #!/bin/bash -xe
 
 DOCKER_IMAGE=installer
-MANIFEST=nuvlabox/${DOCKER_IMAGE}:${TRAVIS_BRANCH}
+if [[ "${TRAVIS_BRANCH}" != "master" ]]
+then
+  DOCKER_ORG=nuvladev
+else
+  DOCKER_ORG=nuvlabox
+MANIFEST=${DOCKER_ORG}/${DOCKER_IMAGE}:${TRAVIS_BRANCH}
 
 platforms=(amd64 arm64 arm)
 
