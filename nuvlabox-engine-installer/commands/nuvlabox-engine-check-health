@@ -9,7 +9,7 @@ from contextlib import contextmanager
 
 
 func = inspect.currentframe().f_code
-timer = sys.argv[1]
+timer = int(sys.argv[1])
 
 @contextmanager
 def timeout(deadline):
@@ -21,7 +21,7 @@ def timeout(deadline):
     try:
         yield
     except TimeoutError:
-        pass
+        raise Exception(f'Exceeded the timeout of {timer} sec while waiting for NuvlaBox installation to be healthy')
     finally:
         # Unregister the signal so it won't be triggered
         # if the timeout is not reached.
@@ -51,6 +51,10 @@ try:
                         container.labels.get('com.docker.compose.service') == "agent":
                     if container.status != "running":
                         break
+                    elif container.attrs.get('RestartCount', 0) > 0:
+                        raise Exception(f'NuvlaBox Agent is unstable and/or misbehaving')
+                    else:
+                        pass
                 elif 'Health' not in state:
                     continue
                 else:

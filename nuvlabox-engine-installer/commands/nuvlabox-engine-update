@@ -23,7 +23,7 @@ then
   nuvlabox-engine-printer "Setting environment for update, at ${env_file}" ${quiet} "INFO" "no"
 
   env_lines=$(echo ${environment} | sed 's/,/\\n/g')
-  nuvlabox-engine-printer "Environment variables are:\n ${env_lines}" ${quiet} "DEBUG" "no"
+  nuvlabox-engine-printer "New environment variables:\n${env_lines}" ${quiet} "DEBUG" "no"
 
   echo -e "${env_lines}" | grep -v "affinity:container" > ${env_file}
 
@@ -49,7 +49,7 @@ fi
 nuvlabox-engine-printer "Preparing to update NuvlaBox Engine running as project ${project}" ${quiet} "NONE" "yes"
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
-docker_compose_command="docker-compose -p ${project} ${docker_compose_args} up --remove-orphans -d"
+docker_compose_command="docker-compose -p ${project} ${docker_compose_args} up --remove-orphans -d --force-recreate"
 
 nuvlabox-engine-printer "Executing update command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
@@ -66,7 +66,7 @@ then
   exit 1
 fi
 
-wait=5
+wait=10
 nuvlabox-engine-printer "Waiting ${wait} seconds and then checking updated NuvlaBox Engine health..." ${quiet} "INFO" "no"
 sleep ${wait}
 
