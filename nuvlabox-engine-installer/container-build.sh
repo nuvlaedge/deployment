@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 DOCKER_IMAGE=installer
-MANIFEST=nuvlabox/${DOCKER_IMAGE}:${GIT_BRANCH}
+MANIFEST=nuvlabox/${DOCKER_IMAGE}:$(git branch --show-current)
 
 platforms=(amd64 arm64 arm)
 
