@@ -6,6 +6,7 @@ then
   DOCKER_ORG=nuvladev
 else
   DOCKER_ORG=nuvlabox
+fi
 MANIFEST=${DOCKER_ORG}/${DOCKER_IMAGE}:${TRAVIS_BRANCH}
 
 platforms=(amd64 arm64 arm)
