@@ -16,7 +16,6 @@ before_install:
 - sudo mv docker-compose /usr/local/bin
 - "./.travis.before_install.sh"
 stages:
-- compile
 - deploy
 after_script:
 - docker stack rm $(docker stack ls --format '{{.Name}}')
@@ -26,11 +25,10 @@ notifications:
     secure: GoXaHXaqwhxYeGw+02wvdlxAzVfQuKZgZEzhqS27eYBXDM2p3UkqOLJsH3EdfqtXoJZ+owEOoLvcKwqUUAWKc87L3oPmqfrE4Wfrr8AMTtjY17iNfGh0c4Ripysaw5VBSujlGgroKxN747T0QJvniD6UKz5N4vMQf8mWrtvbUPk9AeidAyypH8oTdRlAB6YKNgwJ5xcvbnwEP3UaDudhsj9cNgIVWie5ybZFPL3K8YkAuitcLWlEOsNFVYw/W6gAktf2gAuBx5h9+w2waZr8BHfdqCsDT/rvWy4YN5L1x/we6sWTGsgFBacccX2cAKCz3//hmQXQBB2fu/+AMqLutZ+U93F2NJO0Nwp3VdUImIM0DBFp/8u9f2PxDnfwU3ym94JcuCJgWRwScQyedVjyilTHueuiMlSeSGVwDAwe7cSVxA9weiR5TtZIjQJDOiaUBgVYoYP+XbrleCowbxXkQI6TlVJv1GAc0G/92QQlKB2vE3hDJ2J2EiX3dMNYl50kDjVr8k1eR3VNSVM3t9HxZ/KoCDWabA9riGxgSbn3zQ1s56LZddlITSZ8LDbkFkRTnaTZG9zb/NWRf6KyfAln08iD0oHobdbVLEiA8Q6X29lW+KB0AzF+xre6o3YP9JFqdYEHofZZvkuha32JUJ+LQKNCeZdsuIZinwlHfEnnObI=
 jobs:
   include:
-  - stage: compile
-    install: skip
-    script: cd nuvlabox-engine-installer && ./container-build.sh
   - stage: deploy
     install: skip
+    script: cd nuvlabox-engine-installer && ./container-build.sh
+  - install: skip
     script: cd nuvlabox-engine-installer && ./container-push.sh
 env:
   global:
