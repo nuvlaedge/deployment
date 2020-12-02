@@ -27,9 +27,7 @@ jobs:
   include:
   - stage: deploy
     install: skip
-    script: cd nuvlabox-engine-installer && ./container-build.sh
-  - install: skip
-    script: cd nuvlabox-engine-installer && ./container-push.sh
+    script: cd nuvlabox-engine-installer && ./container-release.sh
 env:
   global:
   - secure: pVeHMV00CS1onX+pglXVR+Mpi1qo+679xaEAyeX9k59XcCgb1RqXCzotS9yqG652cCF/M5J9wJHEYFm8uRmDqMGnIqE7hwLF5k/4LOOHl5bHEfa/n1yEMvXiPcCm8HJfnXQxLMDPaxdDZa+Bsd2umDExFi8s8dgGa7PnIC2VYrMLpHXbosq7rfPzpE1j/2QpBoqCJiIftMIxcrupmccZ8ruywWRrdgKCinlFPgvCQ6Tx3DA4/dmk3J2ZE5TMfvBeNX/nriomtRlTr4JnJs7DUDRWyUfTbraMx6SFSqM5qwfSNW1ZxBbkDUw6XOgMMYlivySQksRchscVL9i+ClXHFmDw8R08jBLBAniq+yRXq0Obj856qVni9WI7UyVnM6Vj9L47hPSWoPJRRJKoRZDmdkIjzhdDsr/kH87rJPkhuje70itiKL7IQWoF9vnsH/YqSTvv3dexf2nYQBn+B2vG+7gNIqYH3V9tSW+ilohXPFSVUXCiXlAW+LNKv59/lnPwzOxrJKXXor1Z0r7dtYrG3l1KF1YIl25LHDZX7hrsG7GNOpoDTX5S1Akb1nfHs3hfH2aKJgenpXxRgDVL2GZvic6X9dVNEALefinELeiDqT3uu/WH4twuZdvMRUgCsNubaqcqw5LsOA+I0IyqEltp8stPBGZk39EbyHBzT53IFRk=
