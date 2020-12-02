@@ -7,6 +7,7 @@ WORKDIR ${workdir}
 COPY . .
 
 ENV PATH="$PATH:${workdir}/common:${workdir}/commands" \
-    WORKDIR="${workdir}"
+    WORKDIR="${workdir}" \
+    ROOTFS="/rootfs"
 
 ENTRYPOINT ["./installer"]

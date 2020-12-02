@@ -3,6 +3,7 @@
 command="${1}"
 on_update_failure="rollback"
 on_update_failure_options="('rollback' 'ignore' 'retry')"
+
 export quiet=0
 export github_releases="https://github.com/nuvlabox/deployment/releases"
 
@@ -11,7 +12,7 @@ usage()
   echo -e ""
   echo -e " -- NuvlaBox Engine installer -- "
   echo -e ""
-  echo -e "Usage: $0 [COMMAND] [OPTIONS]"
+  echo -e "Usage: $0 [COMMAND] [ARGS]"
   echo -e ""
   echo -e " -h --help\t\t\t\tShow this help information"
   echo -e ""
@@ -20,18 +21,20 @@ usage()
   echo -e " update\t\t\t\t\tUpdate an existing NuvlaBox Engine installation"
   echo -e " uninstall\t\t\t\tShutdown (and optionally delete) an existing NuvlaBox Engine installation"
   echo -e ""
-  echo -e "INSTALL options:"
+  echo -e "INSTALL args:"
   echo -e " (not implemented yet)"
   echo -e ""
-  echo -e "UDPATE options:"
+  echo -e "UDPATE args (all mandatory):"
   echo -e " --compose-files=<list>\t\t\tComma-separated list of compose files to deploy"
-  echo -e " --environment=<list>\t\t\tComma-separated list of ENV=VALUE keypairs"
+  echo -e " --current-environment=<list>\t\t\tComma-separated list of current ENV=VALUE keypairs, in case a rollback is needed"
+  echo -e " --new-environment=<list>\t\t\tComma-separated list of new ENV=VALUE keypairs"
   echo -e " --on-update-failure=<string>\t\tAction be take in case the update fails ${on_update_failure_options}. Default: ${on_update_failure}"
   echo -e " --project=<string>\t\t\tProject name used during the first installation"
   echo -e " --quiet\t\t\t\tOnly print final status message"
   echo -e " --target-version=<string>\t\tNuvlaBox Engine version to be installed. Must match a release from ${github_releases}"
+  echo -e " --working-dir=<string>\t\tDirectory, on the host, from where the NuvlaBox Engine was installed the first time, and where the corresponding config files can be found"
   echo -e ""
-  echo -e "UNINSTALL options:"
+  echo -e "UNINSTALL args:"
   echo -e " (not implemented yet)"
 }
 
@@ -48,69 +51,130 @@ banner_intro()
   nuvlabox-engine-printer "" ${1}
 }
 
+check_mandatory_args_update()
+{
+  if [[ -z $compose_files ]] || [[ -z $target_version ]] || [[ -z $quiet ]] || [[ -z $on_update_failure ]] || \
+      [[ -z $environment ]] || [[ -z $old_environment ]] || [[ -z $project ]] || [[ -z $working_dir ]]
+  then
+    echo -e "update ERROR: missing mandatory args"
+    usage
+    exit 1
+  fi
+}
+
 case ${command} in
-    -h | --help)
-      usage
-      exit
-      ;;
-    update)
+  -h | --help)
+    usage
+    exit
+    ;;
+  update)
+    shift
+    while [ "$1" != "" ]; do
+      PARAM=`echo -e $1 | awk -F= '{print $1}'`
+      VALUE=`echo -e $1 | cut -d "=" -f 2-`
+      case $PARAM in
+        -h | --help)
+          usage
+          exit
+          ;;
+        --compose-files)
+          export compose_files=${VALUE}
+          ;;
+        --target-version)
+          export target_version=${VALUE}
+          ;;
+        --quiet)
+          export quiet=1
+          ;;
+        --on-update-failure)
+          if [[ "${on_update_failure_options}" == *"${VALUE}"* ]]
+          then
+            export on_update_failure=${VALUE}
+          else
+            echo -e "${command} ERROR: unsupported value ${VALUE} for ${PARAM}. Must be one of ${on_update_failure_options}"
+            exit 1
+          fi
+          ;;
+        --new-environment)
+          export environment=${VALUE}
+          ;;
+        --current-environment)
+          export old_environment=${VALUE}
+          ;;
+        --project)
+          export project=${VALUE}
+          ;;
+        --working-dir)
+          export working_dir=${VALUE}
+          ;;
+        *)
+          echo -e "${command} ERROR: unknown option $PARAM"
+          usage
+          exit 1
+          ;;
+      esac
       shift
-      while [ "$1" != "" ]; do
-        PARAM=`echo -e $1 | awk -F= '{print $1}'`
-        VALUE=`echo -e $1 | cut -d "=" -f 2-`
-        case $PARAM in
-            -h | --help)
-              usage
-              exit
-              ;;
-            --compose-files)
-              export compose_files=${VALUE}
-              ;;
-            --target-version)
-              export target_version=${VALUE}
-              ;;
-            --quiet)
-              export quiet=1
-              ;;
-            --on-update-failure)
-              if [[ "${on_update_failure_options}" == *"${VALUE}"* ]]
-              then
-                export on_update_failure=${VALUE}
-              else
-                echo -e "${command} ERROR: unsupported value ${VALUE} for ${PARAM}. Must be one of ${on_update_failure_options}"
-                exit 1
-              fi
-              ;;
-            --environment)
-              export environment=${VALUE}
-              ;;
-            --project)
-              export project=${VALUE}
-              ;;
-            *)
-              echo -e "${command} ERROR: unknown option $PARAM"
-              usage
-              exit 1
-              ;;
-        esac
-        shift
-      done
-      banner_intro ${quiet}
-      output=$(nuvlabox-engine-update 2>&1)
-      ;;
-    uninstall)
-      echo -e "NOT IMPLEMENTED"
+    done
+    check_mandatory_args_update
+    banner_intro ${quiet}
+    output=$(nuvlabox-engine-update 2>&1)
+
+    if [[ $? -ne 0 ]]
+    then
+      # update failed, so check the fail policy
+      case $on_update_failure in
+        rollback)
+          nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback too previous version" ${quiet} "WARNING" "no"
+          output=$(nuvlabox-engine-rollback 2>&1)
+          if [[ $? -ne 0 ]]
+          then
+            echo -e "${output}"
+            exit 1
+          else
+            # rollback successful
+            nuvlabox-engine-printer "NuvlaBox Engine update failed. But was able to rollback to previous version" ${quiet} "WARNING" "no"
+            echo -e "${output}"
+            exit 0
+          fi
+          ;;
+        retry)
+          nuvlabox-engine-printer "NuvlaBox Engine update failed once. Trying a second time..." ${quiet} "WARNING" "no"
+          output=$(nuvlabox-engine-update 2>&1)
+          if [[ $? -ne 0 ]]
+          then
+            echo -e "${output}"
+            exit 1
+          else
+            # succeeded the second time
+            nuvlabox-engine-printer "NuvlaBox Engine update finally succeeded on retry!" ${quiet} "INFO" "no"
+            echo -e "${output}"
+            exit 0
+          fi
+          ;;
+        ignore)
+          # nothing to do. Just printout final message and exit with error
+          echo -e "${output}"
+          exit 1
+          ;;
+      esac
+    else
+      # update successful
+      # print final message and finish
+      echo -e "${output}"
       exit 0
-      ;;
-    install)
-      echo -e "NOT IMPLEMENTED"
-      exit 0
-      ;;
-    *)
-      echo -e "ERROR: unknown command ${command}"
-      usage
-      exit 1
-      ;;
+    fi
+    ;;
+  uninstall)
+    echo -e "NOT IMPLEMENTED"
+    exit 0
+    ;;
+  install)
+    echo -e "NOT IMPLEMENTED"
+    exit 0
+    ;;
+  *)
+    echo -e "ERROR: unknown command ${command}"
+    usage
+    exit 1
+    ;;
 esac
-
-
