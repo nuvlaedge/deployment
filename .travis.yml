@@ -27,11 +27,9 @@ notifications:
 jobs:
   include:
   - stage: compile
-    if: branch = nb-installer
     install: skip
     script: cd nuvlabox-engine-installer && ./container-build.sh
   - stage: deploy
-    if: branch = nb-installer
     install: skip
     script: cd nuvlabox-engine-installer && ./container-push.sh
 env:
