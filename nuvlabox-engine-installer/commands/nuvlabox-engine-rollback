@@ -21,7 +21,13 @@ mkdir -p "${rollback_dir}"
 cd "${rollback_dir}"
 
 old_nb_dir="${rootfs}${working_dir}"
-cp "${old_nb_dir}/*yml" . || (nuvlabox-engine-printer "Cannot access original config files at ${old_nb_dir}" 0 "ERROR" "no" && exit 1)
+cp "${old_nb_dir}/*yml" .
+
+if [[ $? -ne 0 ]]
+then
+  nuvlabox-engine-printer "Cannot access original config files at ${old_nb_dir}" 0 "ERROR" "no"
+  exit 1
+fi
 
 nuvlabox-engine-printer "Copied old config files into rollback path $(pwd): $(ls)" ${quiet} "INFO" "no"
 
