@@ -49,10 +49,10 @@ try:
 
                 if container.labels.get('com.docker.compose.service') and \
                         container.labels.get('com.docker.compose.service') == "agent":
-                    if container.status != "running":
-                        break
-                    elif container.attrs.get('RestartCount', 0) > 0:
+                    if container.attrs.get('RestartCount', 0) > 0:
                         raise Exception(f'NuvlaBox Agent is unstable and/or misbehaving')
+                    elif container.status != "running":
+                        break
                     else:
                         pass
                 elif 'Health' not in state:

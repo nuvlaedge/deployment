@@ -74,7 +74,7 @@ finalize()
     nuvla-publish-event "$1" "$2" "$3" || nuvlabox-engine-printer "Unable to publish event into Nuvla" ${quiet} "WARNING" "no"
   fi
 
-  echo -e "${1}"
+#  echo -e "${1}"
   exit $4
 }
 
@@ -142,8 +142,8 @@ case ${command} in
       # update failed, so check the fail policy
       case $on_update_failure in
         rollback)
-          nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback too previous version" ${quiet} "WARNING" "no"
-          output=$(nuvlabox-engine-rollback 2>&1)
+          nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback too previous version" 0 "WARNING" "no"
+          output=$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
             finalize "${output}" "CRITICAL" "${command}" 1
