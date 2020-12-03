@@ -4,8 +4,11 @@ command="${1}"
 on_update_failure="rollback"
 on_update_failure_options="('rollback' 'ignore' 'retry')"
 
+export save_dir=$(pwd)
 export quiet=0
 export github_releases="https://github.com/nuvlabox/deployment/releases"
+
+set -o pipefail
 
 usage()
 {
@@ -132,7 +135,7 @@ case ${command} in
     done
     check_mandatory_args_update
     banner_intro ${quiet}
-    output=$(nuvlabox-engine-update 2>&1)
+    output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]
     then

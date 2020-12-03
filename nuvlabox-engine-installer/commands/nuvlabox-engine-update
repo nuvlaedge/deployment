@@ -7,7 +7,7 @@ on_update_failure=${on_update_failure:-$4}
 environment=${environment:-$5}
 project=${project:-$6}
 github_releases=${github_releases:-${7:-"https://github.com/nuvlabox/deployment/releases"}}
-save_dir=$(pwd)
+save_dir=${save_dir:-${8:-$(pwd)}}
 
 nuvlabox-engine-printer "Updating NuvlaBox Engine to version ${target_version}" ${quiet} "NONE" yes
 
