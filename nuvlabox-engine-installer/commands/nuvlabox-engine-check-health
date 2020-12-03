@@ -56,7 +56,10 @@ try:
                     else:
                         pass
                 elif 'Health' not in state:
-                    continue
+                    if (index + 1) < len(nb_containers):
+                        continue
+                    else:
+                        pass
                 else:
                     health = state['Health']
                     if health.get('Status', '').lower() != "healthy":

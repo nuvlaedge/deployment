@@ -10,7 +10,10 @@ severity="$2"
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 name="NuvlaBox Engine Installer - $3 | $category"
 
-set -e
+if [ "$(echo "$NUVLA_ENDPOINT" | cut -c0-8)" != "https://" ]
+then
+  NUVLA_ENDPOINT="https://${NUVLA_ENDPOINT}"
+fi
 
 login() {
   # Then we have to login first
