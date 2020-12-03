@@ -34,12 +34,12 @@ def raise_timeout(signum, frame):
 
 try:
     dc = docker.from_env()
-    nb_containers = dc.containers.list(filters={'label': "nuvlabox.component=True"}, all=True)
 
     healthcheck_finished = False
     with timeout(timer):
         while not healthcheck_finished:
             time.sleep(3)
+            nb_containers = dc.containers.list(filters={'label': "nuvlabox.component=True"}, all=True)
             for index, container in enumerate(nb_containers):
                 # this loop breaks everytime it finds something unhealthy with the NB Engine, thus never terminating
                 # the parent infinite loop
