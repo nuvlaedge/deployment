@@ -66,7 +66,7 @@ then
   exit 1
 fi
 
-wait=10
+wait=5
 nuvlabox-engine-printer "Waiting ${wait} seconds and then checking updated NuvlaBox Engine health..." ${quiet} "INFO" "no"
 sleep ${wait}
 

@@ -21,7 +21,7 @@ mkdir -p "${rollback_dir}"
 cd "${rollback_dir}"
 
 old_nb_dir="${rootfs}${working_dir}"
-cp "${old_nb_dir}/*yml" .
+cp ${old_nb_dir}/*yml .
 
 if [[ $? -ne 0 ]]
 then

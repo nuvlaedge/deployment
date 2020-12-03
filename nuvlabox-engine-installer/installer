@@ -66,7 +66,7 @@ check_args_update()
 
   if [[ -z $old_environment ]]
   then
-    old_environment=$(nuvlabox-engine-current-env ${project} 2>&1)
+    export old_environment=$(nuvlabox-engine-current-env ${project} 2>&1)
     if [[ $? -ne 0 ]]
     then
       echo -e "update ERROR: cannot infer --current-environment. Unable to continue"
@@ -77,7 +77,7 @@ check_args_update()
   if [[ -z $environment ]]
   then
     # assume no changes to the new env
-    environment="${old_environment}"
+    export environment="${old_environment}"
   fi
 }
 
