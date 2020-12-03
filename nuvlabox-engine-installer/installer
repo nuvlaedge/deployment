@@ -143,6 +143,7 @@ case ${command} in
       case $on_update_failure in
         rollback)
           nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback too previous version" 0 "WARNING" "no"
+          nuvlabox-engine-printer "ROLLBACK" ${quiet} "NONE" "yes"
           output=$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
@@ -155,7 +156,8 @@ case ${command} in
           ;;
         retry)
           nuvlabox-engine-printer "NuvlaBox Engine update failed once. Trying a second time..." ${quiet} "WARNING" "no"
-          output=$(nuvlabox-engine-update 2>&1)
+          nuvlabox-engine-printer "RETRY" ${quiet} "NONE" "yes"
+          output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
             finalize "${output}" "CRITICAL" "${command}" 1

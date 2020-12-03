@@ -57,12 +57,12 @@ if [[ ${quiet} -eq 1 ]]
 then
   out=$($docker_compose_command 2>&1)
 else
-  out=$($docker_compose_command)
+  out="\n$($docker_compose_command)"
 fi
 
 if [[ $? -ne 0 ]]
 then
-  nuvlabox-engine-printer "Update failed when executing Docker Compose command ${docker_compose_command}: ${out}" 0 "ERROR" "no"
+  nuvlabox-engine-printer "Update failed when executing Docker Compose command ${docker_compose_command}.${out}" 0 "ERROR" "no"
   exit 1
 fi
 
