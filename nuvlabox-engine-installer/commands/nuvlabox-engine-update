@@ -49,7 +49,7 @@ fi
 nuvlabox-engine-printer "Preparing to update NuvlaBox Engine running as project ${project}" ${quiet} "NONE" "yes"
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
-docker_compose_command="docker-compose -p ${project} ${docker_compose_args} up --remove-orphans -d --force-recreate"
+docker_compose_command="docker-compose --no-ansi --log-level ERROR -p ${project} ${docker_compose_args} up --remove-orphans -d"
 
 nuvlabox-engine-printer "Executing update command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
