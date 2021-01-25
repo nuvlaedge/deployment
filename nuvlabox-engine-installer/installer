@@ -26,7 +26,7 @@ usage()
   echo -e ""
   echo -e "INSTALL args:"
   echo -e " --compose-files=<list>\t\t\t(optional) Comma-separated list of compose files to deploy. If not passed, it uses all"
-  echo -e " --environment=<list>\t\t(optional) Comma-separated list of ENV=VALUE keypairs"
+  echo -e " --environment=<list>\t\t\t(optional) Comma-separated list of ENV=VALUE keypairs"
   echo -e " --target-version=<string>\t\t(optional) NuvlaBox Engine release to be installed. If not passed, it uses the master branch"
   echo -e " --project=<string>\t\t\t(optional) Project name used during the first installation. Default is 'nuvlabox'"
   echo -e " --quiet\t\t\t\t(optional) Only print final status message"
@@ -67,7 +67,6 @@ check_args_install()
     nuvlabox-engine-printer "Installing NuvlaBox Engine with all compose files: ${compose_files}" ${quiet} "INFO" "no"
   fi
 }
-
 
 check_args_update()
 {
