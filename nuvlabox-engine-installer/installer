@@ -28,7 +28,8 @@ usage()
   echo -e " --compose-files=<list>\t\t\t(optional) Comma-separated list of compose files to deploy. If not passed, it uses all"
   echo -e " --environment=<list>\t\t(optional) Comma-separated list of ENV=VALUE keypairs"
   echo -e " --target-version=<string>\t\t(optional) NuvlaBox Engine release to be installed. If not passed, it uses the master branch"
-  echo -e " --quiet\t\t\t\tOnly print final status message"
+  echo -e " --project=<string>\t\t\t(optional) Project name used during the first installation. Default is 'nuvlabox'"
+  echo -e " --quiet\t\t\t\t(optional) Only print final status message"
   echo -e ""
   echo -e "UDPATE args:"
   echo -e " --compose-files=<list>\t\t\tComma-separated list of compose files to deploy"
@@ -36,12 +37,13 @@ usage()
   echo -e " --new-environment=<list>\t\t(optional) Comma-separated list of new ENV=VALUE keypairs"
   echo -e " --on-update-failure=<string>\t\tAction be take in case the update fails ${on_update_failure_options}. Default: ${on_update_failure}"
   echo -e " --project=<string>\t\t\tProject name used during the first installation"
-  echo -e " --quiet\t\t\t\tOnly print final status message"
+  echo -e " --quiet\t\t\t\t(optional) Only print final status message"
   echo -e " --target-version=<string>\t\tNuvlaBox Engine version to be installed. Must match a release from ${github_releases}"
   echo -e " --working-dir=<string>\t\t\tDirectory, on the host, from where the NuvlaBox Engine was installed the first time, and where the corresponding config files can be found"
   echo -e ""
   echo -e "UNINSTALL args:"
-  echo -e " (not implemented yet)"
+  echo -e " --project=<string>\t\t\t(optional) Project name used during the first installation. Default is 'nuvlabox'"
+  echo -e " --quiet\t\t\t\t(optional) Only print final status message"
 }
 
 banner_intro()
@@ -201,8 +203,39 @@ case ${command} in
     #------------------------------------------------------------------------#
     # UNINSTALL
     #------------------------------------------------------------------------#
-    echo -e "NOT IMPLEMENTED"
-    exit 0
+    shift
+    while [ "$1" != "" ]; do
+      PARAM=`echo -e $1 | awk -F= '{print $1}'`
+      VALUE=`echo -e $1 | cut -d "=" -f 2-`
+      case $PARAM in
+        -h | --help)
+          usage
+          exit
+          ;;
+        --project)
+          export project=${VALUE}
+          ;;
+        *)
+          echo -e "${command} ERROR: unknown option $PARAM"
+          usage
+          exit 1
+          ;;
+      esac
+      shift
+    done
+    banner_intro ${quiet}
+    output=$(nuvlabox-engine-uninstall 2>&1 | tee /dev/fd/2)
+
+    if [[ $? -ne 0 ]]
+    then
+      # uninstall failed
+      nuvlabox-engine-printer "NuvlaBox Engine uninstall failed" ${quiet} "ERROR" "no"
+      exit 1
+    else
+      # uninstall successful
+      # print final message and finish
+      exit 0
+    fi
     ;;
   install)
     #------------------------------------------------------------------------#
@@ -225,6 +258,9 @@ case ${command} in
           ;;
         --quiet)
           export quiet=1
+          ;;
+        --project)
+          export project=${VALUE}
           ;;
         --target-version)
           export target_version=${VALUE}
