@@ -8,6 +8,8 @@ WORKDIR ${workdir}
 
 COPY . .
 
+COPY ../docker-compose.* .
+
 ENV PATH="$PATH:${workdir}/common:${workdir}/commands" \
     WORKDIR="${workdir}" \
     ROOTFS="/rootfs"

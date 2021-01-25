@@ -25,7 +25,10 @@ usage()
   echo -e " uninstall\t\t\t\tShutdown (and optionally delete) an existing NuvlaBox Engine installation"
   echo -e ""
   echo -e "INSTALL args:"
-  echo -e " (not implemented yet)"
+  echo -e " --compose-files=<list>\t\t\t(optional) Comma-separated list of compose files to deploy. If not passed, it uses all"
+  echo -e " --environment=<list>\t\t(optional) Comma-separated list of ENV=VALUE keypairs"
+  echo -e " --target-version=<string>\t\t(optional) NuvlaBox Engine release to be installed. If not passed, it uses the master branch"
+  echo -e " --quiet\t\t\t\tOnly print final status message"
   echo -e ""
   echo -e "UDPATE args:"
   echo -e " --compose-files=<list>\t\t\tComma-separated list of compose files to deploy"
@@ -53,6 +56,16 @@ banner_intro()
   nuvlabox-engine-printer "                                                                (_____|              " ${1}
   nuvlabox-engine-printer "" ${1}
 }
+
+check_args_install()
+{
+  if [[ -z $compose_files ]]
+  then
+    export compose_files=$(echo $(ls docker-compose.*) | tr ' ' ',')
+    nuvlabox-engine-printer "Installing NuvlaBox Engine with all compose files: ${compose_files}" ${quiet} "INFO" "no"
+  fi
+}
+
 
 check_args_update()
 {
@@ -87,6 +100,9 @@ case ${command} in
     exit
     ;;
   update)
+    #------------------------------------------------------------------------#
+    # UPDATE
+    #------------------------------------------------------------------------#
     shift
     while [ "$1" != "" ]; do
       PARAM=`echo -e $1 | awk -F= '{print $1}'`
@@ -182,12 +198,59 @@ case ${command} in
     fi
     ;;
   uninstall)
+    #------------------------------------------------------------------------#
+    # UNINSTALL
+    #------------------------------------------------------------------------#
     echo -e "NOT IMPLEMENTED"
     exit 0
     ;;
   install)
-    echo -e "NOT IMPLEMENTED"
-    exit 0
+    #------------------------------------------------------------------------#
+    # INSTALL
+    #------------------------------------------------------------------------#
+    shift
+    while [ "$1" != "" ]; do
+      PARAM=`echo -e $1 | awk -F= '{print $1}'`
+      VALUE=`echo -e $1 | cut -d "=" -f 2-`
+      case $PARAM in
+        -h | --help)
+          usage
+          exit
+          ;;
+        --compose-files)
+          export compose_files=${VALUE}
+          ;;
+        --environment)
+          export environment=${VALUE}
+          ;;
+        --quiet)
+          export quiet=1
+          ;;
+        --target-version)
+          export target_version=${VALUE}
+          ;;
+        *)
+          echo -e "${command} ERROR: unknown option $PARAM"
+          usage
+          exit 1
+          ;;
+      esac
+      shift
+    done
+    banner_intro ${quiet}
+    check_args_install
+    output=$(nuvlabox-engine-install 2>&1 | tee /dev/fd/2)
+
+    if [[ $? -ne 0 ]]
+    then
+      # install failed
+      nuvlabox-engine-printer "NuvlaBox Engine install failed" ${quiet} "ERROR" "no"
+      exit 1
+    else
+      # install successful
+      # print final message and finish
+      exit 0
+    fi
     ;;
   *)
     echo -e "ERROR: unknown command ${command}"
