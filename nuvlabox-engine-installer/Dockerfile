@@ -1,4 +1,4 @@
-FROM nuvladev/job-docker-compose-client:master
+FROM nuvla/job-docker-compose-client:master
 
 ARG workdir="/opt/nuvlabox"
 
