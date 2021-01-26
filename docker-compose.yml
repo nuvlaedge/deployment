@@ -78,6 +78,8 @@ services:
       timeout: 10s
       retries: 4
       start_period: 10s
+    depends_on:
+      - data-gateway
 
   agent:
     <<: *common
