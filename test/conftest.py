@@ -2,6 +2,7 @@ def pytest_addoption(parser):
     parser.addoption("--apikey", action="store", default=None)
     parser.addoption("--apisecret", action="store", default=None)
     parser.addoption("--vpnserver", action="store", default=None)
+    parser.addoption("--remote", action="store_true", default=False, help='Include testing via Nuvla.io')
 
 
 def pytest_generate_tests(metafunc):
@@ -15,5 +16,9 @@ def pytest_generate_tests(metafunc):
     if 'apisecret' in metafunc.fixturenames and option_value is not None:
         metafunc.parametrize("apisecret", [option_value])
 
+    # this needs to be optional because if we use the VPN server all the time, we'll fill up all the available IPs
     if 'vpnserver' in metafunc.fixturenames:
         metafunc.parametrize("vpnserver", [metafunc.config.option.vpnserver])
+
+    if 'remote' in metafunc.fixturenames:
+        metafunc.parametrize("remote", [metafunc.config.option.remote])
