@@ -26,7 +26,7 @@ cleaner = cleanup.Cleanup(api, docker_client)
 atexit.register(cleaner.goodbye)
 
 repo = Repo("..")
-nbe_installer_image = "nuvlabox/installer:pull-mode"
+nbe_installer_image = "nuvladev/installer:e2e"  #TODO change
 
 
 @contextmanager
@@ -55,32 +55,30 @@ credential_id = "credential/78bdb494-4d8d-457a-a484-a582719ab32c"
 install_module_id = "module/787510b0-9d9e-49d5-98c6-ac96cfc38301"
 
 
+#TODO uncomment
 # def test_github_repo():
 #     # This test is only supposed on run on releases, aka on the master branch
 #     assert repo.active_branch.name == "master"
 
 
 def test_nuvla_login():
+    logging.info('Fetching Nuvla API key credential from environment...')
     apikey = os.getenv('NUVLA_DEV_APIKEY')
     _apisecret = os.getenv('NUVLA_DEV_APISECRET')
-    logging.warning('API key is present')
     assert apikey.startswith("credential/")
     assert _apisecret is not None
 
+    logging.info(f'Authenticating with Nuvla at {api.endpoint}')
     api.login_apikey(apikey, _apisecret)
     assert api.is_authenticated()
 
 
 def test_zero_nuvlaboxes():
+    logging.info('We shall not run this test if there are leftover NuvlaBox resources in Nuvla...')
     existing_nuvlaboxes = api.get('nuvlabox',
                                   filter='description^="NuvlaBox for E2E testing - commit" and state="COMMISSIONED"')
     # if there are NBs then it means a previous test run left uncleaned resources. This must be fixed manually
     assert existing_nuvlaboxes.data.get('count', 0) == 0
-
-    logging.info("info")
-    logging.error('error')
-    logging.warning('war')
-    logging.debug('de')
 
 
 def get_nuvlabox_version():
@@ -115,6 +113,7 @@ def test_create_new_nuvlaboxes(request, remote, vpnserver):
         assert nuvlabox_id is not None
         assert new_nb.data.get('status', -1) == 201
 
+        logging.info(f'Created new NuvlaBox (remote) with UUID {nuvlabox_id}')
         request.config.cache.set('nuvlabox_id_remote', nuvlabox_id)
 
         atexit.register(cleaner.delete_nuvlabox, nuvlabox_id)
@@ -125,6 +124,7 @@ def test_create_new_nuvlaboxes(request, remote, vpnserver):
     assert nuvlabox_id is not None
     assert new_nb.data.get('status', -1) == 201
 
+    logging.info(f'Created new NuvlaBox (local) with UUID {nuvlabox_id}')
     request.config.cache.set('nuvlabox_id_local', nuvlabox_id)
 
     atexit.register(cleaner.delete_nuvlabox, nuvlabox_id)
@@ -140,28 +140,27 @@ def test_deploy_nuvlaboxes(request, remote):
     docker_client.images.pull(nbe_installer_image)
     local_project_name = str(uuid.uuid4())
     request.config.cache.set('local_project_name', local_project_name)
-    installer = b''
     try:
-        installer = docker_client.containers.run(nbe_installer_image,
-                                                 environment=[f"NUVLABOX_UUID={nuvlabox_id_local}",
-                                                              f"HOME={os.getenv('HOME')}"],
-                                                 command=f"install --project={local_project_name} --quiet",
-                                                 name="nuvlabox-engine-installer",
-                                                 volumes={
-                                                     '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
-                                                                              'mode': 'ro'}
-                                                 },
-                                                 remove=True)
+        docker_client.containers.run(nbe_installer_image,
+                                     environment=[f"NUVLABOX_UUID={nuvlabox_id_local}",
+                                                  f"HOME={os.getenv('HOME')}"],
+                                     command=f"install --project={local_project_name}",
+                                     name="nuvlabox-engine-installer",
+                                     volumes={
+                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
+                                                                  'mode': 'ro'}
+                                     })
     except docker.errors.ContainerError as e:
-        print(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
+        logging.error(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
 
-    print(installer)
     atexit.register(cleaner.remove_local_nuvlabox, local_project_name, nbe_installer_image)
-    assert "NuvlaBox Engine installed to version" in installer.decode()
+    assert docker_client.containers.get("nuvlabox-engine-installer").attrs['State']['ExitCode'] == 0
+    logging.info(f'NuvlaBox ({nuvlabox_id_local}) Engine successfully installed with project name {local_project_name}')
     atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id_local)
 
     if remote:
         # deploy NB via Nuvla.io
+        logging.info(f'Deploying NuvlaBox Engine remotely via {api.endpoint}')
         # find module
         nuvlabox_id_remote = request.config.cache.get('nuvlabox_id_remote', '')
         assert nuvlabox_id_remote != ''
@@ -199,6 +198,8 @@ def test_deploy_nuvlaboxes(request, remote):
         atexit.unregister(cleaner.delete_install_deployment)
         atexit.register(cleaner.stop_install_deployment, deployment_id)
 
+        logging.info(f'Started remote NuvlaBox Engine from Nuvla deployment {deployment_id}')
+
 
 def test_nuvlabox_engine_local_agent_api(request):
     nuvlabox_id_local = request.config.cache.get('nuvlabox_id_local', '')
@@ -207,6 +208,7 @@ def test_nuvlabox_engine_local_agent_api(request):
     r = requests.get(agent_api + 'healthcheck')
     assert r.status_code == 200
     assert 'true' in r.text.lower()
+    logging.info(f'Agent API ({agent_api}) is healthy')
 
     # send commissioning
     commission = {
@@ -214,6 +216,7 @@ def test_nuvlabox_engine_local_agent_api(request):
     }
     r = requests.post(agent_api + 'commission', json=commission)
     assert r.status_code == 200
+    logging.info(f'NuvlaBox commissioning is working (tested with payload: {commission})')
 
     nuvlabox = api.get(nuvlabox_id_local)
     assert 'TEST_TAG' in nuvlabox.data.get('tags', [])
@@ -285,9 +288,11 @@ def test_nuvlabox_engine_local_agent_api(request):
     with pytest.raises(nuvla.api.api.NuvlaError):
         api.get(mock_peripheral_id)
 
+    logging.info(f'Agent API ({agent_api}) for peripheral management is up and running')
+
 
 def test_nuvlabox_engine_local_management_api(request, remote):
-    isg_id = request.config.cache.get('nuvlabox_id_local_isg')
+    isg_id = request.config.cache.get('nuvlabox_id_local_isg', '')
 
     infra_service_group = api.get(isg_id)
     local_nb_credential = None
@@ -317,6 +322,7 @@ def test_nuvlabox_engine_local_management_api(request, remote):
 
     assert r.status_code == 200
     assert 'nuvlabox-api-endpoints' in r.json()
+    logging.info(f'Management API ({management_api}) is up, running and secured')
 
     # won't do the test on add/revoke-ssh-key because it is a sensitive action
     # let's not compromise the test environment
@@ -338,6 +344,8 @@ def test_nuvlabox_engine_local_management_api(request, remote):
     assert r.status_code == 200
     atexit.unregister(cleaner.delete_zombie_mjpg_streamer)
 
+    logging.info(f'Management API ({management_api}) succeeded at handling Data Gateway video streaming requests')
+
     if remote:
         nuvlabox_id = request.config.cache.get('nuvlabox_id_remote', '')
 
@@ -356,6 +364,8 @@ def test_nuvlabox_engine_local_management_api(request, remote):
 
                 time.sleep(5)
 
+        logging.info(f'Management API ({management_api}) is up, running and secured - remote check from {api.endpoint}')
+
 
 def test_nuvlabox_engine_local_compute_api(request):
     cert_name = request.config.cache.get('local_api_cert', '')
@@ -366,6 +376,8 @@ def test_nuvlabox_engine_local_compute_api(request):
     r = requests.get(compute_api + 'containers/json', verify=False, cert=(cert_name, key_name))
     assert r.status_code == 200
     assert len(r.json()) > 0
+
+    logging.info(f'Compute API ({compute_api}) is up, running and secured')
 
 
 def test_nuvlabox_engine_local_datagateway():
@@ -378,6 +390,8 @@ def test_nuvlabox_engine_local_datagateway():
 
     assert 'OK' in check_dg.decode()
 
+    logging.info(f'NuvlaBox shared network ({nuvlabox_network}) is functional')
+
     cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h datagateway -t nuvlabox-status -C 1"'
     check_mqtt = docker_client.containers.run('alpine',
                                               command=cmd,
@@ -386,6 +400,8 @@ def test_nuvlabox_engine_local_datagateway():
 
     nb_status = json.loads(check_mqtt.decode())
     assert nb_status['status'] == 'OPERATIONAL'
+
+    logging.info('NuvlaBox MQTT messaging is working')
 
 
 def test_nuvlabox_engine_local_system_manager():
@@ -403,6 +419,8 @@ def test_nuvlabox_engine_local_system_manager():
     assert r.status_code == 200
     assert 'NuvlaBox Local Dashboard - Peripherals' in r.text
 
+    logging.info(f'NuvlaBox internal dashboard ({system_manager_dashboard}) is up and running')
+
 
 def test_nuvlabox_engine_remote_system_manager(remote):
     if not remote:
@@ -412,6 +430,8 @@ def test_nuvlabox_engine_remote_system_manager(remote):
 
         with pytest.raises(requests.exceptions.ConnectionError):
             requests.get(system_manager_dashboard)
+
+        logging.info(f'NuvlaBox internal dashboard {system_manager_dashboard} inaccessible from outside, as expected')
 
 
 def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
@@ -429,6 +449,7 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
         container_names.append(container.name)
         image_names.append(container.attrs['Config']['Image'])
 
+    logging.info('All NuvlaBox containers from local installation are stable')
     request.config.cache.set('containers', container_names)
     request.config.cache.set('images', image_names)
 
@@ -447,6 +468,7 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
                 time.sleep(5)
                 continue
             elif current_state == "created":
+                logging.warning(f'Remote NuvlaBox deployment {deployment_id} is still in "created" state...')
                 wait_for_start_job += 1
                 time.sleep(2)
                 continue
@@ -454,6 +476,8 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
                 break
             else:
                 assert current_state in ['starting', 'created', 'started']
+
+        logging.info(f'Remote NuvlaBox started from deployment {deployment_id} is now up and running')
 
         # wait 60 seconds for activation
         decommission_registered = 0
@@ -467,6 +491,7 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
                     break
                 elif nb_state == "activated" and decommission_registered == 0:
                     # in case the commissioning never comes
+                    logging.warning(f'NuvlaBox {nuvlabox_id} activated but still not commissioned...')
                     atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id)
                     decommission_registered = 1
                 else:
@@ -479,6 +504,7 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
         atexit.unregister(cleaner.delete_nuvlabox)
 
         assert nb_state == "commissioned"
+        logging.info(f'Remote NuvlaBox {nuvlabox_id} is now commissioned')
 
         # check for an hearbeat
         nuvlabox = api.get(nuvlabox_id)
@@ -498,6 +524,8 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
 
         # check NB API endpoint
         assert isinstance(nuvlabox_status.data.get('nuvlabox-api-endpoint'), str)
+
+        logging.info(f'Remote NuvlaBox {nuvlabox_id} has an healthy status')
 
 
 def test_cis_benchmark(request, cis):
@@ -538,9 +566,11 @@ def test_cis_benchmark(request, cis):
                 score = int(line.strip().split(' ')[-1])
 
         assert score > 0
+        logging.info(f'CIS benchmark finished with a final score of {score}')
 
 
 def test_snyk_score(request):
+    logging.info('Running Snyk scan with the API token provided from the environment')
     snyktoken = os.getenv('SNYK_SIXSQCI_API_TOKEN')
     assert snyktoken is not None
 
@@ -558,4 +588,6 @@ def test_snyk_score(request):
 
         total_high_vulnerabilities += out['uniqueCount']
 
-    assert total_high_vulnerabilities < reference_vulnerabilities
+    assert total_high_vulnerabilities <= reference_vulnerabilities
+    logging.info(f'Snyk: number of high vulnerabilities found ({total_high_vulnerabilities}) is not higher'
+                 f'than previous tests ({reference_vulnerabilities})')

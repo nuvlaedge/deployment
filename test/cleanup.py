@@ -1,5 +1,6 @@
 import docker
 import nuvla
+import time
 
 
 class Cleanup(object):
@@ -17,7 +18,7 @@ class Cleanup(object):
             self.api.delete(nuvlabox_id)
         except nuvla.api.api.NuvlaResourceOperationNotAvailable:
             self.decommission_nuvlabox(nuvlabox_id)
-            self.api.delete(nuvlabox_id)
+            self.delete_nuvlabox(nuvlabox_id)
 
     def delete_install_deployment(self, deployment_id):
         print(f'Deleting NuvlaBox installation deployment with UUID: {deployment_id}')
@@ -30,9 +31,17 @@ class Cleanup(object):
     def decommission_nuvlabox(self, nuvlabox_id):
         print(f'Decommissioning NuvlaBox with UUID: {nuvlabox_id}')
         self.api.get(nuvlabox_id + "/decommission")
+        time.sleep(5)
 
     def remove_local_nuvlabox(self, project, image):
         print(f'Removing local NuvlaBox Engine installation with project: {project}')
+        try:
+            self.docker_client.api.remove_container("nuvlabox-engine-installer")
+        except docker.errors.NotFound:
+            pass
+        except Exception as e:
+            print(f'Cannot remove local NuvlaBox installer container. Reason: {str(e)}. Moving on')
+
         self.docker_client.containers.run(image,
                                           command=f"uninstall --project={project}",
                                           remove=True,
