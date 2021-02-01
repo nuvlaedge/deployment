@@ -1,0 +1,47 @@
+name: "E2E NuvlaBox Testing"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tagged-release:
+    name: "Run NuvlaBox E2E testing"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/requirements.txt
+          npm install -g snyk
+
+      - name: Test with pytest
+        env:
+          NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
+          NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
+          SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
+        run: |
+          cd test
+          pytest --remote --cis -v -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
+
+
+  notify:
+    if: always()
+    name: Post Workflow Status To Slack
+    needs:
+      - tagged-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Workflow Notification
+        uses: Gamesight/slack-workflow-status@master
+        with:
+          # Required Input
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
+          # Optional Input
+          icon_emoji: ':wrench:'

@@ -1,4 +1,6 @@
 import docker
+import nuvla
+
 
 class Cleanup(object):
     def __init__(self, api, docker_client):
@@ -11,7 +13,11 @@ class Cleanup(object):
 
     def delete_nuvlabox(self, nuvlabox_id):
         print(f"Deleting NuvlaBox with UUID: {nuvlabox_id}")
-        self.api.delete(nuvlabox_id)
+        try:
+            self.api.delete(nuvlabox_id)
+        except nuvla.api.api.NuvlaResourceOperationNotAvailable:
+            self.decommission_nuvlabox(nuvlabox_id)
+            self.api.delete(nuvlabox_id)
 
     def delete_install_deployment(self, deployment_id):
         print(f'Deleting NuvlaBox installation deployment with UUID: {deployment_id}')
@@ -28,8 +34,12 @@ class Cleanup(object):
     def remove_local_nuvlabox(self, project, image):
         print(f'Removing local NuvlaBox Engine installation with project: {project}')
         self.docker_client.containers.run(image,
-                                          command=f"uninstall --project {project}",
+                                          command=f"uninstall --project={project}",
                                           remove=True,
+                                          volumes={
+                                              '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
+                                                                       'mode': 'ro'}
+                                          },
                                           detach=True)
 
     def delete_zombie_mjpg_streamer(self, container_name):

@@ -10,10 +10,13 @@ import pytest
 import uuid
 import requests
 import nuvla
+import logging
+import os
 from tempfile import NamedTemporaryFile
 from contextlib import contextmanager
 from git import Repo
 from nuvla.api import Api
+
 
 api = Api(endpoint="https://nuvla.io",
           reauthenticate=True)
@@ -23,7 +26,7 @@ cleaner = cleanup.Cleanup(api, docker_client)
 atexit.register(cleaner.goodbye)
 
 repo = Repo("..")
-nbe_installer_image = "nuvlabox/installer:master"
+nbe_installer_image = "nuvlabox/installer:pull-mode"
 
 
 @contextmanager
@@ -52,16 +55,19 @@ credential_id = "credential/78bdb494-4d8d-457a-a484-a582719ab32c"
 install_module_id = "module/787510b0-9d9e-49d5-98c6-ac96cfc38301"
 
 
-def test_github_repo():
-    # This test is only supposed on run on releases, aka on the master branch
-    assert repo.active_branch.name == "master"
+# def test_github_repo():
+#     # This test is only supposed on run on releases, aka on the master branch
+#     assert repo.active_branch.name == "master"
 
 
-def test_nuvla_login(apikey, apisecret):
+def test_nuvla_login():
+    apikey = os.getenv('NUVLA_DEV_APIKEY')
+    _apisecret = os.getenv('NUVLA_DEV_APISECRET')
+    logging.warning('API key is present')
     assert apikey.startswith("credential/")
-    assert apisecret is not None
+    assert _apisecret is not None
 
-    api.login_apikey(apikey, apisecret)
+    api.login_apikey(apikey, _apisecret)
     assert api.is_authenticated()
 
 
@@ -71,11 +77,16 @@ def test_zero_nuvlaboxes():
     # if there are NBs then it means a previous test run left uncleaned resources. This must be fixed manually
     assert existing_nuvlaboxes.data.get('count', 0) == 0
 
+    logging.info("info")
+    logging.error('error')
+    logging.warning('war')
+    logging.debug('de')
+
 
 def get_nuvlabox_version():
     major = 1
     for tag in repo.tags:
-        major = int(tag.name.split(',')[0]) if int(tag.name.split(',')[0]) > major else major
+        major = int(tag.name.split('.')[0]) if int(tag.name.split('.')[0]) > major else major
 
     return major
 
@@ -129,16 +140,23 @@ def test_deploy_nuvlaboxes(request, remote):
     docker_client.images.pull(nbe_installer_image)
     local_project_name = str(uuid.uuid4())
     request.config.cache.set('local_project_name', local_project_name)
-    installer = ''
+    installer = b''
     try:
         installer = docker_client.containers.run(nbe_installer_image,
-                                                 environment=[f"NUVLABOX_UUID={nuvlabox_id_local}"],
-                                                 command=f"install --project {local_project_name} --quiet",
+                                                 environment=[f"NUVLABOX_UUID={nuvlabox_id_local}",
+                                                              f"HOME={os.getenv('HOME')}"],
+                                                 command=f"install --project={local_project_name} --quiet",
                                                  name="nuvlabox-engine-installer",
+                                                 volumes={
+                                                     '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
+                                                                              'mode': 'ro'}
+                                                 },
                                                  remove=True)
-    except docker.errors.ContainerError:
-        atexit.register(cleaner.remove_local_nuvlabox, local_project_name, nbe_installer_image)
+    except docker.errors.ContainerError as e:
+        print(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
 
+    print(installer)
+    atexit.register(cleaner.remove_local_nuvlabox, local_project_name, nbe_installer_image)
     assert "NuvlaBox Engine installed to version" in installer.decode()
     atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id_local)
 
@@ -399,12 +417,20 @@ def test_nuvlabox_engine_remote_system_manager(remote):
 def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
     nb_containers = docker_client.containers.list(filters={'label': 'nuvlabox.component=True'}, all=True)
 
+    container_names = []
+    image_names = []
     for container in nb_containers:
         if container.name == 'vpn-client' and not vpnserver:
             continue
 
         assert container.attrs['RestartCount'] == 0
         assert container.status.lower() in ['running', 'paused']
+
+        container_names.append(container.name)
+        image_names.append(container.attrs['Config']['Image'])
+
+    request.config.cache.set('containers', container_names)
+    request.config.cache.set('images', image_names)
 
     if remote:
         deployment_id = request.config.cache.get('deployment_id', '')
@@ -472,3 +498,64 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver):
 
         # check NB API endpoint
         assert isinstance(nuvlabox_status.data.get('nuvlabox-api-endpoint'), str)
+
+
+def test_cis_benchmark(request, cis):
+    if not cis:
+        print('Nothing to do')
+    else:
+        containers = request.config.cache.get('containers', [])
+        images = request.config.cache.get('images', [])
+
+        log_file = 'cis_log'
+        cmd = f'-l {log_file} -c container_images,container_runtime -i {",".join(containers)} -t {",".join(images)}'
+        docker_client.containers.run('docker/docker-bench-security',
+                                     network_mode='host',
+                                     pid_mode='host',
+                                     userns_mode='host',
+                                     remove=True,
+                                     cap_add='audit_control',
+                                     environment=[f'DOCKER_CONTENT_TRUST={os.getenv("DOCKER_CONTENT_TRUST")}'],
+                                     volumes={
+                                         '/etc': {'bind': '/etc', 'mode': 'ro'},
+                                         '/usr/bin/docker-containerd': {'bind': '/usr/bin/docker-containerd',
+                                                                        'mode': 'ro'},
+                                         '/usr/bin/runc': {'bind': '/usr/bin/runc', 'mode': 'ro'},
+                                         '/usr/lib/systemd': {'bind': '/usr/lib/systemd', 'mode': 'ro'},
+                                         '/var/lib': {'bind': '/var/lib', 'mode': 'ro'},
+                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock', 'mode': 'ro'},
+                                         log_file: {'bind': log_file, 'mode': 'rw'}
+                                     },
+                                     label=["docker_bench_security"],
+                                     command=cmd)
+
+        with open(log_file) as r:
+            out = r.readlines()
+
+        score = 0
+        for line in out:
+            if 'Score: ' in line:
+                score = int(line.strip().split(' ')[-1])
+
+        assert score > 0
+
+
+def test_snyk_score(request):
+    snyktoken = os.getenv('SNYK_SIXSQCI_API_TOKEN')
+    assert snyktoken is not None
+
+    images = request.config.cache.get('images', [])
+
+    total_high_vulnerabilities = 0
+
+    # count of current high vulnerabilities
+    reference_vulnerabilities = 51
+    log_file = 'log.json'
+    for img in images:
+        os.system(f'SNYK_TOKEN={snyktoken} snyk test --docker {img} --json --severity-threshold=high > {log_file}')
+        with open(log_file) as l:
+            out = json.load(l)
+
+        total_high_vulnerabilities += out['uniqueCount']
+
+    assert total_high_vulnerabilities < reference_vulnerabilities
