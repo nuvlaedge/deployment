@@ -14,12 +14,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r test/requirements.txt
-          npm install snyk
-
       - name: Test with pytest
         env:
           NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
@@ -27,6 +21,9 @@ jobs:
           SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
         run: |
           cd test
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          npm install snyk
           pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
 
       - name: Archive code coverage results
