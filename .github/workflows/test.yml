@@ -54,7 +54,7 @@ jobs:
     if: always()
     name: Post Workflow Status To Slack
     needs:
-      - tester
+      - upload-artifact
     runs-on: ubuntu-latest
     steps:
       - name: Upload to slack step
