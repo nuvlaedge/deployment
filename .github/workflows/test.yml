@@ -9,6 +9,9 @@ jobs:
   tagged-release:
     name: "Run NuvlaBox E2E testing"
     runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version: [3.8]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -17,17 +20,17 @@ jobs:
       - name: Set up Python 3
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
-
+          python-version: ${{ matrix.python-version }}
       - name: Test with pytest
         env:
           NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
           NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
           SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
         run: |
-          sudo apt-get install -y python3-pytest
+          python --version
+          sudo apt-get install -y python3-pytest python3-pip
           cd test
-          sudo python -m pip3 install --upgrade pip
+          sudo python -m pip install --upgrade pip
           sudo pip3 install -r requirements.txt
           npm install snyk
           pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
