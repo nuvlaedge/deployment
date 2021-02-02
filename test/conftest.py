@@ -4,6 +4,12 @@ def pytest_addoption(parser):
     parser.addoption("--vpn-server", action="store", default=None, dest="vpnserver")
     parser.addoption("--remote", action="store_true", default=False, help='Include testing via Nuvla.io')
     parser.addoption("--cis", action="store_true", default=False, help='Run CIS Benchmark')
+    parser.addoption("--no-linux",
+                     action="store_true",
+                     default=False,
+                     dest="nolinux",
+                     help='When running on Mac/Windows, some components might not work properly. '
+                          'This option tells PyTest to ignore those components errors')
     # parser.addoption("--snyk-token", action="store", default=None, dest="snyktoken")
 
 
@@ -27,6 +33,9 @@ def pytest_generate_tests(metafunc):
 
     if 'cis' in metafunc.fixturenames:
         metafunc.parametrize("cis", [metafunc.config.option.cis])
+
+    if 'nolinux' in metafunc.fixturenames:
+        metafunc.parametrize("nolinux", [metafunc.config.option.nolinux])
 
     # option_value = metafunc.config.option.snyktoken
     # if 'snyktoken' in metafunc.fixturenames and option_value is not None:
