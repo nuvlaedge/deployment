@@ -26,12 +26,14 @@ jobs:
           NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
           NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
           SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
+          SETUPTOOLS_USE_DISTUTILS: stdlib
         run: |
           python --version
-          sudo apt-get install -y python3-pytest python3-pip
+          pip --version
+          sudo apt-get install -y python3-pytest
           cd test
           sudo python -m pip install --upgrade pip
-          sudo pip3 install -r requirements.txt
+          sudo pip install -r requirements.txt
           npm install snyk
           pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
 
