@@ -32,10 +32,9 @@ jobs:
           pip --version
           sudo apt-get install -y python3-pytest
           cd test
-          sudo python -m pip install --upgrade pip
           sudo pip install -r requirements.txt
           npm install snyk
-          pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
+          python -m pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
 
       - name: Keep test results
         uses: actions/upload-artifact@v2
