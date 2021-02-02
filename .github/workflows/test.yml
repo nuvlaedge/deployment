@@ -3,7 +3,7 @@ name: "E2E NuvlaBox Testing"
 on:
   push:
     branches:
-      - master
+      - e2e
 
 jobs:
   tagged-release:
@@ -30,10 +30,18 @@ jobs:
           pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
 
       - name: Archive code coverage results
-          uses: actions/upload-artifact@v2
-          with:
-            name: pytest-report
-            path: test/nuvlabox.e2e_pytest.output.html
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-report
+          path: test/nuvlabox.e2e_pytest.output.html
+
+      - name: Upload to slack step
+        uses: adrey/slack-file-upload-action@master
+        with:
+          token: ${{ secrets.SLACK_TOKEN }}
+          path: test/nuvlabox.e2e_pytest.output.html
+          channel: travis-ci
+          initial_comment: "NuvlaBox E2E PyTest report :wrench:"
 
 
   notify:

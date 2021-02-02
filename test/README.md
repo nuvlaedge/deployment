@@ -15,7 +15,7 @@ Make sure the following env vars are exported in your environment:
 Run:
 
 ```bash
-pytest --remote --cis -vv -x --html=report.html --self-contained-html 
+pytest --cis -vv -x --html=report.html --self-contained-html 
 ```
 
 Add `--no-linux` to the command above if you're not running on a Linux machine.

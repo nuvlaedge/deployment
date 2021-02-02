@@ -22,6 +22,9 @@ api = Api(endpoint="https://nuvla.io",
           reauthenticate=True)
 docker_client = docker.from_env()
 
+cert = NamedTemporaryFile()
+key = NamedTemporaryFile()
+
 cleaner = cleanup.Cleanup(api, docker_client)
 atexit.register(cleaner.goodbye)
 
@@ -137,33 +140,6 @@ def test_create_new_nuvlaboxes(request, remote, vpnserver):
 
 def test_deploy_nuvlaboxes(request, remote):
     # This app is in Nuvla.io and has been created by dev@sixsq.com, as group/sixsq-devs
-
-    nuvlabox_id_local = request.config.cache.get('nuvlabox_id_local', '')
-    assert nuvlabox_id_local != '', 'PyTest cache is not working'
-
-    # deploy local NB
-    docker_client.images.pull(nbe_installer_image)
-    local_project_name = str(uuid.uuid4())
-    request.config.cache.set('local_project_name', local_project_name)
-    try:
-        docker_client.containers.run(nbe_installer_image,
-                                     environment=[f"NUVLABOX_UUID={nuvlabox_id_local}",
-                                                  f"HOME={os.getenv('HOME')}"],
-                                     command=f"install --project={local_project_name}",
-                                     name="nuvlabox-engine-installer",
-                                     volumes={
-                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
-                                                                  'mode': 'ro'}
-                                     })
-    except docker.errors.ContainerError as e:
-        logging.error(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
-
-    atexit.register(cleaner.remove_local_nuvlabox, local_project_name, nbe_installer_image)
-    installer_container = docker_client.containers.get("nuvlabox-engine-installer")
-    assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
-    logging.info(f'NuvlaBox ({nuvlabox_id_local}) Engine successfully installed with project name {local_project_name}')
-    atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id_local)
-
     if remote:
         # deploy NB via Nuvla.io
         logging.info(f'Deploying NuvlaBox Engine remotely via {api.endpoint}')
@@ -206,6 +182,32 @@ def test_deploy_nuvlaboxes(request, remote):
         atexit.register(cleaner.stop_install_deployment, deployment_id)
 
         logging.info(f'Started remote NuvlaBox Engine from Nuvla deployment {deployment_id}')
+
+    nuvlabox_id_local = request.config.cache.get('nuvlabox_id_local', '')
+    assert nuvlabox_id_local != '', 'PyTest cache is not working'
+
+    # deploy local NB
+    docker_client.images.pull(nbe_installer_image)
+    local_project_name = str(uuid.uuid4())
+    request.config.cache.set('local_project_name', local_project_name)
+    try:
+        docker_client.containers.run(nbe_installer_image,
+                                     environment=[f"NUVLABOX_UUID={nuvlabox_id_local}",
+                                                  f"HOME={os.getenv('HOME')}"],
+                                     command=f"install --project={local_project_name}",
+                                     name="nuvlabox-engine-installer",
+                                     volumes={
+                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
+                                                                  'mode': 'ro'}
+                                     })
+    except docker.errors.ContainerError as e:
+        logging.error(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
+
+    atexit.register(cleaner.remove_local_nuvlabox, local_project_name, nbe_installer_image)
+    installer_container = docker_client.containers.get("nuvlabox-engine-installer")
+    assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
+    logging.info(f'NuvlaBox ({nuvlabox_id_local}) Engine successfully installed with project name {local_project_name}')
+    atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id_local)
 
 
 def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinux):
@@ -269,6 +271,8 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
 
                 nb_state = nuvlabox.data['state'].lower()
                 if nb_state == "commissioned":
+                    # just to be sure, give time for a 2nd telemetry cycle to arrive
+                    time.sleep(30)
                     break
                 elif nb_state == "activated" and decommission_registered == 0:
                     # in case the commissioning never comes
@@ -308,6 +312,7 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
             f'NuvlaBox {nuvlabox_id} is missing the information about CPU consumption'
 
         # check NB API endpoint
+        nuvlabox_status = api.get(nuvlabox_status_id)
         assert isinstance(nuvlabox_status.data.get('nuvlabox-api-endpoint'), str), \
             f'Missing management API endpoint attribute for NuvlaBox {nuvlabox_id}'
 
@@ -423,16 +428,11 @@ def test_nuvlabox_engine_local_management_api(request, remote):
             break
 
     assert local_nb_credential is not None, f'Retrieved false NuvlaBox credential'
-    cert = NamedTemporaryFile(delete=True)
     cert.write(local_nb_credential.data['resources'][0]['cert'].encode())
     cert.flush()
 
-    key = NamedTemporaryFile(delete=True)
     key.write(local_nb_credential.data['resources'][0]['key'].encode())
     key.flush()
-
-    request.config.cache.set('local_api_cert', cert.name)
-    request.config.cache.set('local_api_key', key.name)
 
     management_api = 'https://localhost:5001/api'
     r = requests.get(management_api, verify=False, cert=(cert.name, key.name))
@@ -485,12 +485,9 @@ def test_nuvlabox_engine_local_management_api(request, remote):
 
 
 def test_nuvlabox_engine_local_compute_api(request):
-    cert_name = request.config.cache.get('local_api_cert', '')
-    key_name = request.config.cache.get('local_api_key', '')
-
     compute_api = 'https://localhost:5000/'
 
-    r = requests.get(compute_api + 'containers/json', verify=False, cert=(cert_name, key_name))
+    r = requests.get(compute_api + 'containers/json', verify=False, cert=(cert.name, key.name))
     assert r.status_code == 200, f'NuvlaBox compute API {compute_api} is not working'
     assert len(r.json()) > 0, \
         f'NuvlaBox compute API {compute_api} should have reported (at least) the NuvlaBox containers'
@@ -545,7 +542,7 @@ def test_nuvlabox_engine_local_system_manager():
 
 def test_nuvlabox_engine_remote_system_manager(remote):
     if not remote:
-        print('Nothing to do')
+        logging.info('Remote testing disabled')
     else:
         system_manager_dashboard = 'http://swarm.nuvla.io:3636/dashboard'
 
@@ -555,45 +552,48 @@ def test_nuvlabox_engine_remote_system_manager(remote):
         logging.info(f'NuvlaBox internal dashboard {system_manager_dashboard} inaccessible from outside, as expected')
 
 
-def test_cis_benchmark(request, cis):
+def test_cis_benchmark(request, cis, nolinux):
     if not cis:
-        print('Nothing to do')
+        logging.info('CIS Benchmark not selected')
     else:
-        containers = request.config.cache.get('containers', [])
-        images = request.config.cache.get('images', [])
+        if nolinux:
+            logging.warning('CIS Benchmark can only run on Linux machines. Skipping it')
+        else:
+            containers = request.config.cache.get('containers', [])
+            images = request.config.cache.get('images', [])
 
-        log_file = 'cis_log'
-        cmd = f'-l {log_file} -c container_images,container_runtime -i {",".join(containers)} -t {",".join(images)}'
-        docker_client.containers.run('docker/docker-bench-security',
-                                     network_mode='host',
-                                     pid_mode='host',
-                                     userns_mode='host',
-                                     remove=True,
-                                     cap_add='audit_control',
-                                     environment=[f'DOCKER_CONTENT_TRUST={os.getenv("DOCKER_CONTENT_TRUST")}'],
-                                     volumes={
-                                         '/etc': {'bind': '/etc', 'mode': 'ro'},
-                                         '/usr/bin/docker-containerd': {'bind': '/usr/bin/docker-containerd',
-                                                                        'mode': 'ro'},
-                                         '/usr/bin/runc': {'bind': '/usr/bin/runc', 'mode': 'ro'},
-                                         '/usr/lib/systemd': {'bind': '/usr/lib/systemd', 'mode': 'ro'},
-                                         '/var/lib': {'bind': '/var/lib', 'mode': 'ro'},
-                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock', 'mode': 'ro'},
-                                         log_file: {'bind': log_file, 'mode': 'rw'}
-                                     },
-                                     label=["docker_bench_security"],
-                                     command=cmd)
+            log_file = '/tmp/cis_log'
+            cmd = f'-l {log_file} -c container_images,container_runtime -i {",".join(containers)} -t {",".join(images)}'
+            docker_client.containers.run('docker/docker-bench-security',
+                                         network_mode='host',
+                                         pid_mode='host',
+                                         userns_mode='host',
+                                         remove=True,
+                                         cap_add='audit_control',
+                                         environment=[f'DOCKER_CONTENT_TRUST={os.getenv("DOCKER_CONTENT_TRUST")}'],
+                                         volumes={
+                                             '/etc': {'bind': '/etc', 'mode': 'ro'},
+                                             '/usr/bin/docker-containerd': {'bind': '/usr/bin/docker-containerd',
+                                                                            'mode': 'ro'},
+                                             '/usr/bin/runc': {'bind': '/usr/bin/runc', 'mode': 'ro'},
+                                             '/usr/lib/systemd': {'bind': '/usr/lib/systemd', 'mode': 'ro'},
+                                             '/var/lib': {'bind': '/var/lib', 'mode': 'ro'},
+                                             '/var/run/docker.sock': {'bind': '/var/run/docker.sock', 'mode': 'ro'},
+                                             log_file: {'bind': log_file, 'mode': 'rw'}
+                                         },
+                                         labels=["docker_bench_security"],
+                                         command=cmd)
 
-        with open(log_file) as r:
-            out = r.readlines()
+            with open(log_file) as r:
+                out = r.readlines()
 
-        score = 0
-        for line in out:
-            if 'Score: ' in line:
-                score = int(line.strip().split(' ')[-1])
+            score = 0
+            for line in out:
+                if 'Score: ' in line:
+                    score = int(line.strip().split(' ')[-1])
 
-        assert score > 0, f'CIS benchmark failed with a low score of {score}'
-        logging.info(f'CIS benchmark finished with a final score of {score}')
+            assert score > 0, f'CIS benchmark failed with a low score of {score}'
+            logging.info(f'CIS benchmark finished with a final score of {score}')
 
 
 def test_snyk_score(request):
@@ -606,7 +606,7 @@ def test_snyk_score(request):
     total_high_vulnerabilities = 0
 
     # count of current high vulnerabilities
-    reference_vulnerabilities = 51
+    reference_vulnerabilities = 61
     log_file = 'log.json'
     for img in images:
         os.system(f'SNYK_TOKEN={snyktoken} snyk test --docker {img} --json --severity-threshold=high > {log_file}')
