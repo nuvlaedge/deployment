@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Test with pytest
+        uses: cclauss/GitHub-Action-for-pytest@master
         env:
           NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
           NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
