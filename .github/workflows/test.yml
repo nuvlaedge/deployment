@@ -27,6 +27,7 @@ jobs:
           NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
           SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
         run: |
+          docker swarm init
           python --version
           pip --version
           sudo apt-get install -y python3-pytest
@@ -35,12 +36,27 @@ jobs:
           npm install snyk
           python -m pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
 
+  upload-artifact:
+    if: always()
+    name: Keep test ouput
+    needs:
+      - tester
+    runs-on: ubuntu-latest
+    steps:
       - name: Keep test results
         uses: actions/upload-artifact@v2
         with:
           name: pytest-report
           path: test/nuvlabox.e2e_pytest.output.html
 
+
+  notify:
+    if: always()
+    name: Post Workflow Status To Slack
+    needs:
+      - tester
+    runs-on: ubuntu-latest
+    steps:
       - name: Upload to slack step
         uses: adrey/slack-file-upload-action@master
         with:
@@ -49,14 +65,6 @@ jobs:
           channel: travis-ci
           initial_comment: "NuvlaBox E2E PyTest report :wrench:"
 
-
-  notify:
-    if: always()
-    name: Post Workflow Status To Slack
-    needs:
-      - tagged-release
-    runs-on: ubuntu-latest
-    steps:
       - name: Slack Workflow Notification
         uses: Gamesight/slack-workflow-status@master
         with:
