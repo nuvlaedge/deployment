@@ -178,7 +178,7 @@ def test_deploy_nuvlaboxes(request, remote):
 
         # start deployment
         api.get(deployment_id + "/start")
-        atexit.unregister(cleaner.delete_install_deployment)
+        # atexit.unregister(cleaner.delete_install_deployment)
         atexit.register(cleaner.stop_install_deployment, deployment_id)
 
         logging.info(f'Started remote NuvlaBox Engine from Nuvla deployment {deployment_id}')
@@ -204,6 +204,7 @@ def test_deploy_nuvlaboxes(request, remote):
         logging.error(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
 
     atexit.register(cleaner.remove_local_nuvlabox, local_project_name, nbe_installer_image)
+    atexit.register(cleaner.delete_nuvlabox, nuvlabox_id_local)
     installer_container = docker_client.containers.get("nuvlabox-engine-installer")
     assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
     logging.info(f'NuvlaBox ({nuvlabox_id_local}) Engine successfully installed with project name {local_project_name}')
@@ -296,7 +297,7 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
         if decommission_registered == 0:
             atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id)
 
-        atexit.unregister(cleaner.delete_nuvlabox)
+        # atexit.unregister(cleaner.delete_nuvlabox)
 
         assert nb_state == "commissioned", f'NuvlaBox {nuvlabox_id} failed to commission'
         logging.info(f'Remote NuvlaBox {nuvlabox_id} is now commissioned')
