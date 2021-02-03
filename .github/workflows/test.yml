@@ -28,13 +28,14 @@ jobs:
           NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
           SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
         run: |
-          docker swarm init
           python --version
           pip --version
+          sudo npm install -g snyk
+          snyk version
           sudo apt-get install -y python3-pytest
           cd test
           pip install -r requirements.txt
-          npm install snyk
+          docker swarm init
           python -m pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
 
       - if: always()
