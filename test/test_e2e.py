@@ -227,8 +227,10 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
                                 f'and container state ({container.status}) for {container.name}')
                 continue
 
-        assert container.attrs['RestartCount'] == 0, f'Local NuvlaBox container {container.name} is unstable'
-        assert container.status.lower() in ['running', 'paused'], f'Local NuvlaBox container {container.name} in error'
+        assert container.attrs['RestartCount'] == 0, \
+            f'Local NuvlaBox container {container.name} is unstable: {json.dumps(container.attrs, indent=2)}'
+        assert container.status.lower() in ['running', 'paused'], \
+            f'Local NuvlaBox container {container.name} in error: {json.dumps(container.attrs, indent=2)}'
 
         container_names.append(container.name)
 
