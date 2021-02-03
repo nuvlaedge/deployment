@@ -54,7 +54,7 @@ jobs:
           filetype: html
           filename: nuvlabox.e2e_pytest.output.html
           title: "NuvlaBox E2E PyTest report"
-          initial_comment: ":hammer_and_wrench: HTML output from the automated E2E NuvlaBox tests"
+          initial_comment: ":memo: HTML output from the automated E2E NuvlaBox tests"
 
   notify:
     if: always()
