@@ -51,7 +51,10 @@ jobs:
           token: ${{ secrets.SLACK_TOKEN }}
           path: test/nuvlabox.e2e_pytest.output.html
           channel: travis-ci
-          initial_comment: "NuvlaBox E2E PyTest report :wrench:"
+          filetype: html
+          filename: nuvlabox.e2e_pytest.output.html
+          title: "NuvlaBox E2E PyTest report"
+          initial_comment: ":hammer_and_wrench: HTML output from the automated E2E NuvlaBox tests"
 
   notify:
     if: always()
@@ -65,5 +68,4 @@ jobs:
           # Required Input
           repo_token: ${{secrets.GITHUB_TOKEN}}
           slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
-          # Optional Input
-          icon_emoji: ':wrench:'
+          include_jobs: true

@@ -562,19 +562,18 @@ def test_nuvlabox_engine_remote_system_manager(remote):
         logging.info(f'NuvlaBox internal dashboard {system_manager_dashboard} inaccessible from outside, as expected')
 
 
-def test_cis_benchmark(request, tmpdir, cis, nolinux):
+def test_cis_benchmark(request, cis, nolinux):
     if not cis:
         logging.info('CIS Benchmark not selected')
     else:
         if nolinux:
             logging.warning('CIS Benchmark can only run on Linux machines. Skipping it')
         else:
-            log_file_name = "cis_log"
-            log_file = tmpdir.mkdir("sub").join(log_file_name)
             containers = request.config.cache.get('containers', [])
             images = request.config.cache.get('images', [])
 
-            cmd = f'-l /tmp/{log_file_name} -c container_images,container_runtime -i {",".join(containers)} -t {",".join(images)}'
+            log_file = '/tmp/cis_log'
+            cmd = f'-l {log_file} -c container_images,container_runtime -i {",".join(containers)} -t {",".join(images)}'
             docker_client.containers.run('docker/docker-bench-security',
                                          network_mode='host',
                                          pid_mode='host',
@@ -590,12 +589,13 @@ def test_cis_benchmark(request, tmpdir, cis, nolinux):
                                              '/usr/lib/systemd': {'bind': '/usr/lib/systemd', 'mode': 'ro'},
                                              '/var/lib': {'bind': '/var/lib', 'mode': 'ro'},
                                              '/var/run/docker.sock': {'bind': '/var/run/docker.sock', 'mode': 'ro'},
-                                             log_file.strpath: {'bind': f'/tmp/{log_file_name}', 'mode': 'rw'}
+                                             '/tmp': {'bind': '/tmp', 'mode': 'rw'}
                                          },
                                          labels=["docker_bench_security"],
                                          command=cmd)
 
-            out = log_file.readlines()
+            with open(log_file) as r:
+                out = r.readlines()
 
             score = 0
             for line in out:
