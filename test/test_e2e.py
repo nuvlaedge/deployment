@@ -598,11 +598,13 @@ def test_cis_benchmark(request, cis, nolinux):
                 out = r.readlines()
 
             score = 0
+            reference_score = -7
             for line in out:
                 if 'Score: ' in line:
                     score = int(line.strip().split(' ')[-1])
 
-            assert score > 0, f'CIS benchmark failed with a low score of {score}'
+            assert score > reference_score, \
+                f'CIS benchmark failed with a low score of {score}. Containers: {containers}. Images: {images}'
             logging.info(f'CIS benchmark finished with a final score of {score}')
 
 
