@@ -3,7 +3,7 @@ name: "E2E NuvlaBox Testing"
 on:
   push:
     branches:
-      - e2e
+      - master
 
 jobs:
   tester:
