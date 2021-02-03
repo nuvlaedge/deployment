@@ -229,6 +229,12 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
 
         assert container.attrs['RestartCount'] == 0, \
             f'Local NuvlaBox container {container.name} is unstable: {json.dumps(container.attrs, indent=2)}'
+
+        # we allow for containers to have exited, provided they have exited without an error
+        # like this we cover scenarios where, for example, a peripheral manager is not supported by the testing env
+        if container.status.lower() not in ['running', 'paused'] and container.attrs['State']['ExitCode'] == 0:
+            logging.warning(f'Container {container.name} is "{container.status}" but with exit code 0. Ignoring it ...')
+
         assert container.status.lower() in ['running', 'paused'], \
             f'Local NuvlaBox container {container.name} is not running. Logs are: {container.logs()}. ' \
                 f'Details: {json.dumps(container.attrs, indent=2)}'
