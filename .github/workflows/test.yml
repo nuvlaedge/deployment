@@ -39,8 +39,7 @@ jobs:
   upload-artifact:
     if: always()
     name: Keep test ouput
-    needs:
-      - tester
+    needs: tester
     runs-on: ubuntu-latest
     steps:
       - name: Keep test results
@@ -49,12 +48,10 @@ jobs:
           name: pytest-report
           path: test/nuvlabox.e2e_pytest.output.html
 
-
   notify:
     if: always()
     name: Post Workflow Status To Slack
-    needs:
-      - upload-artifact
+    needs: upload-artifact
     runs-on: ubuntu-latest
     steps:
       - name: Upload to slack step
