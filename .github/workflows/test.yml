@@ -56,7 +56,7 @@ jobs:
   notify:
     if: always()
     name: Post Workflow Status To Slack
-    needs: upload-artifact
+    needs: tester
     runs-on: ubuntu-latest
     steps:
       - name: Slack Workflow Notification
