@@ -6,7 +6,7 @@ on:
       - e2e
 
 jobs:
-  tagged-release:
+  tester:
     name: "Run NuvlaBox E2E testing"
     runs-on: "ubuntu-latest"
     strategy:
