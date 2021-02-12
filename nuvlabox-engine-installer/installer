@@ -93,6 +93,16 @@ check_args_update()
     # assume no changes to the new env
     export environment="${old_environment}"
   fi
+
+  # env setup for setting HOME folder (for mgmt-api)
+  for env_var in $(echo ${environment} | tr ',' ' ')
+  do
+    if [[ $(echo ${env_var}  | grep "HOME=") ]]
+    then
+      export ${env_var}
+      break
+    fi
+  done
 }
 
 case ${command} in
