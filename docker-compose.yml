@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  stop_grace_period: 4s
+  stop_grace_period: 30s
   logging:
     options:
       max-size: "250k"
@@ -14,19 +14,11 @@ volumes:
   nuvlabox-db:
     driver: local
 
-networks:
-  nuvlabox-shared-network:
-    driver: overlay
-    name: nuvlabox-shared-network
-    attachable: true
-    driver_opts:
-      encrypted: "true"
-
 services:
   data-gateway:
     <<: *common
     image: traefik:2.3.5
-    container_name: datagateway
+    container_name: data-gateway
     restart: always
     oom_score_adj: -900
     command:
@@ -36,9 +28,6 @@ services:
       - --providers.docker.exposedbydefault=false
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - default
-      - nuvlabox-shared-network
 
   nb-mosquitto:
     <<: *common
@@ -78,8 +67,6 @@ services:
       timeout: 10s
       retries: 4
       start_period: 10s
-    depends_on:
-      - data-gateway
 
   agent:
     <<: *common
@@ -195,5 +182,14 @@ services:
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  on-stop:
+    <<: *common
+    image: nuvlabox/on-stop:0.0.1
+    restart: always
+    container_name: nuvlabox-on-stop
+    commannd: pause
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

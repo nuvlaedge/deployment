@@ -521,6 +521,8 @@ def test_nuvlabox_engine_local_compute_api(request):
 
 
 def test_nuvlabox_engine_local_datagateway():
+    # TODO: first, check if shared network exists
+
     nuvlabox_network = 'nuvlabox-shared-network'
 
     check_dg = docker_client.containers.run('alpine',

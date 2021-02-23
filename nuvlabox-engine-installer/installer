@@ -185,7 +185,7 @@ case ${command} in
       # update failed, so check the fail policy
       case $on_update_failure in
         rollback)
-          nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback too previous version" 0 "WARNING" "no"
+          nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback to previous version" 0 "WARNING" "no"
           nuvlabox-engine-printer "ROLLBACK" ${quiet} "NONE" "yes"
           output=$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
