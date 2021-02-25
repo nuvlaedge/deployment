@@ -13,6 +13,9 @@ x-common: &common
 volumes:
   nuvlabox-db:
     driver: local
+    labels:
+      - "nuvlabox.volume=True"
+      - "nuvlabox.deployment=production"
 
 services:
   data-gateway:
@@ -32,7 +35,7 @@ services:
   nb-mosquitto:
     <<: *common
     image: eclipse-mosquitto:1.6.12
-    container_name: nbmosquitto
+    container_name: nb-mosquitto
     restart: always
     init: true
     command: sh -c 'sleep 10 && /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf'
