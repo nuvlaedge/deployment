@@ -178,7 +178,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:2.11.0
+    image: nuvla/job-lite:2.13.0
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
@@ -190,6 +190,6 @@ services:
     image: nuvlabox/on-stop:0.0.1
     restart: always
     container_name: nuvlabox-on-stop
-    commannd: pause
+    command: pause
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
