@@ -18,47 +18,13 @@ volumes:
       - "nuvlabox.deployment=production"
 
 services:
-  data-gateway:
-    <<: *common
-    image: traefik:2.3.5
-    container_name: data-gateway
-    restart: always
-    oom_score_adj: -900
-    command:
-      - --entrypoints.mqtt.address=:1883
-      - --entrypoints.web.address=:80
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  nb-mosquitto:
-    <<: *common
-    image: eclipse-mosquitto:1.6.12
-    container_name: nb-mosquitto
-    restart: always
-    init: true
-    command: sh -c 'sleep 10 && /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf'
-    labels:
-      - "traefik.enable=true"
-      - "traefik.tcp.routers.mytcprouter.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.mytcprouter.entrypoints=mqtt"
-      - "traefik.tcp.routers.mytcprouter.service=mosquitto"
-      - "traefik.tcp.services.mosquitto.loadbalancer.server.port=1883"
-      - "nuvlabox.component=True"
-      - "nuvlabox.deployment=production"
-    healthcheck:
-      test: ["CMD-SHELL", "timeout 5s mosquitto_sub -t '$$SYS/#' -C 1 | grep -v Error || exit 1"]
-      interval: 10s
-      timeout: 10s
-      start_period: 10s
-
   system-manager:
     <<: *common
     image: nuvlabox/system-manager:1.4.1
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
+      - NUVLABOX_DATA_GATEWAY_IMAGE=${NUVLABOX_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlabox/shared
