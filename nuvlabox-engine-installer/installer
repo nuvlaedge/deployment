@@ -5,7 +5,9 @@ on_update_failure="rollback"
 on_update_failure_options="('rollback' 'ignore' 'retry')"
 
 export save_dir=$(pwd)
+export rootfs=${ROOTFS:-/rootfs}
 export quiet=0
+export force_restart=1
 export github_releases="https://github.com/nuvlabox/deployment/releases"
 
 set -o pipefail
@@ -34,6 +36,7 @@ usage()
   echo -e "UDPATE args:"
   echo -e " --compose-files=<list>\t\t\tComma-separated list of compose files to deploy"
   echo -e " --current-environment=<list>\t\t(optional) Comma-separated list of current ENV=VALUE keypairs, in case a rollback is needed"
+  echo -e " --no-restart\t\t\t\t(optional) If passed, it will not restart the whole NuvlaBox during the update"
   echo -e " --new-environment=<list>\t\t(optional) Comma-separated list of new ENV=VALUE keypairs"
   echo -e " --on-update-failure=<string>\t\tAction be take in case the update fails ${on_update_failure_options}. Default: ${on_update_failure}"
   echo -e " --project=<string>\t\t\tProject name used during the first installation"
@@ -98,6 +101,18 @@ check_args_update()
     exit 1
   fi
 
+  if [[ "${on_update_failure}" == "rollback" ]]
+  then
+    old_nb_dir="${rootfs}${working_dir}"
+    ls ${old_nb_dir}/*yml 2&>1 > /dev/null
+
+    if [[ $? -ne 0 ]]
+    then
+      echo -e "update ERROR: cannot proceed: original compose files are not available for rollback at ${working_dir}"
+      exit 1
+    fi
+  fi
+
   if [[ -z "$old_environment" ]]
   then
     export old_environment=$(nuvlabox-engine-current-env ${project} 2>&1)
@@ -144,6 +159,9 @@ case ${command} in
           ;;
         --quiet)
           export quiet=1
+          ;;
+        --no-restart)
+          export force_restart=0
           ;;
         --on-update-failure)
           case $VALUE in
