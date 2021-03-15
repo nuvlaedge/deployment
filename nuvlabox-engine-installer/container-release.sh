@@ -1,6 +1,7 @@
-#!/usr/bin/env python3
+#!/bin/bash -xe
 
-DOCKER_IMAGE=1.16.1
+
+DOCKER_IMAGE=installer
 
 # default env vars in GH actions
 GIT_BRANCH=$(echo ${GITHUB_REF} | awk -F'/' '{print $(NF)}' | sed -e 's/[^a-z0-9\._-]/-/g')
