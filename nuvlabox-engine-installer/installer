@@ -346,10 +346,10 @@ case ${command} in
           export join_address=${VALUE}
           ;;
         --leave)
-          export cluster_leave=${VALUE}
+          export cluster_leave=1
           ;;
         --force-new-cluster)
-          export cluster_force_new=${VALUE}
+          export cluster_force_new=1
           ;;
         *)
           echo -e "${command} ERROR: unknown option $PARAM"
