@@ -56,6 +56,7 @@ usage()
   echo -e " --join-address=<string>\t\tAdvertised manager address to join to"
   echo -e " --leave\t\t\t\tLeave the cluster. Precedes all join- options"
   echo -e " --force-new-cluster\t\t\tLeave the cluster and force the creation of a new one, where it shall become manager. Ignore all other options"
+  echo -e " --quiet\t\t\t\t(optional) Only print final status message"
 }
 
 banner_intro()
@@ -350,6 +351,9 @@ case ${command} in
           ;;
         --force-new-cluster)
           export cluster_force_new=1
+          ;;
+        --quiet)
+          export quiet=1
           ;;
         *)
           echo -e "${command} ERROR: unknown option $PARAM"
