@@ -52,8 +52,8 @@ usage()
   echo -e ""
   echo -e "CLUSTER args:"
   echo -e " --join-worker=<string>\t\t\tToken used to join this device as a worker. Takes precedence over --token-manager"
-  echo -e " --join-manager=<string>\t\t\tToken used to join this device as a manager"
-  echo -e " --join-address=<string>\t\t\tAdvertised manager address to join to"
+  echo -e " --join-manager=<string>\t\tToken used to join this device as a manager"
+  echo -e " --join-address=<string>\t\tAdvertised manager address to join to"
   echo -e " --leave\t\t\t\tLeave the cluster. Precedes all join- options"
   echo -e " --force-new-cluster\t\t\tLeave the cluster and force the creation of a new one, where it shall become manager. Ignore all other options"
 }
