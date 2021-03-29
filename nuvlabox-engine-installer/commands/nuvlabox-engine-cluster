@@ -3,6 +3,7 @@
 import docker
 import argparse
 import sys
+import socket
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--force-new-cluster", action="store_true")
@@ -66,6 +67,11 @@ else:
       if not args.join_worker and not args.join_manager:
         raise Exception('Join token is missing!')
       else:
+        try:
+          socket.gethostbyaddr(':'.join(args.join_address.split(':')[:-1]))
+        except socket.herror:
+          raise Exception('Join address is not reachable. Make sure this NuvlaBox can reach the appointed manager')
+
         token = args.join_worker if args.join_worker else args.join_manager
         join(token, args.join_address)
     else:

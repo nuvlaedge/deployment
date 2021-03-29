@@ -52,6 +52,7 @@ services:
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
       - HOST_HOME=${HOME}
+      - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlabox/shared
@@ -90,18 +91,6 @@ services:
       timeout: 10s
       start_period: 30s
 
-  network-manager:
-    <<: *common
-    image: nuvlabox/network-manager:1.0.0
-    restart: on-failure
-    environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
-    volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
-    depends_on:
-      - system-manager
-
   vpn-client:
     <<: *common
     image: nuvlabox/vpn-client:1.0.0
@@ -118,7 +107,7 @@ services:
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared
     depends_on:
-      - network-manager
+      - agent
 
   security:
     <<: *common
