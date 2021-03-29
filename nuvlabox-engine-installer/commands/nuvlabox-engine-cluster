@@ -68,9 +68,11 @@ else:
         raise Exception('Join token is missing!')
       else:
         try:
-          socket.gethostbyaddr(':'.join(args.join_address.split(':')[:-1]))
+          addr = args.join_address.split(':')
+          ip_addr = addr[0] if len(addr) == 1 else ':'.join(addr[:-1])
+          reach_check = socket.gethostbyaddr(ip_addr)
         except socket.herror:
-          raise Exception('Join address is not reachable. Make sure this NuvlaBox can reach the appointed manager')
+          raise Exception(f'Join address {args.join_address} is not reachable. Ensure this NuvlaBox can reach the appointed manager')
 
         token = args.join_worker if args.join_worker else args.join_manager
         join(token, args.join_address)
