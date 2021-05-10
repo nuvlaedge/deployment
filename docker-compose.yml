@@ -111,7 +111,7 @@ services:
 
   security:
     <<: *common
-    image: nuvlabox/security:1.0.2
+    image: nuvlabox/security:1.0.3
     restart: on-failure
     network_mode: host
     environment:
@@ -123,7 +123,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:2.13.0
+    image: nuvla/job-lite:2.15.0
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py

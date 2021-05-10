@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvladev/system-manager:clustering
+    image: nuvladev/system-manager:master
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
@@ -41,7 +41,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvladev/agent:clustering
+    image: nuvladev/agent:master
     restart: unless-stopped
     oom_kill_disable: true
     privileged: true
@@ -123,7 +123,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvladev/job-lite:clustering
+    image: nuvladev/job-lite:master
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
