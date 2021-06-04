@@ -34,7 +34,9 @@ where `VERSION` is the tag version to be released, with semantic versioning (e.g
 
 ## Deploying
 
-### Prerequisites 
+### With Docker
+
+#### Prerequisites 
 
 To install the NuvlaBox Engine, you'll need:
  - *Docker (version 18 or higher)*
@@ -44,7 +46,7 @@ The NuvlaBox Engine will, during bootstrap, double check for other requirements 
 Docker Swarm), but you'll be automatically prompted in case some of these are not met.
 
 
-### Production Deployment
+#### Production Deployment
 
 _**artifact:** docker-compose.yml_
 
@@ -59,6 +61,19 @@ In this scenario, we assume you are using Nuvla at https://nuvla.io.
     $ docker-compose -p nuvlabox -f docker-compose.yml up
     ```
     NOTE: add `-f docker-compose.usb.yml -f ... `, to the command above, in order to add the auto peripheral discovery components
+
+
+### With Kubernetes
+
+#### Prerequisites
+
+Helm
+Kubernetes
+Kubectl
+
+#### Production Deployment
+
+`helm install --set HOME=$HOME nuvlabox nuvlabox-engine/`
 
 ## Copyright
 
