@@ -15,16 +15,8 @@ spec:
       labels:
         component: compute-api
     spec:
-      hostNetwork: true
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
-        - name: security
-          image: "{{ .Values.images.security.repository }}:{{ .Values.images.security.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.images.security.pullPolicy }}
-          env:
-            - name: EXTERNAL_CVE_VULNERABILITY_DB
-              value: {{ .Values.EXTERNAL_CVE_VULNERABILITY_DB | default (printf "https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true" | quote) }}
-            - name: EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL
-              value: {{ .Values.EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL | default 86400 | quote }}
-            - name: SECURITY_SCAN_INTERVAL
-              value: {{ .Values.SECURITY_SCAN_INTERVAL | default 1800 | quote }}
+        - name: compute-api
+          image: "{{ .Values.images.computeApi.repository }}:{{ .Values.images.computeApi.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.computeApi.pullPolicy }}
