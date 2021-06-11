@@ -2,6 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+namespace: nuvlabox
+
 replicaCount: 1
 
 images:
@@ -13,18 +15,35 @@ images:
     repository: nuvlabox/security
     pullPolicy: Always
     tag: "1.0.3"
+  peripheralManagerUSB:
+    repository: nuvlabox/peripheral-manager-usb
+    pullPolicy: Always
+    tag: "1.4.1"
+  peripheralManagerNetwork:
+    repository: nuvlabox/peripheral-manager-network
+    pullPolicy: Always
+    tag: "1.0.1"
+  peripheralManagerModbus:
+    repository: nuvlabox/peripheral-manager-modbus
+    pullPolicy: Always
+    tag: "1.1.0"
+  peripheralManagerBluetooth:
+    repository: nuvlabox/peripheral-manager-bluetooth
+    pullPolicy: Always
+    tag: "1.0.0"
+  # TODO
+  peripheralManagerGPU:
+    repository: nuvlabox/peripheral-manager-gpu
+    pullPolicy: Always
+    tag: "0.2.0"
 
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  annotations: {"helm.sh/hook": "pre-install"}
+  name: "nuvlabox-service-account"
 
 podAnnotations: {}
 

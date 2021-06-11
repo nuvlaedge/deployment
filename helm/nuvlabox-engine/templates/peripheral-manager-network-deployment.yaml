@@ -1,0 +1,26 @@
+{{- if .Values.peripheralManagerNetwork }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peripheral-manager-network-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+    {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
+    nuvlabox.peripheral.type: network
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: peripheral-manager-network
+  template:
+    metadata:
+      labels:
+        component: peripheral-manager-network
+    spec:
+      hostNetwork: true
+      containers:
+        - name: peripheral-manager-network
+          image: "{{ .Values.images.peripheralManagerNetwork.repository }}:{{ .Values.images.peripheralManagerNetwork.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.peripheralManagerNetwork.pullPolicy }}
+{{- end }}

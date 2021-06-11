@@ -1,0 +1,25 @@
+{{- if .Values.peripheralManagerModbus }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peripheral-manager-modbus-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+    {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
+    nuvlabox.peripheral.type: modbus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: peripheral-manager-modbus
+  template:
+    metadata:
+      labels:
+        component: peripheral-manager-modbus
+    spec:
+      containers:
+        - name: peripheral-manager-modbus
+          image: "{{ .Values.images.peripheralManagerModbus.repository }}:{{ .Values.images.peripheralManagerModbus.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.peripheralManagerModbus.pullPolicy }}
+{{- end }}

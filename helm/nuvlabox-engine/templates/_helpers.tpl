@@ -45,6 +45,13 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Common peripheral manager labels
+*/}}
+{{- define "nuvlabox-engine.peripheral-manager.labels" -}}
+nuvlabox.peripheral.component: "True"
+{{- end }}
+
+{{/*
 Selector labels
 */}}
 {{- define "nuvlabox-engine.selectorLabels" -}}

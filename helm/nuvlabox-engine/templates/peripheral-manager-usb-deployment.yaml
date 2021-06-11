@@ -1,0 +1,49 @@
+{{- if .Values.peripheralManagerUSB }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peripheral-manager-usb-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+    {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
+    nuvlabox.peripheral.type: usb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: peripheral-manager-usb
+  template:
+    metadata:
+      labels:
+        component: peripheral-manager-usb
+    spec:
+      hostNetwork: true
+      containers:
+        - name: peripheral-manager-usb
+          image: "{{ .Values.images.peripheralManagerUSB.repository }}:{{ .Values.images.peripheralManagerUSB.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.peripheralManagerUSB.pullPolicy }}
+          livenessProbe:
+            exec:
+              command:
+                - ls
+                - /dev
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /dev
+              name: dev
+            - mountPath: /run/udev/control
+              name: udev
+              readOnly: true
+      volumes:
+        - hostPath:
+            path: /dev
+          name: dev
+        - hostPath:
+            path: /run/udev/control
+            type: Socket
+          name: udev
+{{- end }}

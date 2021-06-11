@@ -1,8 +1,7 @@
-{{- if .Values.security }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: security-deployment
+  name: compute-api-deployment
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
@@ -10,11 +9,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      component: security
+      component: compute-api
   template:
     metadata:
       labels:
-        component: security
+        component: compute-api
     spec:
       hostNetwork: true
       serviceAccountName: {{ .Values.serviceAccount.name }}
@@ -29,4 +28,3 @@ spec:
               value: {{ .Values.EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL | default 86400 | quote }}
             - name: SECURITY_SCAN_INTERVAL
               value: {{ .Values.SECURITY_SCAN_INTERVAL | default 1800 | quote }}
-{{- end }}
