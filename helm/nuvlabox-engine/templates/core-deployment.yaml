@@ -1,0 +1,107 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nuvlabox-engine-core-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      component: nuvlabox-engine-core
+  template:
+    metadata:
+      labels:
+        component: nuvlabox-engine-core
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+        # AGENT
+        - name: &containeragentname agent
+          image: "{{ .Values.images.agent.repository }}:{{ .Values.images.agent.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.agent.pullPolicy }}
+          securityContext:
+            privileged: true
+          env:
+            - name: NUVLABOX_UUID
+              value: {{ .Values.NUVLABOX_UUID }}
+            - name: NUVLABOX_ENGINE_VERSION
+              value: "2.0.0"
+            - name: NUVLABOX_IMMUTABLE_SSH_PUB_KEY
+              value: {{ .Values.NUVLABOX_IMMUTABLE_SSH_PUB_KEY }}
+            - name: NUVLA_ENDPOINT
+              value: {{ .Values.NUVLA_ENDPOINT | default "nuvla.io" | quote }}
+            - name: NUVLA_ENDPOINT_INSECURE
+              value: {{ .Values.NUVLA_ENDPOINT_INSECURE | default "False" | quote }}
+            - name: HOST_HOME
+              value: {{ .Values.HOME }}
+            - name: VPN_INTERFACE_NAME
+              value: {{ .Values.VPN_INTERFACE_NAME | default "vpn" | quote }}
+            - name: MY_CONTAINER_NAME
+              value: *containeragentname
+            - name: HOST_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+
+        # JOB ENGINE LITE
+        - name: nuvlabox-job-engine-lite
+          image: "{{ .Values.images.jobEngineLite.repository }}:{{ .Values.images.jobEngineLite.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.jobEngineLite.pullPolicy }}
+          command:
+            - /app/pause.py
+
+        # K8S CREDENTIAL MANAGER
+        - name: kubernetes-credentials-manager
+          image: "{{ .Values.images.kubernetesCredentialsManager.repository }}:{{ .Values.images.kubernetesCredentialsManager.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.kubernetesCredentialsManager.pullPolicy }}
+
+      volumes:
+        - hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+          name: dev-tun
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpn-client-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: vpn-client
+  template:
+    metadata:
+      labels:
+        component: vpn-client
+    spec:
+      hostNetwork: true
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+        - name: vpn-client
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+          image: "{{ .Values.images.vpnClient.repository }}:{{ .Values.images.vpnClient.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.vpnClient.pullPolicy }}
+          livenessProbe:
+            exec:
+              command:
+                - ls
+                - /dev/net/tun
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              name: dev-tun
+      volumes:
+        - hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+          name: dev-tun

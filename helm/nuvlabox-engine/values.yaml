@@ -7,10 +7,18 @@ namespace: nuvlabox
 replicaCount: 1
 
 images:
-  computeApi:
-    repository: nuvlabox/compute-api
+  agent:
+    repository: nuvlabox/agent
     pullPolicy: Always
-    tag: "1.2.0"
+    tag: "2.1.0"
+  jobEngineLite:
+    repository: nuvla/job-lite
+    pullPolicy: Always
+    tag: "2.15.2"
+  kubernetesCredentialsManager:
+    repository: nuvlabox/kubernetes-credentials-manager
+    pullPolicy: Always
+    tag: "0.0.1"
   security:
     repository: nuvlabox/security
     pullPolicy: Always
