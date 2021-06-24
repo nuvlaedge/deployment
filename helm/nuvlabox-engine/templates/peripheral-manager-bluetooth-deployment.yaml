@@ -17,6 +17,7 @@ spec:
     metadata:
       labels:
         component: peripheral-manager-bluetooth
+        {{- include "nuvlabox-engine.labels" . | nindent 4 }}
     spec:
       hostNetwork: true
       containers:

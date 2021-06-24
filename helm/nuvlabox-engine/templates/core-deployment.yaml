@@ -14,11 +14,12 @@ spec:
     metadata:
       labels:
         component: nuvlabox-engine-core
+        {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         # AGENT
-        - name: &containeragentname agent
+        - name: agent
           image: "{{ .Values.images.agent.repository }}:{{ .Values.images.agent.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.agent.pullPolicy }}
           securityContext:
@@ -34,23 +35,22 @@ spec:
               value: {{ .Values.NUVLA_ENDPOINT | default "nuvla.io" | quote }}
             - name: NUVLA_ENDPOINT_INSECURE
               value: {{ .Values.NUVLA_ENDPOINT_INSECURE | default "False" | quote }}
+            - name: NUVLABOX_JOB_ENGINE_LITE_IMAGE
+              value: "{{ .Values.images.jobEngineLite.repository }}:{{ .Values.images.jobEngineLite.tag }}"
+            - name: NUVLABOX_VPN_COMPONENT_NAME
+              value: {{ .Values.vpnClientComponentName }}
             - name: HOST_HOME
               value: {{ .Values.HOME }}
             - name: VPN_INTERFACE_NAME
               value: {{ .Values.VPN_INTERFACE_NAME | default "vpn" | quote }}
-            - name: MY_CONTAINER_NAME
-              value: *containeragentname
-            - name: HOST_NODE_NAME
+            - name: MY_HOST_NODE_IP
+              value: status.hostIP
+            - name: MY_HOST_NODE_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-
-        # JOB ENGINE LITE
-        - name: nuvlabox-job-engine-lite
-          image: "{{ .Values.images.jobEngineLite.repository }}:{{ .Values.images.jobEngineLite.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.images.jobEngineLite.pullPolicy }}
-          command:
-            - /app/pause.py
+            - name: MY_NAMESPACE
+              value: {{ .Values.namespace }}
 
         # K8S CREDENTIAL MANAGER
         - name: kubernetes-credentials-manager
@@ -75,16 +75,17 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      component: vpn-client
+      component: {{ .Values.vpnClientComponentName }}
   template:
     metadata:
       labels:
-        component: vpn-client
+        component: {{ .Values.vpnClientComponentName }}
+        {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
-        - name: vpn-client
+        - name: {{ .Values.vpnClientComponentName }}
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]

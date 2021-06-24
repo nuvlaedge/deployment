@@ -17,6 +17,7 @@ spec:
     metadata:
       labels:
         component: peripheral-manager-modbus
+        {{- include "nuvlabox-engine.labels" . | nindent 4 }}
     spec:
       containers:
         - name: peripheral-manager-modbus

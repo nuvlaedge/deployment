@@ -15,6 +15,7 @@ spec:
     metadata:
       labels:
         component: security
+        {{- include "nuvlabox-engine.labels" . | nindent 4 }}
     spec:
       hostNetwork: true
       serviceAccountName: {{ .Values.serviceAccount.name }}

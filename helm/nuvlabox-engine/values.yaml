@@ -6,6 +6,8 @@ namespace: nuvlabox
 
 replicaCount: 1
 
+vpnClientComponentName: vpn-client
+
 images:
   agent:
     repository: nuvlabox/agent
