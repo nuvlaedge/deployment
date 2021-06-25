@@ -8,11 +8,17 @@ replicaCount: 1
 
 vpnClientComponentName: vpn-client
 
+coreComponentName: nuvlabox-engine-core
+
 images:
   agent:
     repository: nuvlabox/agent
     pullPolicy: Always
     tag: "2.1.0"
+  dataGateway:
+    repository: eclipse-mosquitto
+    pullPolicy: Always
+    tag: "1.6.12"
   jobEngineLite:
     repository: nuvla/job-lite
     pullPolicy: Always
@@ -25,6 +31,10 @@ images:
     repository: nuvlabox/security
     pullPolicy: Always
     tag: "1.0.3"
+  systemManager:
+    repository: nuvlabox/system-manager
+    pullPolicy: Always
+    tag: "2.0.1"
   vpnClient:
     repository: nuvlabox/vpn-client
     pullPolicy: Always

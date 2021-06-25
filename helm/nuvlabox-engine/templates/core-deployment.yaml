@@ -1,19 +1,61 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    component: {{ .Values.coreComponentName }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-manager
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 3636
+      protocol: TCP
+  selector:
+    component: {{ .Values.coreComponentName }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-gateway
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 1883
+      protocol: TCP
+  selector:
+    component: {{ .Values.coreComponentName }}
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nuvlabox-engine-core-deployment
+  name: {{ .Values.coreComponentName }}-deployment
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      component: nuvlabox-engine-core
+      component: {{ .Values.coreComponentName }}
   template:
     metadata:
       labels:
-        component: nuvlabox-engine-core
+        component: {{ .Values.coreComponentName }}
         {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
@@ -51,17 +93,76 @@ spec:
                   fieldPath: spec.nodeName
             - name: MY_NAMESPACE
               value: {{ .Values.namespace }}
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost/api/healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          volumeMounts:
+            - mountPath: /rootfs
+              name: rootfs
+              readOnly: true
+            - mountPath: /srv/nuvlabox/shared
+              name: nuvlabox-db
+
+        # DATAGATEWAY
+        - name: data-gateway
+          image: "{{ .Values.images.dataGateway.repository }}:{{ .Values.images.dataGateway.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.dataGateway.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - "sleep 10 && /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf"
+          ports:
+            - containerPort: 1883
+              protocol: TCP
+            - containerPort: 8883
+              protocol: TCP
 
         # K8S CREDENTIAL MANAGER
         - name: kubernetes-credentials-manager
           image: "{{ .Values.images.kubernetesCredentialsManager.repository }}:{{ .Values.images.kubernetesCredentialsManager.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.kubernetesCredentialsManager.pullPolicy }}
+          volumeMounts:
+            - mountPath: /srv/nuvlabox/shared
+              name: nuvlabox-db
 
+        # SYSTEM MANAGER
+        - name: system-manager
+          image: "{{ .Values.images.systemManager.repository }}:{{ .Values.images.systemManager.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.systemManager.pullPolicy }}
+          env:
+            - name: SKIP_MINIMUM_REQUIREMENTS
+              value: {{ .Values.SKIP_MINIMUM_REQUIREMENTS | default "False" | quote }}
+          ports:
+            - containerPort: 3636
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:3636
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          volumeMounts:
+            - mountPath: /rootfs
+              name: rootfs
+              readOnly: true
+            - mountPath: /srv/nuvlabox/shared
+              name: nuvlabox-db
+
+      ## VOLUMES
       volumes:
-        - hostPath:
-            path: /dev/net/tun
-            type: CharDevice
-          name: dev-tun
+        - name: rootfs
+          hostPath:
+            path: /
+        - name: nuvlabox-db
+          emptyDir: {}
 
 ---
 apiVersion: apps/v1
@@ -102,7 +203,7 @@ spec:
             - mountPath: /dev/net/tun
               name: dev-tun
       volumes:
-        - hostPath:
+        - name: dev-tun
+          hostPath:
             path: /dev/net/tun
             type: CharDevice
-          name: dev-tun
