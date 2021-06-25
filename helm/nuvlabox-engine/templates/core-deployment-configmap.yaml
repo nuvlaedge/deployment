@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-gateway
+  namespace: {{ .Values.namespace }}
+data:
+  mosquitto.conf: |-
+    port 1883
+    protocol mqtt
