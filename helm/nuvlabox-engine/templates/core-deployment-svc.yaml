@@ -7,6 +7,7 @@ metadata:
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
+  publishNotReadyAddresses: True
   ports:
     - port: 80
       protocol: TCP
@@ -22,6 +23,7 @@ metadata:
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
+  publishNotReadyAddresses: True
   ports:
     - port: 3636
       protocol: TCP
@@ -37,8 +39,9 @@ metadata:
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
+  publishNotReadyAddresses: True
   ports:
     - port: 1883
-      protocol: TCP
+      targetPort: 1883
   selector:
     component: {{ .Values.coreComponentName }}

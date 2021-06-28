@@ -6,4 +6,4 @@ metadata:
 data:
   mosquitto.conf: |-
     port 1883
-    protocol mqtt
+    allow_anonymous true

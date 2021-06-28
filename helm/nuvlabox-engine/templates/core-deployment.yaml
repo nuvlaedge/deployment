@@ -79,7 +79,6 @@ spec:
             - "sleep 10 && /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf"
           ports:
             - containerPort: 1883
-              protocol: TCP
           volumeMounts:
             - mountPath: /mosquitto/config/
               name: data-gateway-config
@@ -115,6 +114,7 @@ spec:
               readOnly: true
             - mountPath: /srv/nuvlabox/shared
               name: nuvlabox-db
+
 
       ## VOLUMES
       volumes:

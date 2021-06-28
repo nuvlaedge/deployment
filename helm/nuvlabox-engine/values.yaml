@@ -18,7 +18,7 @@ images:
   dataGateway:
     repository: eclipse-mosquitto
     pullPolicy: Always
-    tag: "1.6.12"
+    tag: "2.0"
   jobEngineLite:
     repository: nuvla/job-lite
     pullPolicy: Always
