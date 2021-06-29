@@ -7,7 +7,6 @@ metadata:
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
-  replicas: 1
   selector:
     matchLabels:
       component: security
@@ -15,9 +14,10 @@ spec:
     metadata:
       labels:
         component: security
-        {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+        {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         - name: security
@@ -30,4 +30,6 @@ spec:
               value: {{ .Values.EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL | default 86400 | quote }}
             - name: SECURITY_SCAN_INTERVAL
               value: {{ .Values.SECURITY_SCAN_INTERVAL | default 1800 | quote }}
+            - name: MY_NAMESPACE
+              value: {{ .Values.namespace }}
 {{- end }}

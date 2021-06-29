@@ -9,7 +9,6 @@ metadata:
     {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
     nuvlabox.peripheral.type: usb
 spec:
-  replicas: 1
   selector:
     matchLabels:
       component: peripheral-manager-usb
@@ -17,13 +16,17 @@ spec:
     metadata:
       labels:
         component: peripheral-manager-usb
-        {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+        {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: peripheral-manager-usb
           image: "{{ .Values.images.peripheralManagerUSB.repository }}:{{ .Values.images.peripheralManagerUSB.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.peripheralManagerUSB.pullPolicy }}
+          env:
+            - name: MY_NAMESPACE
+              value: {{ .Values.namespace }}
           livenessProbe:
             exec:
               command:

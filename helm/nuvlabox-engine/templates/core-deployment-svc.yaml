@@ -45,3 +45,4 @@ spec:
       targetPort: 1883
   selector:
     component: {{ .Values.coreComponentName }}
+

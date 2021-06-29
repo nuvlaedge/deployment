@@ -55,7 +55,6 @@ images:
     repository: nuvlabox/peripheral-manager-bluetooth
     pullPolicy: Always
     tag: "1.0.0"
-  # TODO
   peripheralManagerGPU:
     repository: nuvlabox/peripheral-manager-gpu
     pullPolicy: Always

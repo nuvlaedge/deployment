@@ -98,6 +98,8 @@ spec:
           env:
             - name: SKIP_MINIMUM_REQUIREMENTS
               value: {{ .Values.SKIP_MINIMUM_REQUIREMENTS | default "False" | quote }}
+            - name: MY_NAMESPACE
+              value: {{ .Values.namespace }}
           ports:
             - containerPort: 3636
           livenessProbe:

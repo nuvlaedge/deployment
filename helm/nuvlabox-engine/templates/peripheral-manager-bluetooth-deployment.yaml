@@ -9,7 +9,6 @@ metadata:
     {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
     nuvlabox.peripheral.type: bluetooth
 spec:
-  replicas: 1
   selector:
     matchLabels:
       component: peripheral-manager-bluetooth
@@ -17,11 +16,15 @@ spec:
     metadata:
       labels:
         component: peripheral-manager-bluetooth
-        {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+        {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: peripheral-manager-bluetooth
           image: "{{ .Values.images.peripheralManagerBluetooth.repository }}:{{ .Values.images.peripheralManagerBluetooth.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.peripheralManagerBluetooth.pullPolicy }}
 {{- end }}
+          env:
+            - name: MY_NAMESPACE
+              value: {{ .Values.namespace }}
