@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: peripheral-manager-usb-deployment
-  namespace: {{ .Values.namespace }}
+  namespace: {{ include "nuvlabox-engine.namespace" . }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
     {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
@@ -20,13 +20,15 @@ spec:
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: peripheral-manager-usb
           image: "{{ .Values.images.peripheralManagerUSB.repository }}:{{ .Values.images.peripheralManagerUSB.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.peripheralManagerUSB.pullPolicy }}
           env:
             - name: MY_NAMESPACE
-              value: {{ .Values.namespace }}
+              value: {{ include "nuvlabox-engine.namespace" . }}
           livenessProbe:
             exec:
               command:

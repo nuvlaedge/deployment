@@ -1,10 +1,8 @@
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.coreComponentName }}-deployment
-  namespace: {{ .Values.namespace }}
+  namespace: {{ include "nuvlabox-engine.namespace" . }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
@@ -18,6 +16,8 @@ spec:
         {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         # AGENT
         - name: agent
@@ -51,7 +51,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: MY_NAMESPACE
-              value: {{ .Values.namespace }}
+              value: {{ include "nuvlabox-engine.namespace" . }}
           ports:
             - containerPort: 80
           livenessProbe:
@@ -98,8 +98,12 @@ spec:
           env:
             - name: SKIP_MINIMUM_REQUIREMENTS
               value: {{ .Values.SKIP_MINIMUM_REQUIREMENTS | default "False" | quote }}
+            - name: MY_HOST_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: MY_NAMESPACE
-              value: {{ .Values.namespace }}
+              value: {{ include "nuvlabox-engine.namespace" . }}
           ports:
             - containerPort: 3636
           livenessProbe:
@@ -134,7 +138,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vpn-client-deployment
-  namespace: {{ .Values.namespace }}
+  namespace: {{ include "nuvlabox-engine.namespace" . }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
@@ -150,6 +154,9 @@ spec:
     spec:
       hostNetwork: true
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: {{ .Values.vpnClientComponentName }}
           securityContext:

@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: peripheral-manager-bluetooth-deployment
-  namespace: {{ .Values.namespace }}
+  namespace: {{ include "nuvlabox-engine.namespace" . }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
     {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
@@ -20,11 +20,13 @@ spec:
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: peripheral-manager-bluetooth
           image: "{{ .Values.images.peripheralManagerBluetooth.repository }}:{{ .Values.images.peripheralManagerBluetooth.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.peripheralManagerBluetooth.pullPolicy }}
-{{- end }}
           env:
             - name: MY_NAMESPACE
-              value: {{ .Values.namespace }}
+              value: {{ include "nuvlabox-engine.namespace" . }}
+{{- end }}

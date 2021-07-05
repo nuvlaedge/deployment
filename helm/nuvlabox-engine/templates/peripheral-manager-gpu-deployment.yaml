@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: peripheral-manager-gpu-deployment
-  namespace: {{ .Values.namespace }}
+  namespace: {{ include "nuvlabox-engine.namespace" . }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
     {{- include "nuvlabox-engine.peripheral-manager.labels" . | nindent 4 }}
@@ -18,6 +18,8 @@ spec:
         component: peripheral-manager-gpu
         {{- include "nuvlabox-engine.labels" . | nindent 8 }}
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: peripheral-manager-gpu
           image: "{{ .Values.images.peripheralManagerGPU.repository }}:{{ .Values.images.peripheralManagerGPU.tag | default .Chart.AppVersion }}"
@@ -33,7 +35,7 @@ spec:
               readOnly: true
           env:
             - name: MY_NAMESPACE
-              value: {{ .Values.namespace }}
+              value: {{ include "nuvlabox-engine.namespace" . }}
       volumes:
         - hostPath:
             path: /dev

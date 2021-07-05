@@ -6,6 +6,17 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
+Define the namespace based on the NUVLABOX_UUID
+*/}}
+{{- define "nuvlabox-engine.namespace" -}}
+{{- if .Values.NUVLABOX_UUID }}
+{{- .Values.NUVLABOX_UUID | replace "/" "-" }}
+{{- else }}
+nuvlabox
+{{- end }}
+{{- end }}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.

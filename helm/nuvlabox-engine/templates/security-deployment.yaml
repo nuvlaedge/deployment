@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: security-deployment
-  namespace: {{ .Values.namespace }}
+  namespace: {{ include "nuvlabox-engine.namespace" . }}
   labels:
     {{- include "nuvlabox-engine.labels" . | nindent 4 }}
 spec:
@@ -19,6 +19,8 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: security
           image: "{{ .Values.images.security.repository }}:{{ .Values.images.security.tag | default .Chart.AppVersion }}"
@@ -31,5 +33,5 @@ spec:
             - name: SECURITY_SCAN_INTERVAL
               value: {{ .Values.SECURITY_SCAN_INTERVAL | default 1800 | quote }}
             - name: MY_NAMESPACE
-              value: {{ .Values.namespace }}
+              value: {{ include "nuvlabox-engine.namespace" . }}
 {{- end }}
