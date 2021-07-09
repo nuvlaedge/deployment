@@ -34,4 +34,12 @@ spec:
               value: {{ .Values.SECURITY_SCAN_INTERVAL | default 1800 | quote }}
             - name: MY_NAMESPACE
               value: {{ include "nuvlabox-engine.namespace" . }}
+          volumeMounts:
+            - mountPath: /srv/nuvlabox/shared
+              name: nuvlabox-db
+
+      volumes:
+        - name: nuvlabox-db
+          hostPath:
+            path: /var/lib/{{ include "nuvlabox-engine.namespace" . }}
 {{- end }}

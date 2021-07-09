@@ -6,8 +6,6 @@ replicaCount: 1
 
 vpnClientComponentName: vpn-client
 
-coreComponentName: nuvlabox-engine-core
-
 images:
   agent:
     repository: nuvlabox/agent
