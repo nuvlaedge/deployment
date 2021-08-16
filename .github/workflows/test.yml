@@ -3,7 +3,7 @@ name: "E2E NuvlaBox Testing"
 on:
   workflow_run:
     workflows: ["NuvlaBox Installer Build"]
-    branches: [master]
+    branches: [cicd]
     types:
       - completed
 
