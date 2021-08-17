@@ -1,4 +1,4 @@
-name: "NuvlaBox Testing - Environment Setup"
+name: "NuvlaBox Functional Testing"
 
 on:
   push:
@@ -11,21 +11,21 @@ on:
   #     - completed
 
 jobs:
-  tester:
-    name: "Run NuvlaBox pre-flight-check for testing"
+  setup-ci-node:
+    name: "Prepare node for running NuvlaBox tests"
     runs-on: "ubuntu-latest"
-    strategy:
-      matrix:
-        python-version: [3.8]
+    # strategy:
+    #   matrix:
+    #     python-version: [3.8]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Set up Python 3
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+      # - name: Set up Python 3
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: ${{ matrix.python-version }}
 
       - name: Test pre-flight-check
         env:
@@ -38,7 +38,28 @@ jobs:
           cd test
           pip install -r requirements.pre-flight-check.txt
           docker swarm init
-          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
+
+  pre-flight-check:
+    name: "Run NuvlaBox pre-flight-check for testing"
+    runs-on: "ubuntu-latest"
+    # strategy:
+    #   matrix:
+    #     python-version: [3.8]
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # - uses: actions/checkout@v2
+
+      # - name: Set up Python 3
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: ${{ matrix.python-version }}
+
+      - name: Test pre-flight-check
+        env:
+          NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
+          NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
+        run: python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
 
       - if: always()
         name: Keep test results
