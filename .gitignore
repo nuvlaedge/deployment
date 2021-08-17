@@ -22,6 +22,7 @@ docker-compose.test.yml
 test/.docker-compose*.yml
 test/log.json
 test/report.html
+test/assets
 
 pom.xml.next
 pom.xml.releaseBackup
