@@ -61,23 +61,23 @@ credential_id = "credential/78bdb494-4d8d-457a-a484-a582719ab32c"
 install_module_id = "module/787510b0-9d9e-49d5-98c6-ac96cfc38301"
 
 
-def test_nuvla_login():
-    logging.info('Fetching Nuvla API key credential from environment...')
-    apikey = os.getenv('NUVLA_DEV_APIKEY')
-    _apisecret = os.getenv('NUVLA_DEV_APISECRET')
-    assert apikey.startswith("credential/"), "A valid Nuvla API key needs to start with 'credential/'"
+# def test_nuvla_login():
+#     logging.info('Fetching Nuvla API key credential from environment...')
+#     apikey = os.getenv('NUVLA_DEV_APIKEY')
+#     _apisecret = os.getenv('NUVLA_DEV_APISECRET')
+#     assert apikey.startswith("credential/"), "A valid Nuvla API key needs to start with 'credential/'"
 
-    logging.info(f'Authenticating with Nuvla at {api.endpoint}')
-    api.login_apikey(apikey, _apisecret)
-    assert api.is_authenticated(), "The provided Nuvla API key credential is not valid"
+#     logging.info(f'Authenticating with Nuvla at {api.endpoint}')
+#     api.login_apikey(apikey, _apisecret)
+#     assert api.is_authenticated(), "The provided Nuvla API key credential is not valid"
 
 
-def test_zero_nuvlaboxes():
-    logging.info('We shall not run this test if there are leftover NuvlaBox resources in Nuvla...')
-    existing_nuvlaboxes = api.get('nuvlabox',
-                                  filter='description^="NuvlaBox for E2E testing - commit" and state="COMMISSIONED"')
-    # if there are NBs then it means a previous test run left uncleaned resources. This must be fixed manually
-    assert existing_nuvlaboxes.data.get('count', 0) == 0, 'There are leftovers from previous tests'
+# def test_zero_nuvlaboxes():
+#     logging.info('We shall not run this test if there are leftover NuvlaBox resources in Nuvla...')
+#     existing_nuvlaboxes = api.get('nuvlabox',
+#                                   filter='description^="NuvlaBox for E2E testing - commit" and state="COMMISSIONED"')
+#     # if there are NBs then it means a previous test run left uncleaned resources. This must be fixed manually
+#     assert existing_nuvlaboxes.data.get('count', 0) == 0, 'There are leftovers from previous tests'
 
 
 def get_nuvlabox_version():

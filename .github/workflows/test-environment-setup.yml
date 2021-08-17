@@ -1,18 +1,18 @@
-name: "E2E NuvlaBox Testing"
+name: "NuvlaBox Testing - Environment Setup"
 
 on:
   push:
     branches:
       - cicd
-  workflow_run:
-    workflows: ["NuvlaBox Installer Build"]
-    branches: [master]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["NuvlaBox Installer Build"]
+  #   branches: [master]
+  #   types:
+  #     - completed
 
 jobs:
-  tester:
-    name: "Run NuvlaBox E2E testing"
+  test-environment-setup:
+    name: "Run NuvlaBox pre-flight-check for testing"
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
@@ -27,21 +27,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Test with pytest
+      - name: Test pre-flight-check
         env:
           NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
           NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
-          SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
         run: |
           python --version
           pip --version
-          sudo npm install -g snyk
-          snyk version
           sudo apt-get install -y python3-pytest
           cd test
-          pip install -r requirements.txt
+          pip install -r requirements.pre-flight-check.txt
           docker swarm init
-          python -m pytest --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
+          python -m pytest --cis -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html
 
       - if: always()
         name: Keep test results
@@ -51,16 +48,16 @@ jobs:
           path: test/nuvlabox.e2e_pytest.output.html
 
       - name: Upload to slack step
-        if: always()
+        if: ${{ failure() }}
         uses: adrey/slack-file-upload-action@master
         with:
           token: ${{ secrets.SLACK_TOKEN }}
-          path: test/nuvlabox.e2e_pytest.output.html
+          path: test/nuvlabox.pre-flight-check.output.html
           channel: nuvla-ci
           filetype: html
-          filename: nuvlabox.e2e_pytest.output.html
-          title: "NuvlaBox E2E PyTest report"
-          initial_comment: ":memo: HTML output from the automated E2E NuvlaBox tests"
+          filename: nuvlabox.pre-flight-check.output.html
+          title: "NuvlaBox CI Preflight Check report"
+          initial_comment: ":memo: HTML output from the automated NuvlaBox tests"
 
   notify:
     if: always()
