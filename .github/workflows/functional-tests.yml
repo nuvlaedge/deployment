@@ -83,7 +83,7 @@ jobs:
   notify:
     if: always()
     name: Post Workflow Status To Slack
-    needs: tester
+    needs: pre-flight-check
     runs-on: ubuntu-latest
     steps:
       - name: Slack Workflow Notification
