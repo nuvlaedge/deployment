@@ -14,7 +14,7 @@ env:
   NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
   NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
   SLACK_NBE_WEBHOOK: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
-  BUILD_URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+  # BUILD_URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
 
 
 defaults:
@@ -50,12 +50,12 @@ jobs:
 
       - name: Preflight Checks
         run: |
-          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link=${BUILD_URL}
+          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
       - name: Test vulnerabilities
         if: ${{ success() }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerabilities-scan.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link=${BUILD_URL}
+          python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerability-scan.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
       - if: always()
         name: Keep test results
