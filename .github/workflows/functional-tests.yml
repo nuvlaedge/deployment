@@ -10,71 +10,53 @@ on:
   #   types:
   #     - completed
 
+env:
+  NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
+  NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
+
 jobs:
-  setup-ci-node:
-    name: "Prepare node for running NuvlaBox tests"
+  tester:
+    name: "Run NuvlaBox functional tests"
     runs-on: "ubuntu-latest"
-    # strategy:
-    #   matrix:
-    #     python-version: [3.8]
+    strategy:
+      matrix:
+        python-version: [3.8]
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # - name: Set up Python 3
-      #   uses: actions/setup-python@v2
-      #   with:
-      #     python-version: ${{ matrix.python-version }}
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-      - name: Test pre-flight-check
-        env:
-          NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
-          NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
+      - name: Setup dependencies
         run: |
           python --version
           pip --version
           sudo apt-get install -y python3-pytest
           cd test
-          pip install -r requirements.pre-flight-check.txt
+          pip install -r requirements.txt
           docker swarm init
 
-  pre-flight-check:
-    name: "Run NuvlaBox pre-flight-check for testing"
-    runs-on: "ubuntu-latest"
-    needs: setup-ci-node
-    # strategy:
-    #   matrix:
-    #     python-version: [3.8]
+      - name: Preflight Checks
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
 
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      # - uses: actions/checkout@v2
-
-      # - name: Set up Python 3
-      #   uses: actions/setup-python@v2
+      # - if: always()
+      #   name: Keep test results
+      #   uses: actions/upload-artifact@v2
       #   with:
-      #     python-version: ${{ matrix.python-version }}
-
-      - name: Test pre-flight-check
-        env:
-          NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
-          NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
-        run: python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
-
-      - if: always()
-        name: Keep test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: pytest-report
-          path: test/nuvlabox.e2e_pytest.output.html
+      #     name: pytest-report
+      #     path: test/nuvlabox.e2e_pytest.output.html
 
       - name: Upload to slack step
         if: ${{ failure() }}
         uses: adrey/slack-file-upload-action@master
         with:
           token: ${{ secrets.SLACK_TOKEN }}
-          path: test/nuvlabox.pre-flight-check.output.html
+          path: nuvlabox.pre-flight-check.output.html
           channel: nuvla-ci
           filetype: html
           filename: nuvlabox.pre-flight-check.output.html
@@ -84,7 +66,7 @@ jobs:
   notify:
     if: always()
     name: Post Workflow Status To Slack
-    needs: pre-flight-check
+    needs: tester
     runs-on: ubuntu-latest
     steps:
       - name: Slack Workflow Notification
