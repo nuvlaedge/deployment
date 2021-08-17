@@ -13,6 +13,9 @@ on:
 env:
   NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
   NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
+  SLACK_NBE_WEBHOOK: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
+  BUILD_URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+
 
 defaults:
   run:
@@ -21,7 +24,7 @@ defaults:
 
 jobs:
   tester:
-    name: "Run NuvlaBox functional tests"
+    name: "Run NuvlaBox Functional Tests"
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
@@ -47,26 +50,19 @@ jobs:
 
       - name: Preflight Checks
         run: |
-          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
+          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link=${BUILD_URL}
 
-      # - if: always()
-      #   name: Keep test results
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: pytest-report
-      #     path: test/nuvlabox.e2e_pytest.output.html
+      - name: Test vulnerabilities
+        if: ${{ success() }}
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerabilities-scan.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link=${BUILD_URL}
 
-      - name: Upload to slack step
-        if: ${{ failure() }}
-        uses: adrey/slack-file-upload-action@master
+      - if: always()
+        name: Keep test results
+        uses: actions/upload-artifact@v2
         with:
-          token: ${{ secrets.SLACK_TOKEN }}
-          path: nuvlabox.pre-flight-check.output.html
-          channel: nuvla-ci
-          filetype: html
-          filename: nuvlabox.pre-flight-check.output.html
-          title: "NuvlaBox CI Preflight Check report"
-          initial_comment: ":memo: HTML output from the automated NuvlaBox tests"
+          name: pytest-report
+          path: test/nuvlabox.*.output.html
 
   notify:
     if: always()

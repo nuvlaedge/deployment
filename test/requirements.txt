@@ -2,6 +2,7 @@ pytest
 docker
 requests
 pytest-html
+pytest-slack
 nuvla-api
 gitpython
 six
