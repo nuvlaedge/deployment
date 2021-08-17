@@ -11,7 +11,7 @@ on:
   #     - completed
 
 jobs:
-  test-environment-setup:
+  tester:
     name: "Run NuvlaBox pre-flight-check for testing"
     runs-on: "ubuntu-latest"
     strategy:
