@@ -14,6 +14,11 @@ env:
   NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
   NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
 
+defaults:
+  run:
+    shell: bash
+    working-directory: test
+
 jobs:
   tester:
     name: "Run NuvlaBox functional tests"
@@ -36,7 +41,7 @@ jobs:
           python --version
           pip --version
           sudo apt-get install -y python3-pytest
-          cd test
+          # cd test
           pip install -r requirements.txt
           docker swarm init
 
