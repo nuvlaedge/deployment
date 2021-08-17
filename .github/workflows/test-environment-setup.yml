@@ -38,7 +38,7 @@ jobs:
           cd test
           pip install -r requirements.pre-flight-check.txt
           docker swarm init
-          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html
+          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
 
       - if: always()
         name: Keep test results
