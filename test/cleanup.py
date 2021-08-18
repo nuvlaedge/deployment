@@ -1,7 +1,8 @@
 import docker
 import nuvla
 import time
-
+import os
+from nuvla_api import NuvlaAPI
 
 class Cleanup(object):
     def __init__(self, api, docker_client):
@@ -20,12 +21,12 @@ class Cleanup(object):
             self.decommission_nuvlabox(nuvlabox_id)
             self.delete_nuvlabox(nuvlabox_id)
 
-    def delete_install_deployment(self, deployment_id):
-        print(f'Deleting NuvlaBox installation deployment with UUID: {deployment_id}')
+    def delete_deployment(self, deployment_id):
+        print(f'Deleting deployment with UUID: {deployment_id}')
         self.api.delete(deployment_id)
 
-    def stop_install_deployment(self, deployment_id):
-        print(f'Stopping NuvlaBox installation deployment with UUID: {deployment_id}')
+    def stop_deployment(self, deployment_id):
+        print(f'Stopping deployment with UUID: {deployment_id}')
         self.api.get(deployment_id + "/stop")
 
     def decommission_nuvlabox(self, nuvlabox_id):
@@ -51,13 +52,21 @@ class Cleanup(object):
                                           },
                                           detach=True)
 
-    def delete_zombie_mjpg_streamer(self, container_name):
-        print(f'Removing local zombie MJPG streamer with name: {container_name}')
-        try:
-            container = self.docker_client.containers.get(container_name)
-            container.remove(force=True)
-        except docker.errors.NotFound:
-            pass
 
 
+if __name__ == '__main__':
+    c = Cleanup()
 
+    nuvla_client = NuvlaApi()
+    nuvla_client.login()
+
+    nuvlabox_ids = os.environ.get('NUVLABOX_IDS')
+    nuvla_depls = os.environ.get('NUVLA_DEPLOYMENTS')
+
+    for nbid in nuvlabox_ids.split(','):
+        c.decommission_nuvlabox(nbid)
+        c.delete_nuvlabox(nbid)
+
+    for deplid in nuvla_depls.split(','):
+        c.stop_deployment(deplid)
+        c.delete_deployment(deplid)

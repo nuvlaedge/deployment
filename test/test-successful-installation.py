@@ -51,8 +51,8 @@ def test_nuvlabox_infra(request):
                 f'Cannot find credential for NuvlaBox in {nuvla.api.endpoint}, with query: {query}'
 
             request.config.cache.set('infra_service', infra_service.data)
-            request.config.cache.set('nuvlabox_credential', nb_credential.resource[0].data)
-            print(f'::set-output name=nuvlabox_credential_id::{nb_credential.resource[0].id}')
+            request.config.cache.set('nuvlabox_credential', nb_credential.resources[0].data)
+            print(f'::set-output name=nuvlabox_credential_id::{nb_credential.resources[0].id}')
             break
 
     request.config.cache.set('swarm_enabled', infra_service.data['swarm-enabled'])
