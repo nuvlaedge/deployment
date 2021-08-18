@@ -56,8 +56,63 @@ jobs:
 
       - name: Test vulnerabilities
         if: ${{ success() }}
+        id: ImageScan
         run: |
           python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerability-scan.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Create Test NuvlaBox in Nuvla.io
+        if: ${{ success() }}
+        id: NewNuvlaBox
+        uses: nuvla/nuvla-create-nuvlabox-action@v2
+        with:
+          api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
+          api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
+          name: "(CI/CD) Test NuvlaBox"
+          description: "NuvlaBox for functional testing - commit ${GITHUB_SHA}, on branch ${GITHUB_REF}, by ${GITHUB_ACTOR}"
+
+      - name: Deploy NuvlaBox Engine in CI/CD Testbed
+        if: ${{ success() }}
+        id: DeployNuvlaBoxEngine
+        uses: nuvla/nuvla-deploy-app-action@v1
+        with:
+          api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
+          api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
+          module-id: module/e4dcd975-2717-4051-8ade-80f6ed4bcfb1
+          credential-id: ${{ secrets.RPI_CICD_TESTBED_CREDENTIAL }}
+          environment: "NUVLABOX_UUID=${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}"
+
+      - name: Check commissioning
+        if: ${{ success() }}
+        env:
+          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.commission-check.output.html --self-contained-html commission-check.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Test Installation Success
+        if: ${{ success() }}
+        id: TestInstallationSuccess
+        env:
+          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.test-successful-installation.output.html --self-contained-html test-successful-installation.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Test Peripheral Registration
+        if: ${{ success() }}
+        env:
+          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+          NUVLABOX_SERVICES: ${{ steps.ImageScan.outputs.services }}
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.test-peripherals.output.html --self-contained-html test-peripherals.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Test App Deployment
+        if: ${{ success() }}
+        id: DeployTestApp
+        uses: nuvla/nuvla-deploy-app-action@v1
+        with:
+          api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
+          api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
+          module-id: module/179ee861-b378-4f74-aebf-41363df7b0d9
+          credential-id: ${{ steps.TestInstallationSuccess.outputs.nuvlabox_credential_id }}
 
       - if: always()
         name: Keep test results
