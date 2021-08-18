@@ -43,6 +43,7 @@ jobs:
         run: |
           python --version
           pip --version
+          snyk version
           sudo apt-get install -y python3-pytest
           # cd test
           pip install -r requirements.txt

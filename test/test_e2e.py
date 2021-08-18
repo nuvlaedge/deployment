@@ -434,27 +434,27 @@ def test_cis_benchmark(request, cis, nolinux):
             logging.info(f'CIS benchmark finished with a final score of {score}')
 
 
-def test_snyk_score(request):
-    logging.info('Running Snyk scan with the API token provided from the environment')
-    snyktoken = os.getenv('SNYK_SIXSQCI_API_TOKEN')
-    assert snyktoken is not None, 'Invalid Snyk token provided'
+# def test_snyk_score(request):
+#     logging.info('Running Snyk scan with the API token provided from the environment')
+#     snyktoken = os.getenv('SNYK_SIXSQCI_API_TOKEN')
+#     assert snyktoken is not None, 'Invalid Snyk token provided'
 
-    images = request.config.cache.get('images', [])
+#     images = request.config.cache.get('images', [])
 
-    total_high_vulnerabilities = 0
+#     total_high_vulnerabilities = 0
 
-    # count of current high vulnerabilities
-    reference_vulnerabilities = 74
-    log_file = 'log.json'
-    for img in images:
-        os.system(f'SNYK_TOKEN={snyktoken} snyk test --docker {img} --json --severity-threshold=high > {log_file}')
-        with open(log_file) as l:
-            out = json.load(l)
+#     # count of current high vulnerabilities
+#     reference_vulnerabilities = 74
+#     log_file = 'log.json'
+#     for img in images:
+#         os.system(f'SNYK_TOKEN={snyktoken} snyk test --docker {img} --json --severity-threshold=high > {log_file}')
+#         with open(log_file) as l:
+#             out = json.load(l)
 
-        total_high_vulnerabilities += out['uniqueCount']
+#         total_high_vulnerabilities += out['uniqueCount']
 
-    assert total_high_vulnerabilities <= reference_vulnerabilities, \
-        f'Snyk scan detected more high vulnerabilities ({total_high_vulnerabilities}) ' \
-            f'than expected ({reference_vulnerabilities})'
-    logging.info(f'Snyk: number of high vulnerabilities found ({total_high_vulnerabilities}) is not higher '
-                 f'than previous tests ({reference_vulnerabilities})')
+#     assert total_high_vulnerabilities <= reference_vulnerabilities, \
+#         f'Snyk scan detected more high vulnerabilities ({total_high_vulnerabilities}) ' \
+#             f'than expected ({reference_vulnerabilities})'
+#     logging.info(f'Snyk: number of high vulnerabilities found ({total_high_vulnerabilities}) is not higher '
+#                  f'than previous tests ({reference_vulnerabilities})')
