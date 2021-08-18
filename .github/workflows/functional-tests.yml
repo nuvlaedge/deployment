@@ -43,6 +43,7 @@ jobs:
         run: |
           python --version
           pip --version
+          sudo npm install -g snyk
           snyk version
           sudo apt-get install -y python3-pytest
           # cd test
