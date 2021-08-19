@@ -1,4 +1,4 @@
-name: "NuvlaBox Functional Testing"
+name: "NuvlaBox Remote Certification Test"
 
 on:
   push:

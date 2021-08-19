@@ -64,9 +64,17 @@ if __name__ == '__main__':
     nuvla_depls = os.environ.get('DEPLOYMENT_IDS')
 
     for nbid in nuvlabox_ids.split(','):
-        c.decommission_nuvlabox(nbid)
-        c.delete_nuvlabox(nbid)
+        if len(nbid) > 0:
+            try:
+                c.decommission_nuvlabox(nbid)
+                c.delete_nuvlabox(nbid)
+            except:
+                continue
 
     for deplid in nuvla_depls.split(','):
-        c.stop_deployment(deplid)
-        c.delete_deployment(deplid)
+        if len(deplid) > 0:
+            try:
+                c.stop_deployment(deplid)
+                c.delete_deployment(deplid)
+            except:
+                continue
