@@ -61,7 +61,7 @@ if __name__ == '__main__':
     c = Cleanup(nuvla_client.api, docker.from_env())
 
     nuvlabox_ids = os.environ.get('NUVLABOX_IDS')
-    nuvla_depls = os.environ.get('NUVLA_DEPLOYMENTS')
+    nuvla_depls = os.environ.get('DEPLOYMENT_IDS')
 
     for nbid in nuvlabox_ids.split(','):
         c.decommission_nuvlabox(nbid)
