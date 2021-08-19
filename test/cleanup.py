@@ -55,10 +55,10 @@ class Cleanup(object):
 
 
 if __name__ == '__main__':
-    c = Cleanup()
-
     nuvla_client = NuvlaApi()
     nuvla_client.login()
+
+    c = Cleanup(nuvla.api, docker.from_env())
 
     nuvlabox_ids = os.environ.get('NUVLABOX_IDS')
     nuvla_depls = os.environ.get('NUVLA_DEPLOYMENTS')
