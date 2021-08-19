@@ -45,7 +45,6 @@ jobs:
           snyk version
           sudo apt-get install -y python3-pytest
           pip install -r requirements.txt
-          docker swarm init
 
       - name: Create Test NuvlaBox in Nuvla.io
         if: ${{ success() }}
@@ -65,23 +64,17 @@ jobs:
           python -m pytest -vv -x --html=nuvlabox.test-local.output.html --self-contained-html test-local.py
 
       - if: always()
+        name: Cleanup Nuvla resources
+        env:
+          NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+        run: python cleanup.py
+
+      - if: always()
         name: Keep test results
         uses: actions/upload-artifact@v2
         with:
           name: pytest-report
           path: test/nuvlabox.e2e_pytest.output.html
-
-      - name: Upload to slack step
-        if: always()
-        uses: adrey/slack-file-upload-action@master
-        with:
-          token: ${{ secrets.SLACK_TOKEN }}
-          path: test/nuvlabox.e2e_pytest.output.html
-          channel: nuvla-ci
-          filetype: html
-          filename: nuvlabox.e2e_pytest.output.html
-          title: "NuvlaBox E2E PyTest report"
-          initial_comment: ":memo: HTML output from the automated E2E NuvlaBox tests"
 
   notify:
     if: always()

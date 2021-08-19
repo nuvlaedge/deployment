@@ -23,7 +23,7 @@ class Cleanup(object):
 
     def delete_deployment(self, deployment_id):
         print(f'Deleting deployment with UUID: {deployment_id}')
-        self.api.operation(deployment_id, operation='force-delete')
+        self.api.operation(self.api.get(deployment_id), 'force-delete')
 
     def stop_deployment(self, deployment_id):
         print(f'Stopping deployment with UUID: {deployment_id}')
@@ -75,7 +75,8 @@ if __name__ == '__main__':
             try:
                 c.decommission_nuvlabox(nbid)
                 c.delete_nuvlabox(nbid)
-            except:
+            except Exception as e:
+                print(f'Error: {str(e)}')
                 continue
 
     for deplid in nuvla_depls.split(','):
@@ -83,5 +84,6 @@ if __name__ == '__main__':
             try:
                 c.stop_deployment(deplid)
                 c.delete_deployment(deplid)
-            except:
+            except Exception as e:
+                print(f'Error: {str(e)}')
                 continue
