@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 from nuvla_api import NuvlaApi
 from timeout import timeout
 
@@ -17,6 +18,8 @@ def test_nuvlabox_has_pull_capability(request):
 
     assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
         f'NuvlaBox {nuvlabox_id} is missing the  NUVLA_JOB_PULL capability'
+
+    request.config.cache.set('nuvlabox_has_pull', True)
 
 def test_nuvlabox_is_stable(request):
     nuvlabox_status_id = request.config.cache.get('nuvlabox_status_id', '')
@@ -54,6 +57,28 @@ def test_nuvlabox_infra(request):
             request.config.cache.set('nuvlabox_credential', nb_credential.resources[0].data)
             print(f'::set-output name=nuvlabox_credential_id::{nb_credential.resources[0].id}')
             break
+
+    credential = nb_credential.resources[0].data
+    if credential.get('status', '') != "VALID":
+        r = nuvla.api.get(credential.id + "/check")
+        assert r.data.get('status') == 202, \
+            f'Failed to create job to check credential {credential.id}'
+
+        with timeout(30, f"Unable to check NuvlaBox's credential for the compute infrastructure"):
+            while True:
+                j_status = nuvla.api.get(r.data.get('location'))
+                if j_status.data['progress'] < 100:
+                    time.sleep(1)
+                    continue
+
+                assert j_status.data['state'] == 'SUCCESS', \
+                    f'Failed to perform credential check'
+
+                break
+
+        credential = nuvla.api.get(credential.id)
+        assert credential.data['status'] == 'VALID', \
+            f'The NuvlaBox compute credential is invalid'
 
     request.config.cache.set('swarm_enabled', infra_service.data['swarm-enabled'])
 
