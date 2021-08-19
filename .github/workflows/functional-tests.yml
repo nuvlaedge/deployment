@@ -68,7 +68,7 @@ jobs:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
           name: "(CI/CD) Test NuvlaBox"
-          description: NuvlaBox for functional testing - commit ${GITHUB_SHA}, on branch ${GITHUB_REF}, by ${GITHUB_ACTOR}
+          description: NuvlaBox for functional testing - commit ${{ github.sha }}, on branch ${{ github.ref }}, by ${{ github.actor }}
 
       - name: Deploy NuvlaBox Engine in CI/CD Testbed
         if: ${{ success() }}
