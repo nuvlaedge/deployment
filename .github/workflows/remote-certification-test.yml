@@ -16,7 +16,6 @@ env:
   SLACK_NBE_WEBHOOK: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
   SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
 
-
 defaults:
   run:
     shell: bash
@@ -46,7 +45,6 @@ jobs:
           sudo npm install -g snyk
           snyk version
           sudo apt-get install -y python3-pytest
-          # cd test
           pip install -r requirements.txt
           docker swarm init
 
