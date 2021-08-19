@@ -1,4 +1,4 @@
-# #!/usr/bin/env python3
+#!/usr/bin/env python3
 
 # import cleanup
 # import atexit
@@ -11,11 +11,13 @@
 # import requests
 # import nuvla
 # import logging
-# import os
+import os
 # from tempfile import NamedTemporaryFile
 # from contextlib import contextmanager
-# from git import Repo
+from git import Repo
 # from nuvla.api import Api
+
+nuvlabox_id = os.environ.get('NUVLABOX_ID')
 
 
 # api = Api(endpoint="https://nuvla.io",
@@ -28,12 +30,14 @@
 # cleaner = cleanup.Cleanup(api, docker_client)
 # atexit.register(cleaner.goodbye)
 
-# repo = Repo("..")
-# if repo.active_branch.name == "master":
-#     nbe_installer_image = "nuvlabox/installer:master"
-# else:
-#     nbe_installer_image = f"nuvladev/installer:{repo.active_branch.name}"
+repo = Repo("..")
+if repo.active_branch.name == "master":
+    nbe_installer_image = "nuvlabox/installer:master"
+else:
+    nbe_installer_image = f"nuvladev/installer:{repo.active_branch.name}"
 
+def test_1(request):
+    assert 1 == 1
 
 # @contextmanager
 # def timeout(deadline):

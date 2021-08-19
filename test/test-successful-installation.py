@@ -62,7 +62,7 @@ def test_nuvlabox_infra(request):
     if credential.get('status', '') != "VALID":
         r = nuvla.api.get(credential['id'] + "/check")
         assert r.data.get('status') == 202, \
-            f'Failed to create job to check credential {credential['id']}'
+            f'Failed to create job to check credential {credential["id"]}'
 
         with timeout(30, f"Unable to check NuvlaBox's credential for the compute infrastructure"):
             while True:

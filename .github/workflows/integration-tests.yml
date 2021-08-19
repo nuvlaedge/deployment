@@ -13,7 +13,6 @@ on:
 env:
   NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
   NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
-  SLACK_NBE_WEBHOOK: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
   SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
 
 defaults:
@@ -63,7 +62,7 @@ jobs:
         env:
           NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.test-local.output.html --self-contained-html test-local.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          python -m pytest -vv -x --html=nuvlabox.test-local.output.html --self-contained-html test-local.py
 
       - if: always()
         name: Keep test results
@@ -94,6 +93,6 @@ jobs:
         uses: Gamesight/slack-workflow-status@master
         with:
           # Required Input
-          repo_token: ${{secrets.GITHUB_TOKEN}}
-          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          slack_webhook_url: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
           include_jobs: true

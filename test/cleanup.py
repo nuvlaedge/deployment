@@ -23,11 +23,18 @@ class Cleanup(object):
 
     def delete_deployment(self, deployment_id):
         print(f'Deleting deployment with UUID: {deployment_id}')
-        self.api.delete(deployment_id)
+        self.api.operation(deployment_id, operation='force-delete')
 
     def stop_deployment(self, deployment_id):
         print(f'Stopping deployment with UUID: {deployment_id}')
-        self.api.get(deployment_id + "/stop")
+        r = self.api.get(deployment_id + "/stop")
+        while True:
+            j_status = nuvla.api.get(r.data.get('location'))
+            if j_status.data['progress'] < 100:
+                time.sleep(1)
+                continue
+
+            break
 
     def decommission_nuvlabox(self, nuvlabox_id):
         print(f'Decommissioning NuvlaBox with UUID: {nuvlabox_id}')

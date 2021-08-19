@@ -13,7 +13,6 @@ on:
 env:
   NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
   NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
-  SLACK_NBE_WEBHOOK: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
   SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
 
 defaults:
@@ -50,13 +49,13 @@ jobs:
 
       - name: Preflight Checks
         run: |
-          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
 
       - name: Test vulnerabilities
         if: ${{ success() }}
         id: ImageScan
         run: |
-          python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerability-scan.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerability-scan.py
 
       - name: Create Test NuvlaBox in Nuvla.io
         if: ${{ success() }}
@@ -84,7 +83,7 @@ jobs:
         env:
           NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.commission-check.output.html --self-contained-html commission-check.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          python -m pytest -vv -x --html=nuvlabox.commission-check.output.html --self-contained-html commission-check.py
 
       - name: Test Installation Success
         if: ${{ success() }}
@@ -92,7 +91,7 @@ jobs:
         env:
           NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.test-successful-installation.output.html --self-contained-html test-successful-installation.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          python -m pytest -vv -x --html=nuvlabox.test-successful-installation.output.html --self-contained-html test-successful-installation.py
 
       - name: Test Peripheral Registration
         if: ${{ success() }}
@@ -100,7 +99,7 @@ jobs:
           NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
           NUVLABOX_SERVICES: ${{ steps.ImageScan.outputs.services }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.test-peripherals.output.html --self-contained-html test-peripherals.py --slack_hook=${SLACK_NBE_WEBHOOK} --slack_report_link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          python -m pytest -vv -x --html=nuvlabox.test-peripherals.output.html --self-contained-html test-peripherals.py
 
       - name: Test App Deployment
         if: ${{ success() }}
@@ -126,8 +125,6 @@ jobs:
           name: pytest-report
           path: test/nuvlabox.*.output.html
 
-
-
   notify:
     if: always()
     name: Post Workflow Status To Slack
@@ -139,5 +136,5 @@ jobs:
         with:
           # Required Input
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
+          slack_webhook_url: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
           include_jobs: true
