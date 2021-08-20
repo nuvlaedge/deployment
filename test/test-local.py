@@ -26,6 +26,10 @@ docker_client = docker.from_env()
 nuvla = NuvlaApi()
 nuvla.login()
 
+# need to create .ssh folder otherwise the SSH key installation
+# cannot be tested
+os.system(f'mkdir -p {HOST_HOME}/.ssh')
+
 cert = NamedTemporaryFile()
 key = NamedTemporaryFile()
 

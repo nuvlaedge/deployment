@@ -30,7 +30,6 @@ def test_nuvlabox_is_stable(request):
                 break
 
     request.config.cache.set('nuvlabox_status', nuvlabox_status.data)
-    print(f'')
     for container in nuvlabox_status.data['resources']['container-stats']:
         assert container['container-status'].lower() in ['running', 'paused'], \
             f'NuvlaBox container {container["name"]} is not running'
@@ -40,23 +39,34 @@ def test_nuvlabox_is_stable(request):
 
 def test_nuvlabox_infra(request):
     isg_id = request.config.cache.get('nuvlabox_isg_id', '')
-    infra_service_group = nuvla.api.get(isg_id)
-    request.config.cache.set('nuvlabox_isg', infra_service_group.data)
 
     # check IS
-    for infra in infra_service_group.data['infrastructure-services']:
-        infra_service = nuvla.api.get(infra['href'])
-        if infra_service.data['subtype'] == "swarm":
-            cred_subtype = "infrastructure-service-swarm"
-            query = f'parent="{infra_service.id}" and subtype="{cred_subtype}"'
-            nb_credential = nuvla.api.search('credential', filter=query)
-            assert nb_credential.count == 1, \
-                f'Cannot find credential for NuvlaBox in {nuvla.api.endpoint}, with query: {query}'
+    err = "Unable to validate the NuvlaBox's infrastructure-service"
+    with timeout(180, err):
+        print('Searching for NuvlaBox infrastructure-service')
+        while True:
+            infras = nuvla.api.search('infrastructure-service',
+                                    filter=f'parent="{isg_id}" and subtype="swarm"')
 
-            request.config.cache.set('infra_service', infra_service.data)
-            request.config.cache.set('nuvlabox_credential', nb_credential.resources[0].data)
-            print(f'::set-output name=nuvlabox_credential_id::{nb_credential.resources[0].id}')
-            break
+            if infras.count == 0:
+                time.sleep(2)
+                continue
+
+            infra = infras.resources[0].data
+            if infra.get('endpoint').startswith('https://10.'):
+                break
+            else:
+                time.sleep(2)
+
+    cred_subtype = "infrastructure-service-swarm"
+    query = f'parent="{infra["id"]}" and subtype="{cred_subtype}"'
+    nb_credential = nuvla.api.search('credential', filter=query)
+    assert nb_credential.count == 1, \
+        f'Cannot find credential for NuvlaBox in {nuvla.api.endpoint}, with query: {query}'
+
+    request.config.cache.set('infra_service', infra)
+    request.config.cache.set('nuvlabox_credential', nb_credential.resources[0].data)
+    print(f'::set-output name=nuvlabox_credential_id::{nb_credential.resources[0].id}')
 
     credential = nb_credential.resources[0].data
     if credential.get('status', '') != "VALID":
@@ -72,7 +82,7 @@ def test_nuvlabox_infra(request):
                     continue
 
                 assert j_status.data['state'] == 'SUCCESS', \
-                    f'Failed to perform credential check'
+                    f'Failed to perform credential check. Reason: {j_status.data.get("status-message")}'
 
                 break
 
@@ -80,7 +90,7 @@ def test_nuvlabox_infra(request):
         assert credential.data['status'] == 'VALID', \
             f'The NuvlaBox compute credential is invalid'
 
-    request.config.cache.set('swarm_enabled', infra_service.data['swarm-enabled'])
+    request.config.cache.set('swarm_enabled', infra['swarm-enabled'])
 
 def test_expected_attributes(request):
     swarm_enabled = request.config.cache.get('swarm_enabled', '')
@@ -102,7 +112,8 @@ def test_expected_attributes(request):
     assert nuvlabox_status.get('ip'), \
         f'IP{default_err_log_suffix}'
 
-    request.config.cache.set('nuvlabox_ip', nuvlabox_status['ip'])
+    assert nuvlabox_status['ip'].startswith('10.'), \
+        'VPN IP is not set'
 
     assert nuvlabox_status.get('last-boot'), \
         f'Last Boot{default_err_log_suffix}'
@@ -135,9 +146,4 @@ def test_expected_attributes(request):
         assert nuvlabox_status.get('cluster-join-address'), \
             f'Cluster Join Address{default_err_log_suffix}'
 
-def test_vpn(request):
-    ip = request.config.cache.get('nuvlabox_ip', '')
-
-    assert ip.startswith('10.'), \
-        'VPN IP is not set'
 

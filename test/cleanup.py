@@ -23,7 +23,8 @@ class Cleanup(object):
 
     def delete_deployment(self, deployment_id):
         print(f'Deleting deployment with UUID: {deployment_id}')
-        self.api.operation(self.api.get(deployment_id), 'force-delete')
+        depl = self.api.get(deployment_id)
+        self.api.operation(depl, 'force-delete')
 
     def stop_deployment(self, deployment_id):
         print(f'Stopping deployment with UUID: {deployment_id}')
