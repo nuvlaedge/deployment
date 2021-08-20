@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: pytest-report
-          path: test/nuvlabox.e2e_pytest.output.html
+          path: test/nuvlabox.test-local.output.html
 
   notify:
     if: always()
