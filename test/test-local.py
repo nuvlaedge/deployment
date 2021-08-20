@@ -69,17 +69,14 @@ def test_deploy_nuvlaboxes(request):
     # deploy local NB
     docker_client.images.pull(nbe_installer_image)
     request.config.cache.set('local_project_name', local_project_name)
+
+    nb_env = f'NUVLABOX_UUID={nuvlabox_id},HOST_HOME={HOST_HOME},SKIP_MINIMUM_REQUIREMENTS=True,'\
+            'NUVLABOX_DATA_GATEWAY_IMAGE={NUVLABOX_DATA_GATEWAY_IMAGE},'\
+            'NUVLABOX_IMMUTABLE_SSH_PUB_KEY={NUVLABOX_IMMUTABLE_SSH_PUB_KEY},'\
+            'VPN_INTERFACE_NAME={VPN_INTERFACE_NAME},HOST={HOST}'
     try:
         docker_client.containers.run(nbe_installer_image,
-                                    environment=[f"NUVLABOX_UUID={nuvlabox_id}",
-                                                f"HOST_HOME={HOST_HOME}",
-                                                "SKIP_MINIMUM_REQUIREMENTS=True",
-                                                f"NUVLABOX_DATA_GATEWAY_IMAGE={NUVLABOX_DATA_GATEWAY_IMAGE}",
-                                                f"NUVLABOX_IMMUTABLE_SSH_PUB_KEY={NUVLABOX_IMMUTABLE_SSH_PUB_KEY}",
-                                                f"VPN_INTERFACE_NAME={VPN_INTERFACE_NAME}",
-                                                f"HOST={HOST}",
-                                                ],
-                                    command=f"install --project={local_project_name} --daemon",
+                                    command=f"install --project={local_project_name} --daemon --environment={nb_env}",
                                     name="nuvlabox-engine-installer",
                                     volumes={
                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
@@ -123,9 +120,6 @@ def test_nuvlabox_engine_containers_stability(request):
 
 
 def test_ssh_key_bootstrap():
-    print(os.system('docker ps'))
-    print(os.system(f'docker inspect {local_project_name}_agent_1'))
-
     authorized_keys = HOST_HOME + "/.ssh/authorized_keys"
     assert os.path.isfile(authorized_keys), \
         f'Cannot find SSH keys file in {HOST_HOME}: {os.listdir(HOST_HOME)}'

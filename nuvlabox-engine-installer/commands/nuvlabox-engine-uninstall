@@ -2,10 +2,16 @@
 
 quiet=${quiet:-${1:-0}}
 project=${project:-${2:-"nuvlabox"}}
+remove_volume=${remove_volume:-1}
 
-nuvlabox-engine-printer "Uninstalling NuvlaBox Engine - ${project} - (permanently)" ${quiet} "NONE" yes
+if [[ ${remove_volume} -eq 1 ]]
+then
+  extra_log=" - (permanently)"
+  extra_compose_arg=" -v"
+fi
+nuvlabox-engine-printer "Uninstalling NuvlaBox Engine - ${project}${extra_log}" ${quiet} "NONE" yes
 
-docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} down -v --remove-orphans"
+docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} down ${extra_compose_arg} --remove-orphans"
 
 nuvlabox-engine-printer "Executing uninstall command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
@@ -35,9 +41,9 @@ then
       nuvlabox-engine-printer "Forcing cleanup" ${quiet} "WARNING" "no"
       if [[ ${quiet} -eq 1 ]]
       then
-        out=$(nuvlabox-engine-force-cleanup "${project}" "${working_dir}" 1 2>&1)
+        out=$(nuvlabox-engine-force-cleanup "${project}" "${working_dir}" ${remove_volume} 2>&1)
       else
-        out="\n$(nuvlabox-engine-force-cleanup "${project}" "${working_dir}" 1)"
+        out="\n$(nuvlabox-engine-force-cleanup "${project}" "${working_dir}" ${remove_volume})"
       fi
     fi
     if [[ $? -ne 0 ]]

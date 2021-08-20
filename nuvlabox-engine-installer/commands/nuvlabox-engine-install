@@ -76,6 +76,7 @@ then
   nuvlabox-engine-printer "NuvlaBox Engine is not healthy: ${health}" 0 "ERROR" "no"
   export quiet
   export project
+  export remove_volume 0
   nuvlabox-engine-uninstall
   exit 1
 fi

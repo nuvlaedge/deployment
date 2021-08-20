@@ -72,5 +72,5 @@ try:
                     healthcheck_finished = True
 except Exception as e:
     # making sure that only the error message is printed and not the whole exception
-    exc_type, exc_obj, exc_tb = sys.exc_info()
-    sys.exit(f'Critical error in {func.co_filename}, on line {exc_tb.tb_frame.f_lineno}: {str(e)}')
+    print(f"Critical error while checking NuvlaBox Engine's health: {str(e)}")
+    raise(e)
