@@ -123,6 +123,8 @@ def test_nuvlabox_engine_containers_stability(request):
 
 
 def test_ssh_key_bootstrap():
+    print(os.system('docker ps'))
+    print(os.system('docker inspect nuvlabox_agent_1'))
     print(docker_client.containers.get("nuvlabox_agent_1").attrs)
     authorized_keys = HOST_HOME + "/.ssh/authorized_keys"
     assert os.path.isfile(authorized_keys), \
