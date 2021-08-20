@@ -2,13 +2,12 @@
 
 """Used when installing a new NuvlaBox Engine
 
-After a successful installation, it waits in foreground
-until it receives a shutdown signal.
-When that happens, it launches an uninstall process to
+After a successful installation, it launches an uninstall process to
 remove the ongoing NuvlaBox Engine
 """
 
 import docker
+imoprt os
 import sys
 import socket
 
@@ -28,6 +27,7 @@ except:
 
 docker.from_env().containers.run(my_image_id,
                                     name="nuvlabox-engine-uninstaller",
+                                    environment=[f"working_dir={os.getenv('working_dir')}"]
                                     remove=True,
                                     volumes={
                                         '/var/run/docker.sock': {
