@@ -30,7 +30,7 @@ class Cleanup(object):
         print(f'Stopping deployment with UUID: {deployment_id}')
         r = self.api.get(deployment_id + "/stop")
         while True:
-            j_status = nuvla.api.get(r.data.get('location'))
+            j_status = self.api.get(r.data.get('location'))
             if j_status.data['progress'] < 100:
                 time.sleep(1)
                 continue

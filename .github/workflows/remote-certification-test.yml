@@ -111,12 +111,12 @@ jobs:
           module-id: module/179ee861-b378-4f74-aebf-41363df7b0d9
           credential-id: ${{ steps.TestInstallationSuccess.outputs.nuvlabox_credential_id }}
 
-      - if: always()
-        name: Cleanup Nuvla resources
-        env:
-          NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
-          DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaBoxEngine.outputs.DEPLOYMENT_ID }}
-        run: python cleanup.py
+      # - if: always()
+      #   name: Cleanup Nuvla resources
+      #   env:
+      #     NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+      #     DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaBoxEngine.outputs.DEPLOYMENT_ID }}
+      #   run: python cleanup.py
 
       - if: always()
         name: Keep test results

@@ -124,8 +124,8 @@ def test_nuvlabox_engine_containers_stability(request):
 
 def test_ssh_key_bootstrap():
     print(os.system('docker ps'))
-    print(os.system('docker inspect nuvlabox_agent_1'))
-    print(docker_client.containers.get("nuvlabox_agent_1").attrs)
+    print(os.system(f'docker inspect {local_project_name}_agent_1'))
+
     authorized_keys = HOST_HOME + "/.ssh/authorized_keys"
     assert os.path.isfile(authorized_keys), \
         f'Cannot find SSH keys file in {HOST_HOME}: {os.listdir(HOST_HOME)}'

@@ -63,11 +63,11 @@ jobs:
         run: |
           python -m pytest -vv -x --html=nuvlabox.test-local.output.html --self-contained-html test-local.py
 
-      # - if: always()
-      #   name: Cleanup Nuvla resources
-      #   env:
-      #     NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
-      #   run: python cleanup.py
+      - if: always()
+        name: Cleanup Nuvla resources
+        env:
+          NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+        run: python cleanup.py
 
       - if: always()
         name: Keep test results
