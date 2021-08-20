@@ -128,7 +128,7 @@ def test_nuvlabox_engine_containers_stability(request):
 def test_ssh_key_bootstrap():
     authorized_keys = HOST_HOME + "/.ssh/authorized_keys"
     assert os.path.isfile(authorized_keys), \
-        f'Cannot find SSH keys file in {HOST_HOME}: {os.listdir()}'
+        f'Cannot find SSH keys file in {HOST_HOME}: {os.listdir(HOST_HOME)}'
 
     with open(authorized_keys) as ak:
         assert NUVLABOX_IMMUTABLE_SSH_PUB_KEY in ak.read()
