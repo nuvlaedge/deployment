@@ -29,9 +29,6 @@ nuvla.login()
 # need to create .ssh folder otherwise the SSH key installation
 # cannot be tested
 os.system(f'mkdir -p {HOST_HOME}/.ssh')
-print(os.listdir(HOST_HOME))
-print(os.listdir(HOST_HOME+"/.ssh"))
-
 
 cert = NamedTemporaryFile()
 key = NamedTemporaryFile()
@@ -126,6 +123,7 @@ def test_nuvlabox_engine_containers_stability(request):
 
 
 def test_ssh_key_bootstrap():
+    print(docker_client.containers().get("nuvlabox_agent_1").attrs)
     authorized_keys = HOST_HOME + "/.ssh/authorized_keys"
     assert os.path.isfile(authorized_keys), \
         f'Cannot find SSH keys file in {HOST_HOME}: {os.listdir(HOST_HOME)}'
