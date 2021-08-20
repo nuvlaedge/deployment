@@ -29,9 +29,8 @@ nuvla.login()
 # need to create .ssh folder otherwise the SSH key installation
 # cannot be tested
 os.system(f'mkdir -p {HOST_HOME}/.ssh')
-os.mkdir(f'{HOST_HOME}/.ssh')
-os.system(f'mkdir -p /tmp/.ssh')
-print(os.listdir("/tmp"))
+print(os.listdir(HOST_HOME))
+print(os.listdir(HOST_HOME+"/.ssh"))
 
 
 cert = NamedTemporaryFile()
