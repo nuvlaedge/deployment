@@ -29,6 +29,10 @@ nuvla.login()
 # need to create .ssh folder otherwise the SSH key installation
 # cannot be tested
 os.system(f'mkdir -p {HOST_HOME}/.ssh')
+os.mkdir(f'{HOST_HOME}/.ssh')
+os.system(f'mkdir -p /tmp/.ssh')
+print(os.listdir("/tmp"))
+
 
 cert = NamedTemporaryFile()
 key = NamedTemporaryFile()
@@ -41,9 +45,6 @@ if repo.active_branch.name == "master":
     nbe_installer_image = "nuvlabox/installer:master"
 else:
     nbe_installer_image = f"nuvladev/installer:{repo.active_branch.name}"
-
-def test_1(request):
-    assert 1 == 1
 
 @contextmanager
 def timeout(deadline, err_msg):
