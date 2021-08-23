@@ -13,9 +13,10 @@ def test_nuvlabox_is_commissioned(request):
     nuvlabox_id = os.environ.get('NUVLABOX_ID')
     error_msg = f'Waiting for NB {nuvlabox_id} to get COMMISSIONED'
 
-    with timeout(180, error_msg):
+    with timeout(300, error_msg):
         while True:
             nuvlabox = nuvla.api.get(nuvlabox_id)
+            print(nuvlabox.data.get('state', 'UNKNOWN'))
             if nuvlabox.data.get('state', 'UNKNOWN') == 'COMMISSIONED':
                 break
 

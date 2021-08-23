@@ -9,6 +9,7 @@ import uuid
 import requests
 import logging
 import os
+import nuvla as nuvla_lib
 from tempfile import NamedTemporaryFile
 from contextlib import contextmanager
 from git import Repo
@@ -87,12 +88,6 @@ def test_deploy_nuvlaboxes(request):
 
     installer_container = docker_client.containers.get("nuvlabox-engine-installer")
 
-    print(docker_client.containers.get(local_project_name+"_agent_1").logs())
-    print(docker_client.containers.get(local_project_name+"_agent_1").attrs)
-    print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('ls /rootfs').output)
-    print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('env').output)
-    print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('ls /rootfs/home').output)
-    print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('ls /rootfs/home/runner').output)
     assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
     logging.info(f'NuvlaBox ({nuvlabox_id}) Engine successfully installed with project name {local_project_name}')
 
@@ -219,7 +214,7 @@ def test_nuvlabox_engine_local_agent_api(request):
     assert r.status_code == r.json()['status'] == 200, f'Cannot delete peripheral via {agent_api}'
     assert r.json()['resource-id'] == mock_peripheral_id, f'ID mismatch while deleting peripheral via {agent_api}'
 
-    with pytest.raises(nuvla.api.api.NuvlaError):
+    with pytest.raises(nuvla_lib.api.api.NuvlaError):
         nuvla.api.get(mock_peripheral_id)
 
     logging.info(f'Agent API ({agent_api}) for peripheral management is up and running')
