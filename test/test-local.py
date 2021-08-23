@@ -86,6 +86,8 @@ def test_deploy_nuvlaboxes(request):
         logging.error(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
 
     installer_container = docker_client.containers.get("nuvlabox-engine-installer")
+    print(installer_container.attrs)
+    print(docker_client.containers.get(local_project_name+"_agent_1").attrs)
     assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
     logging.info(f'NuvlaBox ({nuvlabox_id}) Engine successfully installed with project name {local_project_name}')
 
