@@ -72,7 +72,7 @@ def test_deploy_nuvlaboxes(request):
 
     nb_env = f'NUVLABOX_UUID={nuvlabox_id},HOST_HOME={HOST_HOME},SKIP_MINIMUM_REQUIREMENTS=True,'\
             f'NUVLABOX_DATA_GATEWAY_IMAGE={NUVLABOX_DATA_GATEWAY_IMAGE},'\
-            f'NUVLABOX_IMMUTABLE_SSH_PUB_KEY={NUVLABOX_IMMUTABLE_SSH_PUB_KEY},'\
+            f'NUVLABOX_SSH_PUB_KEY={NUVLABOX_IMMUTABLE_SSH_PUB_KEY},'\
             f'VPN_INTERFACE_NAME={VPN_INTERFACE_NAME},HOST={HOST}'
     try:
         docker_client.containers.run(nbe_installer_image,

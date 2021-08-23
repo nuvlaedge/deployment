@@ -27,11 +27,10 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        architectures: [ arm64 ]
         include:
-          # - architectures: arm
+          # - architecture: arm
           #   credential-id: credential/b0c42cd1-b230-4851-be87-fc7e05bdfbb3
-          - architectures: arm64
+          - architecture: arm64
             credential-id: credential/5698ccd5-54b6-4412-b19c-46e3c6212f33
 
     steps:
@@ -81,7 +80,7 @@ jobs:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
           module-id: module/e4dcd975-2717-4051-8ade-80f6ed4bcfb1
-          credential-id: ${{ matrix.architectures.credential-id }}
+          credential-id: ${{ matrix.credential-id }}
           environment: "NUVLABOX_UUID=${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}"
 
       - name: Check commissioning
