@@ -327,7 +327,7 @@ def test_cis_benchmark(request):
         out = r.readlines()
 
     score = 0
-    reference_score = -7
+    reference_score = -10
     for line in out:
         if 'Score: ' in line:
             score = int(line.strip().split(' ')[-1])
@@ -337,5 +337,6 @@ def test_cis_benchmark(request):
     logging.info(f'CIS benchmark finished with a final score of {score}')
 
 def test_security_scanner(request):
-    volume_path = request.cache.get('nuvlabox_volume_path')
-    assert os.path.isfile(volume_path + "/vulnerabilities")
+    agent = docker_client.containers.get(local_project_name + "_agent_1")
+
+    assert agent.exec_run('cat /srv/nuvlabox/shared/vulnerabilities').exit_code == 0
