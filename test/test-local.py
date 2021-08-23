@@ -224,13 +224,15 @@ def test_nuvlabox_engine_local_compute_api(request):
     volume = docker_client.api.inspect_volume(local_project_name + "_nuvlabox-db").get('Mountpoint')
     request.config.cache.set('nuvlabox_volume_path', volume)
 
-    with open(volume + "/cert.pem") as c:
-        cert.write(c.read().encode())
-        cert.flush()
+    agent = docker_client.containers.get(local_project_name + "_agent_1")
 
-    with open(volume + "/key.pem") as k:
-        key.write(k.read().encode())
-        key.flush()
+    raw_cert = agent.exec_run('cat /srv/nuvlabox/shared/cert.pem').output
+    cert.write(raw_cert)
+    cert.flush()
+
+    raw_key = agent.exec_run('cat /srv/nuvlabox/shared/key.pem').output
+    key.write(raw_key)
+    key.flush()
 
     compute_api = 'https://localhost:5000/'
 
