@@ -88,7 +88,9 @@ def test_deploy_nuvlaboxes(request):
     installer_container = docker_client.containers.get("nuvlabox-engine-installer")
 
     print(docker_client.containers.get(local_project_name+"_agent_1").logs())
+    print(docker_client.containers.get(local_project_name+"_agent_1").attrs)
     print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('ls /rootfs').output)
+    print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('env').output)
     print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('ls /rootfs/home').output)
     print(docker_client.containers.get(local_project_name+"_agent_1").exec_run('ls /rootfs/home/runner').output)
     assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'

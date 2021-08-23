@@ -81,7 +81,7 @@ jobs:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
           module-id: module/e4dcd975-2717-4051-8ade-80f6ed4bcfb1
-          credential-id: ${{ matrix.architectures }}
+          credential-id: ${{ matrix.architectures.credential-id }}
           environment: "NUVLABOX_UUID=${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}"
 
       - name: Check commissioning
