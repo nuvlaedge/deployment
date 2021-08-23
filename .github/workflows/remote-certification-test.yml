@@ -27,7 +27,12 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        architectures: [ "credential/b0c42cd1-b230-4851-be87-fc7e05bdfbb3", "credential/5698ccd5-54b6-4412-b19c-46e3c6212f33" ]
+        architectures: [ arm, arm64 ]
+        include:
+          - architectures: arm
+            credential-id: credential/b0c42cd1-b230-4851-be87-fc7e05bdfbb3
+          - architectures: arm64
+            credential-id: credential/5698ccd5-54b6-4412-b19c-46e3c6212f33
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
