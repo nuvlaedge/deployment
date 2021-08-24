@@ -104,7 +104,8 @@ def test_nuvlabox_infra(request):
     request.config.cache.set('swarm_enabled', infra['swarm-enabled'])
 
 def test_expected_attributes(request):
-    swarm_enabled = request.config.cache.get('swarm_enabled', '')
+    infra = request.config.cache.get('infra_service')
+    swarm_enabled = nuvla.api.get(infra['id']).data['swarm-enabled']
     nuvlabox_status = request.config.cache.get('nuvlabox_status', {})
 
     default_err_log_suffix = ': attribute missing from NuvlaBox status'
