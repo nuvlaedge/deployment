@@ -102,7 +102,7 @@ def test_nuvlabox_infra(request):
             f'The NuvlaBox compute credential is invalid'
 
 def test_expected_attributes(request):
-    infra = request.config.cache.get('infra_service')
+    infra = request.config.cache.get('infra_service', {})
     swarm_enabled = nuvla.api.get(infra['id']).data['swarm-enabled']
     nuvlabox_status = request.config.cache.get('nuvlabox_status', {})
 
