@@ -26,7 +26,7 @@ def test_nuvlabox_has_pull_capability(request):
 
 def test_nuvlabox_is_stable(request):
     nuvlabox_status_id = request.config.cache.get('nuvlabox_status_id', '')
-    with timeout(120, f'Waited too long for container-stats'):
+    with timeout(180, f'Waited too long for container-stats'):
         while True:
             try:
                 nuvlabox_status = nuvla.api.get(nuvlabox_status_id)
@@ -52,7 +52,7 @@ def test_nuvlabox_infra(request):
 
     # check IS
     err = "Unable to validate the NuvlaBox's infrastructure-service"
-    with timeout(180, err):
+    with timeout(300, err):
         search_filter = f'parent="{isg_id}" and subtype="swarm"'
         print('Searching for NuvlaBox infrastructure-service: ' + search_filter)
         while True:
