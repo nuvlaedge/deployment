@@ -27,6 +27,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
+        architecture: [arm, arm64]
         include:
           - architecture: arm
             credential-id: credential/b0c42cd1-b230-4851-be87-fc7e05bdfbb3
@@ -115,7 +116,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: remote-certification-report
-          path: nuvlabox.*.output.html
+          path: tests/remote_certification/nuvlabox.*.output.html
 
       - if: always()
         name: Cleanup Nuvla resources

@@ -106,6 +106,9 @@ def test_expected_attributes(request):
     swarm_enabled = nuvla.api.get(infra['id']).data['swarm-enabled']
     nuvlabox_status = request.config.cache.get('nuvlabox_status', {})
 
+    # update the status
+    nuvlabox_status = nuvla.api.get(nuvlabox_status['id']).data
+
     default_err_log_suffix = ': attribute missing from NuvlaBox status'
     assert nuvlabox_status.get('operating-system'), \
         f'Operating System{default_err_log_suffix}'

@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: integration-tests-report
-          path: nuvlabox.*.output.html
+          path: tests/integration_tests/nuvlabox.*.output.html
 
       - if: always()
         name: Cleanup Nuvla resources
