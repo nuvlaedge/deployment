@@ -40,7 +40,7 @@ key = NamedTemporaryFile()
 # cleaner = cleanup.Cleanup(api, docker_client)
 # atexit.register(cleaner.goodbye)
 
-repo = Repo("..")
+repo = Repo("../..")
 if repo.active_branch.name == "master":
     nbe_installer_image = "nuvlabox/installer:master"
 else:
