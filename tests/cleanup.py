@@ -2,7 +2,7 @@ import docker
 import nuvla
 import time
 import os
-from nuvla_api import NuvlaApi
+from common.nuvla_api import NuvlaApi
 
 class Cleanup(object):
     def __init__(self, api, docker_client):

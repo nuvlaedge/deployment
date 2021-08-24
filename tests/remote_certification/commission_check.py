@@ -2,8 +2,11 @@
 
 import os
 import time
-from nuvla_api import NuvlaApi
-from timeout import timeout
+import sys
+sys.path.append('../')
+
+from common.timeout import timeout
+from common.nuvla_api import NuvlaApi
 
 nuvla = NuvlaApi()
 nuvla.login()

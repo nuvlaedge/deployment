@@ -2,8 +2,11 @@
 
 import os
 import time
-from nuvla_api import NuvlaApi
-from timeout import timeout
+import sys
+sys.path.append('../')
+
+from common.nuvla_api import NuvlaApi
+from common.timeout import timeout
 
 nuvla = NuvlaApi()
 nuvla.login()
@@ -25,9 +28,16 @@ def test_nuvlabox_is_stable(request):
     nuvlabox_status_id = request.config.cache.get('nuvlabox_status_id', '')
     with timeout(120, f'Waited too long for container-stats'):
         while True:
-            nuvlabox_status = nuvla.api.get(nuvlabox_status_id)
+            try:
+                nuvlabox_status = nuvla.api.get(nuvlabox_status_id)
+            except IndexError:
+                nuvlabox_status = {}
+                pass
+
             if nuvlabox_status.data.get('resources', {}).get('container-stats'):
                 break
+
+            time.sleep(3)
 
     request.config.cache.set('nuvlabox_status', nuvlabox_status.data)
     for container in nuvlabox_status.data['resources']['container-stats']:

@@ -56,12 +56,6 @@ jobs:
         run: |
           python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
 
-      - name: Test vulnerabilities
-        if: ${{ success() }}
-        id: ImageScan
-        run: |
-          python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerability-scan.py
-
       - name: Create Test NuvlaBox in Nuvla.io
         if: ${{ success() }}
         id: NewNuvlaBox
@@ -116,19 +110,19 @@ jobs:
           module-id: module/179ee861-b378-4f74-aebf-41363df7b0d9
           credential-id: ${{ steps.TestInstallationSuccess.outputs.nuvlabox_credential_id }}
 
+      - if: always()
+        name: Keep test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: remote-certification-report
+          path: nuvlabox.*.output.html
+
       # - if: always()
       #   name: Cleanup Nuvla resources
       #   env:
       #     NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
       #     DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaBoxEngine.outputs.DEPLOYMENT_ID }}
-      #   run: python cleanup.py
-
-      - if: always()
-        name: Keep test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: pytest-report
-          path: test/nuvlabox.*.output.html
+      #   run: cd .. && python cleanup.py
 
   notify:
     if: always()

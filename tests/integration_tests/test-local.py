@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# import time
 import signal
 import json
 import docker
@@ -11,9 +10,13 @@ import logging
 import os
 import nuvla as nuvla_lib
 from tempfile import NamedTemporaryFile
-from contextlib import contextmanager
 from git import Repo
-from nuvla_api import NuvlaApi
+
+import sys
+sys.path.append('../')
+from common.nuvla_api import NuvlaApi
+from common.timeout import timeout
+
 
 NUVLABOX_DATA_GATEWAY_IMAGE="eclipse-mosquitto:1.6.12"
 NUVLABOX_IMMUTABLE_SSH_PUB_KEY="testpubkey"
@@ -42,26 +45,6 @@ if repo.active_branch.name == "master":
     nbe_installer_image = "nuvlabox/installer:master"
 else:
     nbe_installer_image = f"nuvladev/installer:{repo.active_branch.name}"
-
-@contextmanager
-def timeout(deadline, err_msg):
-    # Register a function to raise a TimeoutError on the signal.
-    signal.signal(signal.SIGALRM, raise_timeout)
-    # Schedule the signal to be sent after ``time``.
-    signal.alarm(deadline)
-
-    try:
-        yield
-    except TimeoutError:
-        raise Exception(err_msg)
-    finally:
-        # Unregister the signal so it won't be triggered
-        # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
-
-
-def raise_timeout(signum, frame):
-    raise TimeoutError
 
 
 def test_deploy_nuvlaboxes(request):

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 import os
-from nuvla_api import NuvlaApi
+import sys
+sys.path.append('../')
+
+from common.nuvla_api import NuvlaApi
 
 nuvla = NuvlaApi()
 nuvla.login()

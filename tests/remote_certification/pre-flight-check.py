@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import logging
-import pytest
-from nuvla_api import NuvlaApi
+import sys
+sys.path.append('../')
+
+from common.nuvla_api import NuvlaApi
 
 nuvla = NuvlaApi()
 
