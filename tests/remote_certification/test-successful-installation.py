@@ -53,10 +53,11 @@ def test_nuvlabox_infra(request):
     # check IS
     err = "Unable to validate the NuvlaBox's infrastructure-service"
     with timeout(180, err):
-        print('Searching for NuvlaBox infrastructure-service')
+        search_filter = f'parent="{isg_id}" and subtype="swarm"'
+        print('Searching for NuvlaBox infrastructure-service: ' + search_filter)
         while True:
             infras = nuvla.api.search('infrastructure-service',
-                                    filter=f'parent="{isg_id}" and subtype="swarm"')
+                                    filter=search_filter)
 
             if infras.count == 0:
                 time.sleep(2)

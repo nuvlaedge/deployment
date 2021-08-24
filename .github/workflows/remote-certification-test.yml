@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   tester:
-    name: "Run NuvlaBox Functional Tests"
+    name: "Run NuvlaBox Remote Certification Tests"
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
