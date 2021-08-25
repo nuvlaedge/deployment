@@ -13,16 +13,11 @@ nuvla.login()
 
 nuvlabox_id = os.environ.get('NUVLABOX_ID')
 
-def test_nuvlabox_has_pull_capability(request):
+def test_nuvlabox_exists(request):
     nuvlabox = nuvla.api.get(nuvlabox_id)
     request.config.cache.set('nuvlabox', nuvlabox.data)
     request.config.cache.set('nuvlabox_status_id', nuvlabox.data['nuvlabox-status'])
     request.config.cache.set('nuvlabox_isg_id', nuvlabox.data['infrastructure-service-group'])
-
-    assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
-        f'NuvlaBox {nuvlabox_id} is missing the  NUVLA_JOB_PULL capability'
-
-    request.config.cache.set('nuvlabox_has_pull', True)
 
 def test_nuvlabox_is_stable(request):
     nuvlabox_status_id = request.config.cache.get('nuvlabox_status_id', '')
@@ -144,6 +139,10 @@ def test_expected_attributes(request):
 
     assert nuvlabox_status.get('orchestrator'), \
         f'Orchestrator{default_err_log_suffix}'
+
+    nuvlabox = nuvla.api.get(nuvlabox_id)
+    assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
+        f'NuvlaBox {nuvlabox_id} is missing the  NUVLA_JOB_PULL capability'
 
     if swarm_enabled.lower() == "true":
         assert nuvlabox_status.get('node-id'), \
