@@ -70,7 +70,7 @@ jobs:
       - name: Deploy NuvlaBox Engine in CI/CD Testbed
         if: ${{ success() }}
         id: DeployNuvlaBoxEngine
-        uses: nuvla/nuvla-deploy-app-action@v1
+        uses: nuvla/nuvla-deploy-app-action@v2
         with:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
@@ -96,7 +96,7 @@ jobs:
       - name: Test App Deployment
         if: ${{ success() }}
         id: DeployTestApp
-        uses: nuvla/nuvla-deploy-app-action@v1
+        uses: nuvla/nuvla-deploy-app-action@v2
         with:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
