@@ -27,10 +27,10 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
-        architecture: [arm, arm64]
+        architecture: [arm] #, arm64]
         include:
-          - architecture: arm
-            credential-id: credential/b0c42cd1-b230-4851-be87-fc7e05bdfbb3
+          # - architecture: arm
+          #   credential-id: credential/b0c42cd1-b230-4851-be87-fc7e05bdfbb3
           - architecture: arm64
             credential-id: credential/5698ccd5-54b6-4412-b19c-46e3c6212f33
 
