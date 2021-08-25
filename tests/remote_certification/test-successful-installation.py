@@ -144,7 +144,7 @@ def test_expected_attributes(request):
     assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
         f'NuvlaBox {nuvlabox_id} is missing the  NUVLA_JOB_PULL capability'
 
-    if swarm_enabled.lower() == "true":
+    if swarm_enabled:
         assert nuvlabox_status.get('node-id'), \
             f'Node ID{default_err_log_suffix}'
 

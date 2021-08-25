@@ -118,12 +118,12 @@ jobs:
           name: remote-certification-report
           path: tests/remote_certification/nuvlabox.*.output.html
 
-      # - if: always()
-      #   name: Cleanup Nuvla resources
-      #   env:
-      #     NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
-      #     DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaBoxEngine.outputs.DEPLOYMENT_ID }}
-      #   run: cd .. && python cleanup.py
+      - if: always()
+        name: Cleanup Nuvla resources
+        env:
+          NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+          DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaBoxEngine.outputs.DEPLOYMENT_ID }}
+        run: cd .. && python cleanup.py
 
   notify:
     if: always()
