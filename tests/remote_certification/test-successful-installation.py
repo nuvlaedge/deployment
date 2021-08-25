@@ -107,9 +107,20 @@ def test_expected_attributes(request):
     nuvlabox_status = request.config.cache.get('nuvlabox_status', {})
 
     # update the status
-    nuvlabox_status = nuvla.api.get(nuvlabox_status['id']).data
+    with timeout(120, 'VPN IP is not available in NuvlaBox Status'):
+        while True:
+            nuvlabox_status = nuvla.api.get(nuvlabox_status['id']).data
+            if nuvlabox_status.get('ip') and nuvlabox_status['ip'].startswith('10.'):
+                break
+
+            time.sleep(3)
 
     default_err_log_suffix = ': attribute missing from NuvlaBox status'
+    assert nuvlabox_status.get('ip'), \
+        f'IP{default_err_log_suffix}'
+
+    assert nuvlabox_status['ip'].startswith('10.'), \
+        'VPN IP is not set'
     assert nuvlabox_status.get('operating-system'), \
         f'Operating System{default_err_log_suffix}'
 
@@ -121,12 +132,6 @@ def test_expected_attributes(request):
 
     assert nuvlabox_status.get('hostname'), \
         f'Hostname{default_err_log_suffix}'
-
-    assert nuvlabox_status.get('ip'), \
-        f'IP{default_err_log_suffix}'
-
-    assert nuvlabox_status['ip'].startswith('10.'), \
-        'VPN IP is not set'
 
     assert nuvlabox_status.get('last-boot'), \
         f'Last Boot{default_err_log_suffix}'
