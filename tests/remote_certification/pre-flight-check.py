@@ -20,7 +20,7 @@ def test_nuvla_login():
 
 def test_zero_nuvlaboxes():
     logging.info('We shall not run this test if there are leftover NuvlaBox resources in Nuvla...')
-    search_filter = 'description^="NuvlaBox for E2E testing - commit" and state="COMMISSIONED"'
+    search_filter = 'name^="[CI/CD Remote Certification " and state="COMMISSIONED"'
     existing_nuvlaboxes = nuvla.api.get('nuvlabox',
                                         filter=search_filter)
     # if there are NBs then it means a previous test run left uncleaned resources. This must be fixed manually
