@@ -72,7 +72,7 @@ def test_nuvlabox_infra(request):
 
     request.config.cache.set('infra_service', infra)
     request.config.cache.set('nuvlabox_credential', nb_credential.resources[0].data)
-    print(f'::set-output name=nuvlabox_credential_id::{nb_credential.resources[0].id}')
+    print(f'::set-output name=nuvlabox_credential_id::{nb_credential.resources[0].data["id"]}')
 
     credential = nb_credential.resources[0].data
     if credential.get('status', '') != "VALID":
