@@ -93,14 +93,6 @@ jobs:
         run: |
           python -m pytest -vv -x --html=nuvlabox.test-successful-installation.output.html --self-contained-html test-successful-installation.py
 
-      - name: Test Peripheral Registration
-        if: ${{ success() }}
-        env:
-          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
-          NUVLABOX_SERVICES: ${{ steps.ImageScan.outputs.services }}
-        run: |
-          python -m pytest -vv -x --html=nuvlabox.test-peripherals.output.html --self-contained-html test-peripherals.py
-
       - name: Test App Deployment
         if: ${{ success() }}
         id: DeployTestApp
