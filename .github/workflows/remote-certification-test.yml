@@ -94,7 +94,7 @@ jobs:
           python -m pytest -vv -x --html=nuvlabox.test-successful-installation.output.html --self-contained-html test-successful-installation.py
           out=$(cat nuvlabox.test-successful-installation.output.html | grep ::set-nuvlabox_credential_id)
           cred_id=$(echo $out | awk -F'::set-nuvlabox_credential_id' '{print $2}')
-          echo '::set-output name=nuvlabox_credential_id::$cred_id'
+          echo "::set-output name=nuvlabox_credential_id::$cred_id"
 
       - name: Test App Deployment
         if: ${{ success() }}
