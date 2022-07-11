@@ -4,6 +4,7 @@ import docker
 import sys
 import time
 import signal
+import logging
 from contextlib import contextmanager
 
 
@@ -19,7 +20,7 @@ def timeout(deadline):
     try:
         yield
     except TimeoutError:
-        raise Exception(f'Exceeded the timeout of {timer} sec while waiting for NuvlaBox installation to be healthy')
+        raise Exception(f'Exceeded the timeout of {timer} sec while waiting for NuvlaEdge installation to be healthy')
     finally:
         # Unregister the signal so it won't be triggered
         # if the timeout is not reached.
@@ -30,48 +31,86 @@ def raise_timeout(signum, frame):
     raise TimeoutError
 
 
-try:
-    dc = docker.from_env()
+def is_agent(container):
+    return container.labels.get('com.docker.compose.service', '') == 'agent'
 
-    healthcheck_finished = False
+
+def get_containers(docker_client):
+    filters = {'label': "nuvlabox.component=True"}
+    return docker_client.containers.list(filters=filters, all=True)
+
+
+def check_container_running(container):
+    status = container.status
+    if not status or status.lower() != 'running':
+        return False, f'container "{container.name}" status not running: {status}'
+    return True, ''
+
+
+def check_restart_count(container):
+    restart_count = container.attrs.get('RestartCount', 0)
+    if restart_count != 0:
+        return False, f'container "{container.name}" restart count not zero: {restart_count}'
+    return True, ''
+
+
+def check_health_state(container):
+    state = container.attrs.get('State')
+    if not state:
+        return False, f'container "{container.name}" state not available'
+
+    health = state.get('Health')
+    if not health:
+        return True, f'container "{container.name}" health not available (not an issue)'
+
+    status = health.get('Status')
+    if not status or status.lower() != 'healthy':
+        return False, f'container "{container.name}" status not healthy: {status}'
+
+    return True, ''
+
+
+def handle_result(command_return, results, messages):
+    res, msg = command_return
+    results.append(res)
+    if msg:
+        messages.append(msg)
+    logging.info(msg)
+
+
+last_messages = []
+
+try:
+    docker_client = docker.from_env()
+
     with timeout(timer):
-        while not healthcheck_finished:
-            time.sleep(3)
+        while True:
+            results = []
+            messages = []
+
             try:
-                nb_containers = dc.containers.list(filters={'label': "nuvlabox.component=True"}, all=True)
+                containers = get_containers(docker_client)
             except docker.errors.APIError:
                 continue
 
-            for index, container in enumerate(nb_containers):
-                # this loop breaks everytime it finds something unhealthy with the NB Engine, thus never terminating
-                # the parent infinite loop
-                state = container.attrs.get('State')
-                if not state:
-                    break
+            for container in containers:
+                local_results = []
+                if is_agent(container):
+                    handle_result(check_restart_count(container), local_results, messages)
+                    handle_result(check_container_running(container), local_results, messages)
+                handle_result(check_health_state(container), local_results, messages)
+                results.append(local_results and all(local_results))
 
-                if container.labels.get('com.docker.compose.service') and \
-                        container.labels.get('com.docker.compose.service') == "agent":
-                    if container.attrs.get('RestartCount', 0) > 0:
-                        raise Exception(f'NuvlaBox Agent is unstable and/or misbehaving')
-                    elif container.status != "running":
-                        break
-                    else:
-                        pass
-                elif 'Health' not in state:
-                    if (index + 1) < len(nb_containers):
-                        continue
-                    else:
-                        pass
-                else:
-                    health = state['Health']
-                    if health.get('Status', '').lower() != "healthy":
-                        break
+            last_messages = messages
 
-                if (index + 1) == len(nb_containers):
-                    # if we got here, we are on the last container, and we haven't "break", so it means that:
-                    # - agent is running
-                    # - all NB containers with a Docker healthcheck are healthy
-                    healthcheck_finished = True
+            if all(results):
+                break
+
+            time.sleep(3)
+
 except Exception as e:
+    messages = "\n".join(last_messages)
+    print(f'{e}')
+    print(f'Messages: \n{messages}')
     # making sure that only the error message is printed and not the whole exception
     raise
