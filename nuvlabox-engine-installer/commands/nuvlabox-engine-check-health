@@ -40,51 +40,60 @@ def get_containers(docker_client):
     return docker_client.containers.list(filters=filters, all=True)
 
 
+def get_container_logs(container):
+    return container.logs(stream=False, tail=100)
+
+
 def check_container_running(container):
     status = container.status
     if not status or status.lower() != 'running':
-        return False, f'container "{container.name}" status not running: {status}'
+        return False, f'status not running: {status}'
     return True, ''
 
 
 def check_restart_count(container):
     restart_count = container.attrs.get('RestartCount', 0)
     if restart_count != 0:
-        return False, f'container "{container.name}" restart count not zero: {restart_count}'
+        return False, f'restart count not zero: {restart_count}'
     return True, ''
 
 
 def check_health_state(container):
     state = container.attrs.get('State')
     if not state:
-        return False, f'container "{container.name}" state not available'
+        return False, 'state not available'
 
     health = state.get('Health')
     if not health:
-        return True, f'container "{container.name}" health not available (not an issue)'
+        return True, 'health not available (not an issue)'
 
     status = health.get('Status')
     if not status or status.lower() != 'healthy':
-        return False, f'container "{container.name}" status not healthy: {status}'
+        return False, f'status not healthy: {status}'
 
     return True, ''
 
 
-def handle_result(command_return, results, messages):
-    res, msg = command_return
+def exec_check(command, container, results, messages, logs):
+    res, msg = command(container)
     results.append(res)
     if msg:
-        messages.append(msg)
-    logging.info(msg)
+        message = f'Container "{container.name}" {msg}'
+        messages.append(message)
+        logging.info(message)
+    if not res:
+        logs[container.name] = get_container_logs(container)
 
 
 last_messages = []
+last_logs = []
 
 try:
     docker_client = docker.from_env()
 
     with timeout(timer):
         while True:
+            logs = {}
             results = []
             messages = []
 
@@ -95,13 +104,15 @@ try:
 
             for container in containers:
                 local_results = []
+                args = (container, local_results, messages, logs)
                 if is_agent(container):
-                    handle_result(check_restart_count(container), local_results, messages)
-                    handle_result(check_container_running(container), local_results, messages)
-                handle_result(check_health_state(container), local_results, messages)
+                    exec_check(check_restart_count, *args)
+                    exec_check(check_container_running, *args)
+                exec_check(check_health_state, *args)
                 results.append(local_results and all(local_results))
 
             last_messages = messages
+            last_logs = logs
 
             if all(results):
                 break
@@ -112,5 +123,8 @@ except Exception as e:
     messages = "\n".join(last_messages)
     print(f'{e}')
     print(f'Messages: \n{messages}')
+    print(f'Logs:')
+    for container_name, logs in last_logs.items():
+        print(f'{container_name}: \n{logs}')
     # making sure that only the error message is printed and not the whole exception
     raise
