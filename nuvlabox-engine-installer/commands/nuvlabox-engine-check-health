@@ -41,7 +41,7 @@ def get_containers(docker_client):
 
 
 def get_container_logs(container):
-    return container.logs(stream=False, tail=100)
+    return container.logs(stream=False, tail=100, timestamps=True)
 
 
 def check_container_running(container):
