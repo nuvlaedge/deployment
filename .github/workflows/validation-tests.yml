@@ -11,11 +11,12 @@ on:
 jobs:
   validate-release:
     runs-on: validation-runner
-    working-directory: "/Users/runner/actions-runner/_work/validation/validation"
     strategy:
       matrix:
         board-config: [ "1_rpi4.toml" ]
-
+    defaults:
+      run:
+        working-directory: "/Users/runner/actions-runner/_work/validation/validation"
     steps:
       - name: Setup Python environment
         uses: actions/setup-python@v4
