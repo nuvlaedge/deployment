@@ -1,0 +1,36 @@
+name: "NuvlaEdge Device and System validation tests"
+
+on:
+  push:
+    branches:
+      - [validation-tests]
+    pull_request:
+  workflow_dispatch:
+
+
+jobs:
+  validate-release:
+    runs-on: validation-runner
+    working-directory: "/Users/runner/actions-runner/_work/validation/validation"
+    strategy:
+      matrix:
+        board-config: [ "1_rpi4.toml" ]
+
+    steps:
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.8'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Validation on board ${{ matrix.board-config }}
+        working-directory: ./validation_framework
+        run: python main.py
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: always()
+        with:
+          junit_files: "temp_results/xml/*.xml"
