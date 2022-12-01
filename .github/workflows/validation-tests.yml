@@ -14,9 +14,7 @@ jobs:
     strategy:
       matrix:
         board-config: [ "1_rpi4.toml" ]
-    defaults:
-      run:
-        working-directory: "/Users/runner/actions-runner/_work/validation/validation"
+
     steps:
       - name: Setup Python environment
         uses: actions/setup-python@v4
@@ -24,9 +22,11 @@ jobs:
           python-version: '3.10.8'
 
       - name: Install dependencies
+        working-directory: "/Users/runner/actions-runner/_work/validation/validation/"
         run: pip install -r requirements.txt
 
       - name: Run Validation on board ${{ matrix.board-config }}
+        working-directory: "/Users/runner/actions-runner/_work/validation/validation/validation_framework/"
         run: python main.py
 
       - name: Publish Unit Test Results
