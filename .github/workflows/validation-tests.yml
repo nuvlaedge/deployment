@@ -3,7 +3,7 @@ name: "NuvlaEdge Device and System validation tests"
 on:
   push:
     branches:
-      - [validation-tests]
+      - "validation-tests"
     pull_request:
   workflow_dispatch:
 
