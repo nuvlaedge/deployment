@@ -13,24 +13,34 @@ jobs:
     runs-on: validation-runner
     strategy:
       matrix:
-        board-config: [ "1_rpi4.toml" ]
+        board-config: [ "1_rpi4.toml", "2_ubuntu_vm.toml" ]
+        validation-type: [ "basic_tests", "nuvla_operations" ]
 
     steps:
+      - name: CheckOut configuration and package
+        uses: actions/checkout@v3
+        with:
+          repository: nuvlaedge/validation
+          ssh-key: ${{ secrets.VALIDATION_SSH_KEY }}
+
       - name: Setup Python environment
         uses: actions/setup-python@v4
         with:
           python-version: '3.10.8'
 
       - name: Install dependencies
-        working-directory: "/Users/runner/actions-runner/_work/validation/validation/"
         run: pip install -r requirements.txt
 
+      - name: Install Validation Framework dependency
+        working-directory: ./dist/
+        run: pip install validation-0.0.1a1-py3-none-any.whl  --force-reinstall
+
       - name: Run Validation on board ${{ matrix.board-config }}
-        working-directory: "/Users/runner/actions-runner/_work/validation/validation/validation_framework/"
-        run: python main.py
+        working-directory: ./validation_framework
+        run: python -m validation_framework --target ${{ matrix.board-config }} --validator ${{ matrix.validation-type }}
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: always()
         with:
-          junit_files: "/Users/runner/actions-runner/_work/validation/validation/temp_results/xml/*.xml"
+          junit_files: "temp_results/xml/*.xml"
