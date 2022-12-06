@@ -20,12 +20,12 @@ jobs:
       - name: CheckOut validation packages
         run: |
           "curl -H 'Authorization: ${{ secrets.VALIDATION_TOKEN_USERNAME }} ${{secrets.VALIDATION_TOKEN_SECRET}}' -H 'Accept: application/vnd.github.v3.raw' \
-          -O -L https://api.github.com/repos/nuvlaedge/validations/dist/"
+          -O -L https://api.github.com/repos/nuvlaedge/validation/dist/"
 
       - name: Gather System configuration
         run: |
           "curl -H 'Authorization: ${{ secrets.VALIDATION_TOKEN_USERNAME }} ${{secrets.VALIDATION_TOKEN_SECRET}}' -H 'Accept: application/vnd.github.v3.raw' \
-          -O -L https://api.github.com/repos/nuvlaedge/validations/conf/"
+          -O -L https://api.github.com/repos/nuvlaedge/validation/conf/"
 
       - name: Setup Python environment
         uses: actions/setup-python@v4
