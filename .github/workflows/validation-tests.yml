@@ -25,17 +25,17 @@ jobs:
           -L "https://api.github.com/repos/nuvlaedge/validation/contents/dist/validation-0.0.1a1-py3-none-any.whl"
 
       - name: Gather System configuration
-        run: |
-          wget --header="Accept: application/vnd.github+json" \
-          --header="Authorization: ${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
-          --no-parent \
-          -r \
-          "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/"
 #        run: |
-#          curl -i -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
-#          -H 'Accept: application/vnd.github.v3.raw' \
-#          -O \
-#          -O -L "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/"
+#          wget -O --header="Accept: application/vnd.github+json" \
+#          --header="Authorization: ${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
+#          --no-parent \
+#          -r \
+#          "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/"
+        run: |
+          curl -i -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
+          -H 'Accept: application/vnd.github.v3.raw' \
+          -O \
+          -O -L "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/1_rpi4.toml"
 
       - name: Setup Python environment
         uses: actions/setup-python@v4
