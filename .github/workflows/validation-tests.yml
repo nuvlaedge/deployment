@@ -17,11 +17,15 @@ jobs:
         validation-type: [ "basic_tests", "nuvla_operations" ]
 
     steps:
-      - name: CheckOut configuration and package
-        uses: actions/checkout@v3
-        with:
-          repository: nuvlaedge/validation
-          ssh-key: ${{ secrets.VALIDATION_SSH_KEY }}
+      - name: CheckOut validation packages
+        run: |
+          curl -H 'Authorization: ${{ secrets.VALIDATION_TOKEN_USERNAME }} ${{secrets.VALIDATION_TOKEN_SECRET}}' -H 'Accept: application/vnd.github.v3.raw' \
+          -O -L https://api.github.com/repos/nuvlaedge/validations/dist/
+
+      - name: Gather System configuration
+        run: |
+          curl -H 'Authorization: ${{ secrets.VALIDATION_TOKEN_USERNAME }} ${{secrets.VALIDATION_TOKEN_SECRET}}' -H 'Accept: application/vnd.github.v3.raw' \
+          -O -L https://api.github.com/repos/nuvlaedge/validations/conf/
 
       - name: Setup Python environment
         uses: actions/setup-python@v4
