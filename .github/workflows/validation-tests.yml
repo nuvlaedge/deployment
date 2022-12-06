@@ -20,7 +20,7 @@ jobs:
       - name: CheckOut validation packages
         run: |
           "curl -H 'Authorization: ${{ secrets.VALIDATION_TOKEN_USERNAME }} ${{secrets.VALIDATION_TOKEN_SECRET}}' -H 'Accept: application/vnd.github.v3.raw' \
-          -O -L https://api.github.com/repos/nuvlaedge/validation/contentes/dist/"
+          -O -L https://api.github.com/repos/nuvlaedge/validation/contents/dist/"
 
       - name: Gather System configuration
         run: |
