@@ -22,7 +22,7 @@ jobs:
           curl -i -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
           -H 'Accept: application/vnd.github.v3.raw' \
           -O --create-dirs --output-dir conf/targets/ \
-          -L "https://api.github.com/repos/nuvlaedge/validation/contents/dist/validation-0.0.1a1-py3-none-any.whl" \
+          -L "https://api.github.com/repos/nuvlaedge/validation/contents/dist/validation-0.0.1-py3-none-any.whl" \
           
 
       - name: Gather System configuration
@@ -43,7 +43,7 @@ jobs:
           python-version: '3.10.8'
 
       - name: Install Validation Framework dependency
-        run: pip install validation-0.0.1a1-py3-none-any.whl  --force-reinstall
+        run: pip install validation-0.0.1-py3-none-any.whl  --force-reinstall
 
       - name: Setup results folder
         run: |
