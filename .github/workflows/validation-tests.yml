@@ -43,7 +43,6 @@ jobs:
           python-version: '3.10.8'
 
       - name: Install Validation Framework dependency
-        working-directory: ./dist/
         run: pip install validation-0.0.1a1-py3-none-any.whl  --force-reinstall
 
       - name: Run Validation on board ${{ matrix.board-config }}
