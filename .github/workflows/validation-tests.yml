@@ -34,16 +34,12 @@ jobs:
         run: |
           curl -i -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
           -H 'Accept: application/vnd.github.v3.raw' \
-          -O \
-          -O -L "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/1_rpi4.toml"
+          -O -L "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/${{ matrix.board-config }}"
 
       - name: Setup Python environment
         uses: actions/setup-python@v4
         with:
           python-version: '3.10.8'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
 
       - name: Install Validation Framework dependency
         working-directory: ./dist/
