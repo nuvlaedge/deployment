@@ -45,6 +45,7 @@ jobs:
           mkdir -p temp_results/xml temp_results/json
 
       - name: Run Validation on board ${{ matrix.board-config }}
+        working-directory: ./deployment/
         run: python -m validation_framework --target ${{ matrix.board-config }} --validator ${{ matrix.validation-type }}
 
       - name: Publish Unit Test Results
