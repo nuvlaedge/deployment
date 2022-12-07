@@ -52,6 +52,6 @@ jobs:
         with:
           junit_files: "temp_results/xml/*.xml"
 
-      - name: Clean up after validation
-        run: |
-          rm -rf ./* || true
+#      - name: Clean up after validation
+#        run: |
+#          rm -rf ./* || true
