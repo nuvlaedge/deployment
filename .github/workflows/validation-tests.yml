@@ -7,9 +7,7 @@ on:
     pull_request:
   workflow_dispatch:
 
-defaults:
- run:
-  working-directory: ./deployment/
+
 
 jobs:
   validate-release:
