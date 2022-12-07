@@ -7,6 +7,9 @@ on:
     pull_request:
   workflow_dispatch:
 
+defaults:
+ run:
+  working-directory: ./validation
 
 jobs:
   validate-release:
