@@ -46,7 +46,6 @@ jobs:
         run: pip install validation-0.0.1a1-py3-none-any.whl  --force-reinstall
 
       - name: Run Validation on board ${{ matrix.board-config }}
-        working-directory: ./validation_framework
         run: python -m validation_framework --target ${{ matrix.board-config }} --validator ${{ matrix.validation-type }}
 
       - name: Publish Unit Test Results
