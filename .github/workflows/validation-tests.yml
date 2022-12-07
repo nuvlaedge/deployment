@@ -45,6 +45,10 @@ jobs:
       - name: Install Validation Framework dependency
         run: pip install validation-0.0.1a1-py3-none-any.whl  --force-reinstall
 
+      - name: Setup results folder
+        run: |
+          mkdir -p temp_results/xml temp_results/json
+
       - name: Run Validation on board ${{ matrix.board-config }}
         run: python -m validation_framework --target ${{ matrix.board-config }} --validator ${{ matrix.validation-type }}
 
@@ -53,3 +57,7 @@ jobs:
         if: always()
         with:
           junit_files: "temp_results/xml/*.xml"
+
+      - name: Clean up after validation
+        run: |
+          rm -rf ./* || true
