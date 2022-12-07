@@ -21,8 +21,9 @@ jobs:
         run: |
           curl -i -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
           -H 'Accept: application/vnd.github.v3.raw' \
-          -O \
-          -L "https://api.github.com/repos/nuvlaedge/validation/contents/dist/validation-0.0.1a1-py3-none-any.whl"
+          -O --create-dirs conf/targets/ --output-dir conf/targets/ \
+          -L "https://api.github.com/repos/nuvlaedge/validation/contents/dist/validation-0.0.1a1-py3-none-any.whl" \
+          
 
       - name: Gather System configuration
 #        run: |
