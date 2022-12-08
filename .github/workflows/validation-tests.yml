@@ -1,4 +1,8 @@
-name: "NuvlaEdgeValidation"
+name: "DeploymentValidation"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
 
 on:
   push:
