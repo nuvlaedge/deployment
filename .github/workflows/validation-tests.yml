@@ -1,4 +1,4 @@
-name: "NuvlaEdge Device and System validation tests"
+name: "NuvlaEdgeValidation"
 
 on:
   push:
@@ -8,14 +8,13 @@ on:
   workflow_dispatch:
 
 
-
 jobs:
   validate-release:
-    runs-on: validation-runner
     strategy:
       matrix:
-        board-config: [ "rpi4.toml", "ubuntu_vm.toml" ]
+        board-config: [ "rpi4", "ubuntu_vm" ]
         validation-type: [ "basic_tests", "nuvla_operations" ]
+    runs-on: ${{ matrix.board-config }}
 
     steps:
       - name: CheckOut validation packages
@@ -45,14 +44,10 @@ jobs:
           mkdir -p temp_results/xml temp_results/json
 
       - name: Run Validation on board ${{ matrix.board-config }}
-        run: python -m validation_framework --target ${{ matrix.board-config }} --validator ${{ matrix.validation-type }}
+        run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: always()
         with:
           junit_files: "temp_results/xml/*.xml"
-
-#      - name: Clean up after validation
-#        run: |
-#          rm -rf ./* || true
