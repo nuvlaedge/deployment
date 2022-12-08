@@ -22,7 +22,7 @@ jobs:
           curl -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_TOKEN_SECRET }}" \
           -H 'Accept: application/vnd.github.v3.raw' \
           -O --create-dirs --output-dir conf/targets/ \
-          -L "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/${{ matrix.board-config }}" \
+          -L "https://api.github.com/repos/nuvlaedge/validation/contents/conf/targets/${{ matrix.board-config }}.toml" \
           
 
       - name: Gather System configuration
