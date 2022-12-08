@@ -47,6 +47,11 @@ jobs:
         run: |
           mkdir -p temp_results/xml temp_results/json
 
+      # FUTURE: Store results somewhere else?
+      - name: Clear previous results
+        run: |
+          rm temp_results/xml/*.xml
+
       - name: Run Validation on board ${{ matrix.board-config }}
         run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
 
