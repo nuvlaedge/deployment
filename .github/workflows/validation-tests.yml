@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  VALIDATION_PACKAGE_NAME: "validations-framework-latest-py3-none-any.whl"
+  VALIDATION_PACKAGE_NAME: "validation-latest-py3-none-any.whl"
 
 jobs:
   validate-release:
