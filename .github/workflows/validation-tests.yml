@@ -67,5 +67,5 @@ jobs:
         run: |
           curl -X POST https://api.github.com/repos/nuvlaedge/validation \
           -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u ${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
-          --data '{"event_type": "parse_results", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "device": ${{ matrix.board-config }} }}'
+          -u -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
+          --data '{"event_type": "parse_results", "client_payload": { "device": ${{ matrix.board-config }} }}'
