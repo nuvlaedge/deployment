@@ -62,10 +62,17 @@ jobs:
 #        if: always()
 #        with:
 #          junit_files: "temp_results/xml/*.xml"
+      - name: Test with external action
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.VALIDATION_DISPATCH_TOKEN }}
+          repository: nuvlaedge/validation
+          event-type: my-event
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "dev": "${{ matrix.board-config }}"}'
 
-      - name: Update release validation results
-        run: |
-          curl -X POST https://api.github.com/repos/nuvlaedge/validation/dispatches \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u ${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
-          --data '{"event_type": "parse_results", "client_payload": { "device": "'"${{ matrix.board-config }}"'" }}'
+#      - name: Update release validation results
+#        run: |
+#          curl -X POST https://api.github.com/repos/nuvlaedge/validation/dispatches \
+#          -H 'Accept: application/vnd.github.everest-preview+json' \
+#          -u ${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
+#          --data '{"event_type": "parse_results", "client_payload": { "device": "'"${{ matrix.board-config }}"'" }}'
