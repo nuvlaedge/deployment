@@ -68,7 +68,7 @@ jobs:
           token: ${{ secrets.VALIDATION_DISPATCH_TOKEN }}
           repository: nuvlaedge/validation
           event-type: update-validation-results
-          client-payload: {"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "dev": "${{ matrix.board-config }}"}
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "dev": "${{ matrix.board-config }}"}'
 
 #      - name: Update release validation results
 #        run: |
