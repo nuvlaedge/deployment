@@ -42,8 +42,8 @@ jobs:
         with:
           python-version: '3.10.8'
 
-      - name: Install Validation Framework dependency
-        run: pip install ${{ env.VALIDATION_PACKAGE_NAME }}  --force-reinstall
+#      - name: Install Validation Framework dependency
+#        run: pip install ${{ env.VALIDATION_PACKAGE_NAME }}  --force-reinstall
 
       - name: Setup results folder
         run: |
@@ -67,5 +67,5 @@ jobs:
         run: |
           curl -X POST https://api.github.com/repos/nuvlaedge/validation \
           -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_DISPATCH_TOKEN }}" \
+          -u ${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
           --data '{"event_type": "parse_results", "client_payload": { "device": "'"${{ matrix.board-config }}"'" }}'
