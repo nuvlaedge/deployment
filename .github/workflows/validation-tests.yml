@@ -42,26 +42,27 @@ jobs:
         with:
           python-version: '3.10.8'
 
-#      - name: Install Validation Framework dependency
-#        run: pip install ${{ env.VALIDATION_PACKAGE_NAME }}  --force-reinstall
+      - name: Install Validation Framework dependency
+        run: pip install ${{ env.VALIDATION_PACKAGE_NAME }}  --force-reinstall
 
       - name: Setup results folder
         run: |
           mkdir -p results/xml results/json
 
       # FUTURE: Store results somewhere else?
-#      - name: Clear previous results
-#        run: |
-#          rm results/xml/*.xml || true
-#
-#      - name: Run Validation on board ${{ matrix.board-config }}
-#        run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
-#
-#      - name: Publish Unit Test Results
-#        uses: EnricoMi/publish-unit-test-result-action/composite@v2
-#        if: always()
-#        with:
-#          junit_files: "temp_results/xml/*.xml"
+      - name: Clear previous results
+        run: |
+          rm results/xml/*.xml || true
+
+      - name: Run Validation on board ${{ matrix.board-config }}
+        run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: always()
+        with:
+          junit_files: "results/xml/*.xml"
+
       - name: Test with external action
         uses: peter-evans/repository-dispatch@v2
         with:
@@ -69,10 +70,3 @@ jobs:
           repository: nuvlaedge/validation
           event-type: update-validation-results
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "dev": "${{ matrix.board-config }}"}'
-
-#      - name: Update release validation results
-#        run: |
-#          curl -X POST https://api.github.com/repos/nuvlaedge/validation/dispatches \
-#          -H 'Accept: application/vnd.github.everest-preview+json' \
-#          -u ${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
-#          --data '{"event_type": "parse_results", "client_payload": { "device": "'"${{ matrix.board-config }}"'" }}'
