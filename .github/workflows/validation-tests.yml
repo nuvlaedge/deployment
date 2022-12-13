@@ -47,7 +47,7 @@ jobs:
 
       - name: Setup results folder
         run: |
-          mkdir -p temp_results/xml temp_results/json
+          mkdir -p results/xml results/json
 
       # FUTURE: Store results somewhere else?
       - name: Clear previous results
