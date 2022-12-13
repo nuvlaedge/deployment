@@ -16,6 +16,7 @@ env:
 
 jobs:
   validate-release:
+    permissions: write-all
     strategy:
       matrix:
         board-config: [ "rpi4", "ubuntu_vm" ]
