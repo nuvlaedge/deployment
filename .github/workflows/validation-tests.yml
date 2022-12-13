@@ -50,22 +50,22 @@ jobs:
           mkdir -p results/xml results/json
 
       # FUTURE: Store results somewhere else?
-      - name: Clear previous results
-        run: |
-          rm results/xml/*.xml || true
-
-      - name: Run Validation on board ${{ matrix.board-config }}
-        run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: always()
-        with:
-          junit_files: "temp_results/xml/*.xml"
+#      - name: Clear previous results
+#        run: |
+#          rm results/xml/*.xml || true
+#
+#      - name: Run Validation on board ${{ matrix.board-config }}
+#        run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
+#
+#      - name: Publish Unit Test Results
+#        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+#        if: always()
+#        with:
+#          junit_files: "temp_results/xml/*.xml"
 
       - name: Update release validation results
         run: |
           curl -X POST https://api.github.com/repos/nuvlaedge/validation \
           -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
-          --data '{"event_type": "parse_results", "client_payload": { "device": ${{ matrix.board-config }} }}'
+          -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_DISPATCH_TOKEN }}" \
+          --data '{"event_type": "parse_results", "client_payload": { "device": "'"${{ matrix.board-config }}"'" }}'
