@@ -52,7 +52,7 @@ jobs:
       # FUTURE: Store results somewhere else?
       - name: Clear previous results
         run: |
-          rm temp_results/xml/*.xml
+          rm results/xml/*.xml
 
       - name: Run Validation on board ${{ matrix.board-config }}
         run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
@@ -67,5 +67,5 @@ jobs:
         run: |
           curl -X POST https://api.github.com/repos/nuvlaedge/validation \
           -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
+          -u "${{ secrets.VALIDATION_TOKEN_USERNAME }}:${{ secrets.VALIDATION_DISPATCH_TOKEN }} \
           --data '{"event_type": "parse_results", "client_payload": { "device": ${{ matrix.board-config }} }}'
