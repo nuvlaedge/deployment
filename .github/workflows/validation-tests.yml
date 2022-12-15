@@ -1,4 +1,4 @@
-name: "DeploymentValidation"
+name: "Deployment Validation"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
@@ -66,10 +66,11 @@ jobs:
           check_name: "| ${{ matrix.board-config }} --- ${{ matrix.validation-type }} |"
           junit_files: "results/temp/xml/*.xml"
 
-      - name: Test with external action
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.VALIDATION_DISPATCH_TOKEN }}
-          repository: nuvlaedge/validation
-          event-type: update-validation-results
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "dev": "${{ matrix.board-config }}"}'
+# Future: Triggers workflow dispatch in nuvlaedge/validation for release validation
+#      - name: Test with external action
+#        uses: peter-evans/repository-dispatch@v2
+#        with:
+#          token: ${{ secrets.VALIDATION_DISPATCH_TOKEN }}
+#          repository: nuvlaedge/validation
+#          event-type: update-validation-results
+#          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "dev": "${{ matrix.board-config }}"}'
