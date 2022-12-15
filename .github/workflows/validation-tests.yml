@@ -47,22 +47,24 @@ jobs:
 
       - name: Setup results folder
         run: |
-          mkdir -p results/xml results/json
+          mkdir -p results/temp/xml results/temp/json
 
       # FUTURE: Store results somewhere else?
       - name: Clear previous results
         run: |
-          rm results/xml/*.xml || true
+          rm results/temp/xml/*.xml || true
 
       - name: Run Validation on board ${{ matrix.board-config }}
-        run: python -m validation_framework --target ${{ matrix.board-config }}.toml --validator ${{ matrix.validation-type }}
+        run: |
+          python -m validation_framework --target ${{ matrix.board-config }}.toml \
+          --validator ${{ matrix.validation-type }} --microservice ${{ github.event.repository.name }}
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: always()
         with:
-          check_name: "${{ matrix.board-config }}=${{ matrix.validation-type }}"
-          junit_files: "results/xml/*.xml"
+          check_name: "| ${{ matrix.board-config }} --- ${{ matrix.validation-type }} |"
+          junit_files: "results/temp/xml/*.xml"
 
       - name: Test with external action
         uses: peter-evans/repository-dispatch@v2
