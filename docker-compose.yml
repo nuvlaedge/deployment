@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvlaedge/system-manager:2.5.0
+    image: nuvladev/system-manager:main
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
@@ -45,7 +45,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlaedge/agent:2.9.6
+    image: nuvladev/agent:main
     restart: always
     oom_kill_disable: true
     privileged: true
@@ -81,7 +81,7 @@ services:
 
   compute-api:
     <<: *common
-    image: nuvlaedge/compute-api:1.3.0
+    image: nuvladev/compute-api:main
     restart: on-failure
     oom_score_adj: -900
     pid: "host"
@@ -100,7 +100,7 @@ services:
 
   vpn-client:
     <<: *common
-    image: nuvlaedge/vpn-client:1.2.0
+    image: nuvladev/vpn-client:main
     restart: always
     oom_kill_disable: true
     network_mode: host
@@ -116,7 +116,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:3.2.2
+    image: nuvladev/job-lite:master
     restart: always
     entrypoint: /app/pause.py
     volumes:
@@ -124,7 +124,7 @@ services:
 
   on-stop:
     <<: *common
-    image: nuvlaedge/on-stop:1.2.0
+    image: nuvladev/on-stop:merge
     restart: always
     command: pause
     volumes:
