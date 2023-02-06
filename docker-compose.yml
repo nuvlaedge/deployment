@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvladev/system-manager:main
+    image: nuvladev/system-manager:merge
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME}-system-manager
     environment:
@@ -47,10 +47,8 @@ services:
 
   agent:
     <<: *common
-    image: nuvladev/agent:main
+    image: nuvladev/agent:isolationV4
     container_name: ${COMPOSE_PROJECT_NAME}-agent
-    entrypoint: tail -f
-    command: /dev/null
     restart: always
     oom_kill_disable: true
     privileged: true
