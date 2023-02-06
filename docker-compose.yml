@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: sm_test:0.2
+    image: nuvladev/system-manager:main
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME}-system-manager
     environment:
@@ -47,7 +47,7 @@ services:
 
   agent:
     <<: *common
-    image: ag_test:0.2
+    image: nuvladev/agent:main
     container_name: ${COMPOSE_PROJECT_NAME}-agent
     entrypoint: tail -f
     command: /dev/null
