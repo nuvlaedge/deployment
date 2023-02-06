@@ -20,8 +20,9 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvladev/system-manager:merge
+    image: sm_test:0.2
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME}-system-manager
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
       - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
@@ -31,6 +32,7 @@ services:
       - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /Users/nacho/PycharmProjects/isolationV3/system-manager/code/:/opt/mytests/
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
       - "127.0.0.1:${MANAGER_PORT:-3636}:3636"
@@ -45,7 +47,10 @@ services:
 
   agent:
     <<: *common
-    image: nuvladev/agent:main
+    image: ag_test:0.2
+    container_name: ${COMPOSE_PROJECT_NAME}-agent
+    entrypoint: tail -f
+    command: /dev/null
     restart: always
     oom_kill_disable: true
     privileged: true
@@ -66,7 +71,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-      - /Users/nacho/PycharmProjects/isolation/agent/code/:/opt/mytests/
+      - /Users/nacho/PycharmProjects/isolationV3/agent/code/:/opt/mytests/
       - /:/rootfs:ro
     ports:
       - "127.0.0.1:${AGENT_PORT:-5080}:80"
@@ -82,6 +87,7 @@ services:
   compute-api:
     <<: *common
     image: nuvladev/compute-api:main
+    container_name: ${COMPOSE_PROJECT_NAME}-compute-api
     restart: on-failure
     oom_score_adj: -900
     pid: "host"
@@ -101,6 +107,7 @@ services:
   vpn-client:
     <<: *common
     image: nuvladev/vpn-client:main
+    container_name: ${COMPOSE_PROJECT_NAME}-vpn-client
     restart: always
     oom_kill_disable: true
     network_mode: host
@@ -117,6 +124,7 @@ services:
   job-engine-lite:
     <<: *common
     image: nuvladev/job-lite:master
+    container_name: ${COMPOSE_PROJECT_NAME}-job-engine-lite
     restart: always
     entrypoint: /app/pause.py
     volumes:
@@ -125,6 +133,7 @@ services:
   on-stop:
     <<: *common
     image: nuvladev/on-stop:merge
+    container_name: ${COMPOSE_PROJECT_NAME}-on-stop
     restart: always
     command: pause
     volumes:
