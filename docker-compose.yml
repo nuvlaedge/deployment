@@ -17,19 +17,20 @@ volumes:
       - "nuvlaedge.volume=True"
       - "nuvlaedge.deployment=production"
 
+
 services:
   system-manager:
     <<: *common
     image: nuvladev/system-manager:merge
     restart: always
-    container_name: ${COMPOSE_PROJECT_NAME}-system-manager
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
       - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
       - MANAGER_PORT=${MANAGER_PORT:-3636}
       - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
       - AGENT_PORT=${AGENT_PORT:-5080}
-      - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME}
+      - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -47,7 +48,7 @@ services:
   agent:
     <<: *common
     image: nuvladev/agent:isolationV4
-    container_name: ${COMPOSE_PROJECT_NAME}-agent
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     restart: always
     oom_kill_disable: true
     privileged: true
@@ -64,7 +65,7 @@ services:
       - MANAGER_PORT=${MANAGER_PORT:-3636}
       - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
       - AGENT_PORT=${AGENT_PORT:-5080}
-      - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME}
+      - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -83,7 +84,7 @@ services:
   compute-api:
     <<: *common
     image: nuvladev/compute-api:main
-    container_name: ${COMPOSE_PROJECT_NAME}-compute-api
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
     restart: on-failure
     oom_score_adj: -900
     pid: "host"
@@ -93,7 +94,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
-      - "${COMPUTE_API_PORT:-5000}:5000"
+      - ":5000"
     healthcheck:
       test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
       interval: 20s
@@ -103,7 +104,7 @@ services:
   vpn-client:
     <<: *common
     image: nuvladev/vpn-client:main
-    container_name: ${COMPOSE_PROJECT_NAME}-vpn-client
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
     restart: always
     oom_kill_disable: true
     network_mode: host
@@ -120,7 +121,7 @@ services:
   job-engine-lite:
     <<: *common
     image: nuvladev/job-lite:master
-    container_name: ${COMPOSE_PROJECT_NAME}-job-engine-lite
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     restart: always
     entrypoint: /app/pause.py
     volumes:
@@ -129,7 +130,7 @@ services:
   on-stop:
     <<: *common
     image: nuvladev/on-stop:merge
-    container_name: ${COMPOSE_PROJECT_NAME}-on-stop
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
     restart: always
     command: pause
     volumes:
