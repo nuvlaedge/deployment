@@ -32,7 +32,6 @@ services:
       - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /Users/nacho/PycharmProjects/isolationV3/system-manager/code/:/opt/mytests/
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
       - "127.0.0.1:${MANAGER_PORT:-3636}:3636"
@@ -69,7 +68,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-      - /Users/nacho/PycharmProjects/isolationV3/agent/code/:/opt/mytests/
       - /:/rootfs:ro
     ports:
       - "127.0.0.1:${AGENT_PORT:-5080}:80"
