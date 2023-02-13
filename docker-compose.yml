@@ -94,7 +94,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
-      - ":5000"
+      - "${COMPUTE_API_PORT:-5000}:5000"
     healthcheck:
       test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
       interval: 20s
