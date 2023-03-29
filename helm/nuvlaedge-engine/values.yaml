@@ -8,9 +8,9 @@ vpnClientComponentName: vpn-client
 
 images:
   agent:
-    repository: nuvlaedge/agent
+    repository: nuvladev/agent
     pullPolicy: Always
-    tag: "2.9.5"
+    tag: "k8s-fixes"
   dataGateway:
     repository: eclipse-mosquitto
     pullPolicy: Always
@@ -18,11 +18,11 @@ images:
   jobEngineLite:
     repository: nuvla/job-lite
     pullPolicy: Always
-    tag: "3.2.2"
+    tag: "3.2.5"
   kubernetesCredentialsManager:
-    repository: nuvlaedge/kubernetes-credentials-manager
+    repository: nuvladev/kubernetes-credentials-manager
     pullPolicy: Always
-    tag: "1.0.0"
+    tag: "dont-approve"
   security:
     repository: nuvlaedge/security
     pullPolicy: Always
@@ -55,6 +55,17 @@ images:
     repository: nuvlaedge/peripheral-manager-gpu
     pullPolicy: Always
     tag: "1.2.0"
+
+agentConfig:
+  # comma separated list of monitors to exclude
+  excluded_monitors:
+  log_level: INFO
+
+credManager:
+  # name of the CertificateSigningRequest for the edge management credentials
+  csr_name: nuvlaedge-csr
+  # waiting time in seconds for approving the edge management credentials
+  wait_approved_sec: 600
 
 nameOverride: ""
 fullnameOverride: ""
