@@ -22,6 +22,7 @@ services:
     <<: *common
     image: nuvlaedge/system-manager:2.5.0
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
       - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
@@ -47,6 +48,7 @@ services:
     <<: *common
     image: nuvlaedge/agent:2.9.6
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
     privileged: true
     environment:
@@ -83,6 +85,7 @@ services:
     <<: *common
     image: nuvlaedge/compute-api:1.3.0
     restart: on-failure
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
     oom_score_adj: -900
     pid: "host"
     environment:
@@ -102,6 +105,7 @@ services:
     <<: *common
     image: nuvlaedge/vpn-client:1.2.0
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
     oom_kill_disable: true
     network_mode: host
     privileged: true
@@ -118,6 +122,7 @@ services:
     <<: *common
     image: nuvla/job-lite:3.2.2
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     entrypoint: /app/pause.py
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -125,6 +130,7 @@ services:
   on-stop:
     <<: *common
     image: nuvlaedge/on-stop:1.2.0
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
     restart: always
     command: pause
     volumes:
