@@ -68,7 +68,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-      - /Users/nacho/PycharmProjects/isolation/agent/code/:/opt/mytests/
       - /:/rootfs:ro
     ports:
       - "127.0.0.1:${AGENT_PORT:-5080}:80"
