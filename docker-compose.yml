@@ -29,7 +29,7 @@ services:
       - MANAGER_PORT=${MANAGER_PORT:-3636}
       - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
       - AGENT_PORT=${AGENT_PORT:-5080}
-      - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME:-nuvlaedge}
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -64,7 +64,7 @@ services:
       - MANAGER_PORT=${MANAGER_PORT:-3636}
       - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
       - AGENT_PORT=${AGENT_PORT:-5080}
-      - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME:-nuvlaedge}
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
