@@ -35,6 +35,47 @@ helm install --set NUVLAEDGE_UUID=<paste_NUVLAEDGE_UUID_from_nuvla> \
 This will install the core NuvlaEdge Engine components in your Kubernetes node,
 within the namespace "nuvlaedge-<uuid_of_your_nuvlaedge>".
 
+### Approve NuvlaEdge manager certificate
+
+After running `helm install ...` command, the output will contain instructions
+for running certificate signing request approval command
+`kubectl certificate approve`. Example:
+
+```shell
+1. After the initial installation, to approve the certificate signing request
+   for the certificate used to manage the NuvlaEdge instance please run the
+   following command as system admin of the K8s cluster
+   
+   kubectl certificate approve nuvlaedge-csr
+```
+
+Please check the actual output of the command and follow the provided
+instructions.
+
+### Troubleshooting NuvlaEdge manager certificate signing request
+
+If for whatever reason the NuvlaEdge manager certificate signing request failed,
+it's possible to re-run the request.
+
+Because the credential manager is implemented as Kubernetes Job, to actually
+re-run the Job it needs to be replaced. Use example command below and adjust it
+to your case:
+
+```shell
+kubectl -n nuvlabox-<uuid_of_your_nuvlaedge> get job kubernetes-credentials-manager -o json | \
+   jq 'del(.spec.selector)' | jq 'del(.spec.template.metadata.labels)' | kubectl replace --force -f -
+```
+
+Example of running the command within the actual NuvlaEdge namespace:
+
+```shell
+$ kubectl -n nuvlabox-f1757497-efc4-4636-b921-e36711104521 get job kubernetes-credentials-manager -o json | \
+   jq 'del(.spec.selector)' | jq 'del(.spec.template.metadata.labels)' | kubectl replace --force -f -
+job.batch "kubernetes-credentials-manager" deleted
+job.batch/kubernetes-credentials-manager replaced
+$
+```
+
 ### Enable optional NuvlaEdge Engine components
 
 The following components are optional:
