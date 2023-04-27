@@ -39,7 +39,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlaedge/agent:2.10.0
+    image: nuvlaedge/agent:2.11.0
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
