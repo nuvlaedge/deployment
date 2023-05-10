@@ -8,6 +8,8 @@ project=${project:-${5:-nuvlaedge}}
 github_releases=${github_releases:-${6:-"https://github.com/nuvlaedge/deployment/releases"}}
 save_dir=${save_dir:-${7:-$(pwd)}}
 
+export COMPOSE_PROJECT_NAME="${project}"
+
 nuvlaedge-engine-printer "Installing NuvlaEdge Engine to version: ${target_version}" ${quiet} "NONE" yes
 
 if [[ ! -z "${environment}" ]]
@@ -69,7 +71,7 @@ sleep ${wait}
 # set timeout for 10 minutes
 timer=600
 nuvlaedge-engine-printer "Checking NuvlaEdge Engine health (will timeout after ${timer} sec)..." ${quiet} "INFO" "no"
-health=$(nuvlaedge-engine-check-health ${timer} 2>&1)
+health=$(nuvlaedge-engine-check-health ${timer} "${project}" 2>&1)
 
 if [[ $? -ne 0 ]]
 then
