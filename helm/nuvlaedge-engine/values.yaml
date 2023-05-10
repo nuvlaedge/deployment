@@ -10,7 +10,7 @@ images:
   agent:
     repository: nuvladev/agent
     pullPolicy: Always
-    tag: "k8s-fixes"
+    tag: "k8s-fixes-ks"
   dataGateway:
     repository: eclipse-mosquitto
     pullPolicy: Always
@@ -18,7 +18,7 @@ images:
   jobEngineLite:
     repository: nuvla/job-lite
     pullPolicy: Always
-    tag: "3.2.5"
+    tag: "3.2.7"
   kubernetesCredentialsManager:
     repository: nuvladev/kubernetes-credentials-manager
     pullPolicy: Always
@@ -30,7 +30,7 @@ images:
   systemManager:
     repository: nuvlaedge/system-manager
     pullPolicy: Always
-    tag: "2.5.0"
+    tag: "2.6.0"
   vpnClient:
     repository: nuvlaedge/vpn-client
     pullPolicy: Always
