@@ -32,7 +32,7 @@ spec:
               value: {{ .Values.NUVLAEDGE_UUID }}
             - name: NUVLAEDGE_ENGINE_VERSION
               value: {{ .Values.images.agent.tag }}
-            - name: EXCLUDED_MONITORS
+            - name: NUVLAEDGE_EXCLUDED_MONITORS
               value: {{ .Values.agentConfig.excluded_monitors }}
             - name: NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY
               value: {{ .Values.NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY }}
