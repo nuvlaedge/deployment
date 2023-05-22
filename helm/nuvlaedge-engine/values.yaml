@@ -8,7 +8,7 @@ vpnClientComponentName: vpn-client
 
 images:
   agent:
-    repository: nuvladev/agent
+    repository: nuvlaedge/agent
     pullPolicy: Always
     tag: "2.11.0"
   dataGateway:
@@ -20,7 +20,7 @@ images:
     pullPolicy: Always
     tag: "3.2.7"
   kubernetesCredentialsManager:
-    repository: nuvladev/kubernetes-credentials-manager
+    repository: nuvlaedge/kubernetes-credentials-manager
     pullPolicy: Always
     tag: "1.1.0"
   security:
