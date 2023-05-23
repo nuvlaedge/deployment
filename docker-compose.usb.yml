@@ -15,7 +15,8 @@ x-common: &common
 services:
   peripheral-manager-usb:
     <<: *common
-    image: nuvlaedge/peripheral-manager-usb:2.3.0
+    image: nuvladev/nuvlaedge:main
+    entrypoint: usb
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-usb
     network_mode: host

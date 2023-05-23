@@ -10,6 +10,10 @@ x-common: &common
     - "nuvlaedge.component=True"
     - "nuvlaedge.deployment=production"
 
+x-common-image: &common-image
+  <<: *common
+  image: nuvladev/nuvlaedge:main
+
 volumes:
   nuvlabox-db:
     driver: local
@@ -19,8 +23,8 @@ volumes:
 
 services:
   system-manager:
-    <<: *common
-    image: nuvlaedge/system-manager:2.6.0
+    <<: *common-image
+    entrypoint: system-manager
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
@@ -37,8 +41,8 @@ services:
       - on-stop
 
   agent:
-    <<: *common
-    image: nuvlaedge/agent:2.12.0
+    <<: *common-image
+    entrypoint: agent
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
@@ -112,10 +116,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   on-stop:
-    <<: *common
-    image: nuvlaedge/on-stop:1.2.0
+    <<: *common-image
+    entrypoint: on-stop
+    command: pause
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
     restart: always
-    command: pause
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
