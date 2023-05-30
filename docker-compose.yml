@@ -12,7 +12,7 @@ x-common: &common
 
 x-common-image: &common-image
   <<: *common
-  image: nuvladev/nuvlaedge:main
+  image: nuvlaedge/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
 
 volumes:
   nuvlabox-db:

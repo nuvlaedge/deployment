@@ -12,10 +12,13 @@ x-common: &common
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=usb"
 
+x-common-image: &common-image
+  <<: *common
+  image: nuvlaedge/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
+
 services:
   peripheral-manager-usb:
-    <<: *common
-    image: nuvladev/nuvlaedge:main
+    <<: *common-image
     entrypoint: usb
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-usb

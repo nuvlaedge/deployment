@@ -12,10 +12,13 @@ x-common: &common
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=network"
 
+x-common-image: &common-image
+  <<: *common
+  image: nuvlaedge/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
+
 services:
   peripheral-manager-network:
-    <<: *common
-    image: nuvladev/nuvlaedge:main
+    <<: *common-image
     entrypoint: network
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-network
