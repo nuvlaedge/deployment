@@ -12,7 +12,7 @@ x-common: &common
 
 x-common-image: &common-image
   <<: *common
-  image: nuvlaedge/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
+  image: ${DOCKER_ORG:-nuvlaedge}/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
 
 volumes:
   nuvlabox-db:
@@ -70,8 +70,8 @@ services:
       - compute-api
 
   compute-api:
-    <<: *common
-    image: nuvlaedge/compute-api:1.3.0
+    <<: *common-image
+    entrypoint: api
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
     oom_score_adj: -900
@@ -90,8 +90,8 @@ services:
       start_period: 30s
 
   vpn-client:
-    <<: *common
-    image: nuvlaedge/vpn-client:1.2.0
+    <<: *common-image
+    entrypoint: openvpn-client
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
     oom_kill_disable: true

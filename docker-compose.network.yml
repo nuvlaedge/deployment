@@ -14,7 +14,8 @@ x-common: &common
 
 x-common-image: &common-image
   <<: *common
-  image: nuvlaedge/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
+  image: ${DOCKER_ORG:-nuvlaedge}/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
+
 
 services:
   peripheral-manager-network:
