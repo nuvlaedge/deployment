@@ -107,11 +107,12 @@ services:
       - agent
 
   job-engine-lite:
-    <<: *common
-    image: nuvla/job-lite:3.2.7
+    <<: *common-image
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
-    entrypoint: /app/pause.py
+    entrypoint: my_init
+    command:
+      - /app/pause.py
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
