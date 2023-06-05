@@ -15,13 +15,30 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Install Helm
+        uses: Azure/setup-helm@v3
+
+      - name: Create helm package
+        run: helm package helm/nuvlaedge
+
       - uses: "marvinpinto/action-automatic-releases@latest"
+        name: Release docker and k8s packages
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: true
           files: |
             install.sh
             *.yml
+            nuvlaedge-${{github.ref_name}}.tgz
+
+      - name: Index helm release
+        run: |
+          git switch gh-pages
+          helm repo index --url https://github.com/nuvlaedge/deployment/releases/download/nuvlaedge-${{github.ref_name}}/nuvlaedge-${{github.ref_name}}.tgz
+          git add index.yaml
+          git commit -m "new release ${{github.ref_name}}"
+          git push
+          git switch main
 
   notify:
     if: always()

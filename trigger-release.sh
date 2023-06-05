@@ -40,7 +40,11 @@ rm docker-compose.yml.old
 #sed -i.old "s/DOCKER_IMAGE=.*/DOCKER_IMAGE=$tag/g" nuvlaedge-engine-installer/container-release.sh
 #rm nuvlaedge-engine-installer/container-release.sh.old
 
-git add docker-compose.yml #nuvlaedge-engine-installer/container-release.sh
+sed -i.old "s/version:.*/version: $tag/g" helm/nuvlaedge/Chart.yaml
+sed -i.old "s/appVersion:.*/appVersion: $tag/g" helm/nuvlaedge/Chart.yaml
+rm -f helm/nuvlaedge/Chart.yaml.old
+
+git add docker-compose.yml helm/nuvlaedge/Chart.yaml #nuvlaedge-engine-installer/container-release.sh
 git commit -m "Update NuvlaEdge Engine version to $tag"
 git push
 
