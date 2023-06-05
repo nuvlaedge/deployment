@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: agent-deployment
-  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
-    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+    {{- include "nuvlaedge.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -13,7 +13,7 @@ spec:
     metadata:
       labels:
         component: agent
-        {{- include "nuvlaedge-engine.labels" . | nindent 8 }}
+        {{- include "nuvlaedge.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
       nodeSelector:
@@ -57,7 +57,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: MY_NAMESPACE
-              value: {{ include "nuvlaedge-engine.namespace" . }}
+              value: {{ include "nuvlaedge.namespace" . }}
           volumeMounts:
             - mountPath: /rootfs
               name: rootfs
@@ -73,4 +73,4 @@ spec:
             path: /
         - name: nuvlaedge-db
           hostPath:
-            path: /var/lib/{{ include "nuvlaedge-engine.namespace" . }}
+            path: /var/lib/{{ include "nuvlaedge.namespace" . }}
