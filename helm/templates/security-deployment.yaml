@@ -3,9 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: security-deployment
-  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
-    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+    {{- include "nuvlaedge.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         component: security
-        {{- include "nuvlaedge-engine.labels" . | nindent 8 }}
+        {{- include "nuvlaedge.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
@@ -33,7 +33,7 @@ spec:
             - name: SECURITY_SCAN_INTERVAL
               value: {{ .Values.SECURITY_SCAN_INTERVAL | default 1800 | quote }}
             - name: MY_NAMESPACE
-              value: {{ include "nuvlaedge-engine.namespace" . }}
+              value: {{ include "nuvlaedge.namespace" . }}
           volumeMounts:
             - mountPath: /srv/nuvlaedge/shared
               name: nuvlaedge-db
@@ -41,5 +41,5 @@ spec:
       volumes:
         - name: nuvlaedge-db
           hostPath:
-            path: /var/lib/{{ include "nuvlaedge-engine.namespace" . }}
+            path: /var/lib/{{ include "nuvlaedge.namespace" . }}
 {{- end }}
