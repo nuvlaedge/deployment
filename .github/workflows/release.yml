@@ -19,7 +19,7 @@ jobs:
         uses: Azure/setup-helm@v3
 
       - name: Create helm package
-        run: helm package helm/nuvlaedge
+        run: helm package helm
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         name: Release docker and k8s packages
