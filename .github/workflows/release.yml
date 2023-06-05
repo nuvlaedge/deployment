@@ -37,8 +37,8 @@ jobs:
           git config --global user.name "SixSq NuvlaEdge"
           git fetch
           git switch gh-pages
-          helm repo index --url https://github.com/konstan/nuvlaedge-deployment/releases/download/nuvlaedge-${{github.ref_name}}/nuvlaedge-${{github.ref_name}}.tgz --merge index.yaml .
-          # helm repo index --url https://github.com/nuvlaedge/deployment/releases/download/nuvlaedge-${{github.ref_name}}/nuvlaedge-${{github.ref_name}}.tgz --merge index.yaml .
+          helm repo index --url https://github.com/konstan/nuvlaedge-deployment/releases/download/${{github.ref_name}} --merge index.yaml .
+          # helm repo index --url https://github.com/nuvlaedge/deployment/releases/download/${{github.ref_name}} --merge index.yaml .
           git add index.yaml
           git commit -m "new release ${{github.ref_name}}"
           git push
