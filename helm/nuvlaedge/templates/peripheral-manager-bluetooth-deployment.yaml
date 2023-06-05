@@ -3,10 +3,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: peripheral-manager-bluetooth-deployment
-  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
-    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
-    {{- include "nuvlaedge-engine.peripheral-manager.labels" . | nindent 4 }}
+    {{- include "nuvlaedge.labels" . | nindent 4 }}
+    {{- include "nuvlaedge.peripheral-manager.labels" . | nindent 4 }}
     nuvlaedge.peripheral.type: bluetooth
 spec:
   selector:
@@ -16,7 +16,7 @@ spec:
     metadata:
       labels:
         component: peripheral-manager-bluetooth
-        {{- include "nuvlaedge-engine.labels" . | nindent 8 }}
+        {{- include "nuvlaedge.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
@@ -28,5 +28,5 @@ spec:
           imagePullPolicy: {{ .Values.images.peripheralManagerBluetooth.pullPolicy }}
           env:
             - name: MY_NAMESPACE
-              value: {{ include "nuvlaedge-engine.namespace" . }}
+              value: {{ include "nuvlaedge.namespace" . }}
 {{- end }}
