@@ -33,6 +33,8 @@ jobs:
 
       - name: Index helm release
         run: |
+          git config --global user.email "nuvlaedge@sixsq.com"
+          git config --global user.name "SixSq NuvlaEdge"
           git fetch
           git switch gh-pages
           helm repo index --url https://github.com/konstan/nuvlaedge-deployment/releases/download/nuvlaedge-${{github.ref_name}}/nuvlaedge-${{github.ref_name}}.tgz --merge index.yaml .
