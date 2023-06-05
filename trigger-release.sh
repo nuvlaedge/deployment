@@ -34,6 +34,8 @@ then
   exit 1
 fi
 
+set -e
+
 sed -i.old "s/NUVLAEDGE_ENGINE_VERSION.*/NUVLAEDGE_ENGINE_VERSION=$tag/g" docker-compose.yml
 rm -f docker-compose.yml.old
 
