@@ -1,3 +1,4 @@
+{{- if .Values.vpnClient }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,3 +50,4 @@ spec:
         - name: nuvlaedge-db
           hostPath:
             path: /var/lib/{{ include "nuvlaedge.namespace" . }}
+{{- end }}
