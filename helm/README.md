@@ -79,11 +79,11 @@ $
 
 The following components are optional:
  - security
- - peripheral-manager-usb
- - peripheral-manager-network
- - peripheral-manager-bluetooth
- - peripheral-manager-gpu
- - peripheral-manager-modbus
+ - peripheralManagerUSB
+ - peripheralManagerNetwork
+ - peripheralManagerBluetooth
+ - peripheralManagerGPU
+ - peripheralManagerModbus
 
 To enable them at installation time, simply
 add `--set security=true --set peripheralManagerGPU=true # etc.` to the command
