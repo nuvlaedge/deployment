@@ -84,6 +84,7 @@ The following components are optional:
  - peripheralManagerBluetooth
  - peripheralManagerGPU
  - peripheralManagerModbus
+ - vpnClient
 
 To enable them at installation time, simply
 add `--set security=true --set peripheralManagerGPU=true # etc.` to the command
