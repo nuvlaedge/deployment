@@ -29,8 +29,8 @@ choose your TARGET_KUBERNETES_NODE_NAME. You can do this by
 running `kubectl get nodes` and choosing one of the master nodes. And then, run:
 
 ```
-helm install nuvlabox-<UUID> nuvlaedge/nuvlaedge --version <version> \
-    --set NUVLAEDGE_UUID=nuvlabox/<UUID> \
+helm install nuvlaedge-<uuid_of_your_nuvlaedge> nuvlaedge/nuvlaedge --version <version> \
+    --set NUVLAEDGE_UUID=<paste_NUVLAEDGE_UUID_from_nuvla> \
     --set kubernetesNode=<TARGET_KUBERNETES_NODE_NAME>
 ```
 
