@@ -1,6 +1,7 @@
 version: "3.7"
 
 x-common: &common
+  image: ${DOCKER_ORG:-nuvlaedge}/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
   stop_grace_period: 5s
   logging:
     options:
@@ -12,13 +13,9 @@ x-common: &common
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=bluetooth"
 
-x-common-image: &common-image
-  <<: *common
-  image: nuvlaedge/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
-
 services:
   peripheral-manager-bluetooth:
-    <<: *common-image
+    <<: *common
     entrypoint: bluetooth
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-bluetooth

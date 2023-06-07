@@ -1,6 +1,7 @@
 version: "3.7"
 
 x-common: &common
+  image: ${DOCKER_ORG:-nuvlaedge}/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
   stop_grace_period: 5s
   logging:
     options:
@@ -10,9 +11,6 @@ x-common: &common
     - "nuvlaedge.component=True"
     - "nuvlaedge.deployment=production"
 
-x-common-image: &common-image
-  <<: *common
-  image: ${DOCKER_ORG:-nuvlaedge}/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
 
 volumes:
   nuvlabox-db:
@@ -23,7 +21,7 @@ volumes:
 
 services:
   system-manager:
-    <<: *common-image
+    <<: *common
     entrypoint: system-manager
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
@@ -41,7 +39,7 @@ services:
       - on-stop
 
   agent:
-    <<: *common-image
+    <<: *common
     entrypoint: agent
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
@@ -70,7 +68,7 @@ services:
       - compute-api
 
   compute-api:
-    <<: *common-image
+    <<: *common
     entrypoint: api
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
@@ -90,7 +88,7 @@ services:
       start_period: 30s
 
   vpn-client:
-    <<: *common-image
+    <<: *common
     entrypoint: openvpn-client
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
@@ -107,7 +105,7 @@ services:
       - agent
 
   job-engine-lite:
-    <<: *common-image
+    <<: *common
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     entrypoint: my_init
@@ -117,7 +115,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   on-stop:
-    <<: *common-image
+    <<: *common
     entrypoint: on-stop
     command: pause
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
