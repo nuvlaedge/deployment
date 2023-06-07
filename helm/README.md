@@ -15,20 +15,23 @@ Make sure you have:
 
 ## Install the NuvlaEdge Engine
 
-First, go through the usual NuvlaEdge creation process via Nuvla, to get
-your `NUVLAEDGE_UUID`.
+First, go through the usual NuvlaEdge creation process via Nuvla.
+
+Add Helm repo.
+
+```
+helm repo add nuvlaedge https://nuvlaedge.github.io/deployment
+```
 
 This installation places the NuvlaEdge Engine in a single node of the Kubernetes
 cluster (preferably a master). So before doing the installation, make sure you
 choose your TARGET_KUBERNETES_NODE_NAME. You can do this by
-running `kubectl get nodes` and choosing one of the master nodes.
-
-Then, from this directory, run:
+running `kubectl get nodes` and choosing one of the master nodes. And then, run:
 
 ```
-helm install --set NUVLAEDGE_UUID=<paste_NUVLAEDGE_UUID_from_nuvla> \
-    --set kubernetesNode=<TARGET_KUBERNETES_NODE_NAME> \
-    $(echo "<paste_NUVLAEDGE_UUID_from_nuvla>" | tr "/" "-") .
+helm install nuvlabox-<UUID> nuvlaedge/nuvlaedge --version <version> \
+    --set NUVLAEDGE_UUID=nuvlabox/<UUID> \
+    --set kubernetesNode=<TARGET_KUBERNETES_NODE_NAME>
 ```
 
 This will install the core NuvlaEdge Engine components in your Kubernetes node,
