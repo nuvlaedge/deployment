@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: data-gateway
-  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  namespace: {{ include "nuvlaedge.namespace" . }}
 data:
   mosquitto.conf: |-
     port 1883

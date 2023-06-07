@@ -8,7 +8,7 @@ The NuvlaEdge Engine has just been installed on your Kubernetes node {{ .Values.
 
 2. To get the internal NuvlaEdge dashboard URL, you can run:
 
-  echo $(kubectl get svc -n {{ include "nuvlaedge-engine.namespace" . }} system-manager -o jsonpath="{.spec.clusterIP}")":3636"
+  echo $(kubectl get svc -n {{ include "nuvlaedge.namespace" . }} system-manager -o jsonpath="{.spec.clusterIP}")":3636"
 
 
 You can now find your NuvlaEdge at {{ .Values.NUVLA_ENDPOINT | default "https://nuvla.io" }}/ui/edge/{{ .Values.NUVLAEDGE_UUID | replace "nuvlabox/" "" }}

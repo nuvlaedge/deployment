@@ -28,8 +28,7 @@ Then, from this directory, run:
 ```
 helm install --set NUVLAEDGE_UUID=<paste_NUVLAEDGE_UUID_from_nuvla> \
     --set kubernetesNode=<TARGET_KUBERNETES_NODE_NAME> \
-    $(echo "<paste_NUVLAEDGE_UUID_from_nuvla>" | tr "/" "-") \
-    ./nuvlaedge-engine
+    $(echo "<paste_NUVLAEDGE_UUID_from_nuvla>" | tr "/" "-") .
 ```
 
 This will install the core NuvlaEdge Engine components in your Kubernetes node,
@@ -80,11 +79,12 @@ $
 
 The following components are optional:
  - security
- - peripheral-manager-usb
- - peripheral-manager-network
- - peripheral-manager-bluetooth
- - peripheral-manager-gpu
- - peripheral-manager-modbus
+ - peripheralManagerUSB
+ - peripheralManagerNetwork
+ - peripheralManagerBluetooth
+ - peripheralManagerGPU
+ - peripheralManagerModbus
+ - vpnClient
 
 To enable them at installation time, simply
 add `--set security=true --set peripheralManagerGPU=true # etc.` to the command
@@ -98,7 +98,7 @@ There are certain parameters that can be set at installation time.
 
 Add `--set images.<componentName>.repository=<your_image_repo> --set images.<componentName>.tag=<your_image_tag>`
 to the command above, for every component's Docker image you want to override.
-The <componentName> values can be found in "./nuvlaedge-engine/values.yaml".
+The <componentName> values can be found in "./values.yaml".
 
 Example:
 

@@ -1,10 +1,11 @@
+{{- if .Values.vpnClient }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vpn-client-deployment
-  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
-    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+    {{- include "nuvlaedge.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
@@ -14,7 +15,7 @@ spec:
     metadata:
       labels:
         component: {{ .Values.vpnClientComponentName }}
-        {{- include "nuvlaedge-engine.labels" . | nindent 8 }}
+        {{- include "nuvlaedge.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
       serviceAccountName: {{ .Values.serviceAccount.name }}
@@ -48,4 +49,5 @@ spec:
             type: CharDevice
         - name: nuvlaedge-db
           hostPath:
-            path: /var/lib/{{ include "nuvlaedge-engine.namespace" . }}
+            path: /var/lib/{{ include "nuvlaedge.namespace" . }}
+{{- end }}
