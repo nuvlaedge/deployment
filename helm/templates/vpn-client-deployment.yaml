@@ -24,11 +24,12 @@ spec:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: {{ .Values.vpnClientComponentName }}
+          command: ["openvpn-client"]
+          image: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]
-          image: "{{ .Values.images.vpnClient.repository }}:{{ .Values.images.vpnClient.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.images.vpnClient.pullPolicy }}
           livenessProbe:
             exec:
               command:
