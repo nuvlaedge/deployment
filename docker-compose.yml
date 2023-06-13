@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  image: ${DOCKER_ORG:-nuvlaedge}/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.9.0}
   stop_grace_period: 5s
   logging:
     options:
@@ -50,7 +50,6 @@ services:
       - NUVLAEDGE_API_KEY=${NUVLAEDGE_API_KEY:-}
       - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET:-}
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
-      - NUVLAEDGE_ENGINE_VERSION=2.8.1
       - NUVLAEDGE_EXCLUDED_MONITORS=${NUVLAEDGE_EXCLUDED_MONITORS:-}
       - NUVLAEDGE_THREAD_MONITORS=${NUVLAEDGE_THREAD_MONITORS:-False}
       - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}

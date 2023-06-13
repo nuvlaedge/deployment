@@ -11,7 +11,7 @@ nuvlaedge:
     registry: ""
     organization: sixsq
     repository: nuvlaedge
-    tag: "2.10.0"
+    #tag: "latest"
   security:
     registry: ""
     organization: nuvlaedge

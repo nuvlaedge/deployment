@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  image: ${DOCKER_ORG:-nuvlaedge}/nuvlaedge:${NUVLAEDGE_VERSION:-latest}
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.9.0}
   stop_grace_period: 5s
   logging:
     options:
