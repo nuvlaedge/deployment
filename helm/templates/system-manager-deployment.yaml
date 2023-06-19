@@ -26,6 +26,8 @@ spec:
           env:
             - name: SKIP_MINIMUM_REQUIREMENTS
               value: {{ .Values.SKIP_MINIMUM_REQUIREMENTS | default "False" | quote }}
+            - name: NUVLAEDGE_IMAGE
+              value: {{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}
             - name: MY_HOST_NODE_NAME
               valueFrom:
                 fieldRef:
