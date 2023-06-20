@@ -71,6 +71,7 @@ services:
     entrypoint: api
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
+    scale: ${NUVLAEDGE_COMPUTE_API_ENABLE:-1}
     oom_score_adj: -900
     pid: "host"
     environment:
@@ -91,6 +92,7 @@ services:
     entrypoint: openvpn-client
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
+    scale: ${NUVLAEDGE_VPN_CLIENT_ENABLE:-1}
     oom_kill_disable: true
     network_mode: host
     privileged: true
@@ -107,17 +109,9 @@ services:
     <<: *common
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
+    scale: ${NUVLAEDGE_JOB_ENABLE:-1}
     entrypoint: my_init
     command:
       - /app/pause.py
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  on-stop:
-    <<: *common
-    entrypoint: on-stop
-    command: pause
-    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
-    restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
