@@ -35,8 +35,14 @@ spec:
               value: {{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}
             - name: NUVLAEDGE_EXCLUDED_MONITORS
               value: {{ .Values.agentConfig.excluded_monitors }}
+            - name: NUVLAEDGE_THREAD_MONITORS
+              value: {{ .Values.NUVLAEDGE_THREAD_MONITORS }}
             - name: NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY
               value: {{ .Values.NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY }}
+            - name: NUVLAEDGE_API_KEY
+              value: {{ .Values.NUVLAEDGE_API_KEY }}
+            - name: NUVLAEDGE_API_SECRET
+              value: {{ .Values.NUVLAEDGE_API_SECRET }}
             - name: NUVLA_ENDPOINT
               value: {{ .Values.NUVLA_ENDPOINT | default "nuvla.io" | quote }}
             - name: NUVLA_ENDPOINT_INSECURE
@@ -49,6 +55,8 @@ spec:
               value: {{ .Values.HOME }}
             - name: VPN_INTERFACE_NAME
               value: {{ .Values.VPN_INTERFACE_NAME | default "vpn" | quote }}
+            - name: VPN_CONFIG_EXTRA
+              value: {{ .Values.VPN_CONFIG_EXTRA }}
             - name: MY_HOST_NODE_IP
               valueFrom:
                 fieldRef:
