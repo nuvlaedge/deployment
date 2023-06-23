@@ -9,8 +9,8 @@ Expand the name of the chart.
 Define the namespace based on the NUVLAEDGE_UUID
 */}}
 {{- define "nuvlaedge.namespace" -}}
-{{- if .Values.NUVLAEDGE_UUID }}
-{{- .Values.NUVLAEDGE_UUID | replace "/" "-" }}
+{{- if .Release.Name }}
+{{- .Release.Name | replace "/" "-" }}
 {{- else }}
 nuvlaedge
 {{- end }}
