@@ -74,4 +74,4 @@ spec:
             path: /
         - name: nuvlaedge-db
           hostPath:
-            path: /var/lib/{{ include "nuvlaedge.namespace" . }}
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}

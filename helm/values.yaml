@@ -6,6 +6,8 @@ replicaCount: 1
 
 vpnClientComponentName: vpn-client
 
+nuvlaedgeVolumeHostPath: /var/lib/nuvlaedge
+
 nuvlaedge:
   image:
     registry: ""
