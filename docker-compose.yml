@@ -35,8 +35,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-    depends_on:
-      - on-stop
 
   agent:
     <<: *common
@@ -63,8 +61,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
-    depends_on:
-      - compute-api
 
   compute-api:
     <<: *common
@@ -109,7 +105,7 @@ services:
     <<: *common
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
-    scale: ${NUVLAEDGE_JOB_ENABLE:-1}
+    scale: ${NUVLAEDGE_JOB_ENABLE:-0}
     entrypoint: my_init
     command:
       - /app/pause.py
