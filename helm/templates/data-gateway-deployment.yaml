@@ -20,7 +20,7 @@ spec:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: data-gateway
-          image: "{{ .Values.nuvlaedge.dataGateway.repository }}:{{ .Values.nuvlaedge.image.tag }}"
+          image: "{{ .Values.nuvlaedge.dataGateway.repository }}:{{ .Values.nuvlaedge.dataGateway.tag }}"
           imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           command:
             - sh
