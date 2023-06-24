@@ -30,4 +30,11 @@ spec:
           env:
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge.namespace" . }}
+          volumeMounts:
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
+      volumes:
+        - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
 {{- end }}

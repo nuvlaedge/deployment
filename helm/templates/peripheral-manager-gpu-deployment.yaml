@@ -26,6 +26,8 @@ spec:
           image: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           volumeMounts:
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
             - mountPath: /host/dev
               name: dev
             - mountPath: /host/etc
@@ -38,6 +40,9 @@ spec:
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge.namespace" . }}
       volumes:
+        - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - hostPath:
             path: /dev
           name: dev

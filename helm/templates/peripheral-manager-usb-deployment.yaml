@@ -40,12 +40,17 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
             - mountPath: /dev
               name: dev
             - mountPath: /run/udev/control
               name: udev
               readOnly: true
       volumes:
+        - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - hostPath:
             path: /dev
           name: dev
