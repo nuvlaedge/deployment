@@ -35,7 +35,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.9.0}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -64,7 +64,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.9.0}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
