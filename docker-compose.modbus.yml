@@ -1,6 +1,7 @@
 version: "3.7"
 
 x-common: &common
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.9.0}
   stop_grace_period: 5s
   logging:
     options:
@@ -12,10 +13,11 @@ x-common: &common
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=modbus"
 
+
 services:
   peripheral-manager-modbus:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/peripheral-manager-modbus:1.5.0
+    entrypoint: modbus
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-modbus
     restart: on-failure
     volumes:

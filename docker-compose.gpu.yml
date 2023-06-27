@@ -1,6 +1,7 @@
 version: "3.7"
 
 x-common: &common
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.9.0}
   stop_grace_period: 5s
   logging:
     options:
@@ -15,14 +16,14 @@ x-common: &common
 services:
   peripheral-manager-gpu:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/peripheral-manager-gpu:1.3.0
+    entrypoint: gpu
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-gpu
     volumes:
-      - /etc/:/etcfs/:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /usr/lib/:/usr/lib/:ro
-      - /dev/:/dev/:ro
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - /dev/:/host/dev/:ro
+      - /etc/:/host/etc/:ro
+      - /usr/lib/:/host/usr/lib/:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - agent

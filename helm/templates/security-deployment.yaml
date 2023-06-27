@@ -23,8 +23,8 @@ spec:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: security
-          image: "{{ .Values.images.security.repository }}:{{ .Values.images.security.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.images.security.pullPolicy }}
+          image: "{{ .Values.nuvlaedge.security.registry }}{{ .Values.nuvlaedge.security.organization }}/{{ .Values.nuvlaedge.security.repository }}:{{ .Values.nuvlaedge.security.tag }}"
+          imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           env:
             - name: EXTERNAL_CVE_VULNERABILITY_DB
               value: {{ .Values.EXTERNAL_CVE_VULNERABILITY_DB | default (printf "https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true" | quote) }}
@@ -41,5 +41,5 @@ spec:
       volumes:
         - name: nuvlaedge-db
           hostPath:
-            path: /var/lib/{{ include "nuvlaedge.namespace" . }}
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
 {{- end }}

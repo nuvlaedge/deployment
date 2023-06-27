@@ -1,6 +1,7 @@
 version: "3.7"
 
 x-common: &common
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.9.0}
   stop_grace_period: 5s
   logging:
     options:
@@ -15,7 +16,7 @@ x-common: &common
 services:
   peripheral-manager-usb:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/peripheral-manager-usb:2.3.0
+    entrypoint: usb
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-usb
     network_mode: host

@@ -22,21 +22,27 @@ spec:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: peripheral-manager-gpu
-          image: "{{ .Values.images.peripheralManagerGPU.repository }}:{{ .Values.images.peripheralManagerGPU.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.images.peripheralManagerGPU.pullPolicy }}
+          command: ["gpu"]
+          image: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           volumeMounts:
-            - mountPath: /dev
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
+            - mountPath: /host/dev
               name: dev
-            - mountPath: /etcfs
+            - mountPath: /host/etc
               name: etc
               readOnly: true
-            - mountPath: /usr/lib
+            - mountPath: /host/usr/lib
               name: lib
               readOnly: true
           env:
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge.namespace" . }}
       volumes:
+        - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - hostPath:
             path: /dev
           name: dev

@@ -24,9 +24,17 @@ spec:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: peripheral-manager-bluetooth
-          image: "{{ .Values.images.peripheralManagerBluetooth.repository }}:{{ .Values.images.peripheralManagerBluetooth.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.images.peripheralManagerBluetooth.pullPolicy }}
+          command: ["bluetooth"]
+          image: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           env:
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge.namespace" . }}
+          volumeMounts:
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
+      volumes:
+        - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
 {{- end }}

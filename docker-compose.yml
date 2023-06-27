@@ -1,6 +1,7 @@
 version: "3.7"
 
 x-common: &common
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.9.0}
   stop_grace_period: 5s
   logging:
     options:
@@ -9,6 +10,7 @@ x-common: &common
   labels:
     - "nuvlaedge.component=True"
     - "nuvlaedge.deployment=production"
+
 
 volumes:
   nuvlabox-db:
@@ -20,7 +22,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/system-manager:2.6.0
+    entrypoint: system-manager
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
@@ -30,15 +32,17 @@ services:
       - NUVLAEDGE_DATA_GATEWAY_ENABLED=${NUVLAEDGE_DATA_GATEWAY_ENABLED:-True}
       - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:2.0.15-openssl}
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
+      - NE_IMAGE_REGISTRY
+      - NE_IMAGE_ORGANIZATION
+      - NE_IMAGE_REPOSITORY
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.9.0}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-    depends_on:
-      - on-stop
 
   agent:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/agent:2.12.0
+    entrypoint: agent
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
@@ -48,7 +52,6 @@ services:
       - NUVLAEDGE_API_KEY=${NUVLAEDGE_API_KEY:-}
       - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET:-}
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
-      - NUVLAEDGE_ENGINE_VERSION=2.8.3
       - NUVLAEDGE_EXCLUDED_MONITORS=${NUVLAEDGE_EXCLUDED_MONITORS:-}
       - NUVLAEDGE_THREAD_MONITORS=${NUVLAEDGE_THREAD_MONITORS:-False}
       - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
@@ -58,18 +61,21 @@ services:
       - VPN_CONFIG_EXTRA
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+      - NE_IMAGE_REGISTRY
+      - NE_IMAGE_ORGANIZATION
+      - NE_IMAGE_REPOSITORY
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.9.0}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
-    depends_on:
-      - compute-api
 
   compute-api:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/compute-api:1.3.0
+    entrypoint: api
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
+    scale: ${NUVLAEDGE_COMPUTE_API_ENABLE:-1}
     oom_score_adj: -900
     pid: "host"
     environment:
@@ -87,9 +93,10 @@ services:
 
   vpn-client:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/vpn-client:1.2.0
+    entrypoint: openvpn-client
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
+    scale: ${NUVLAEDGE_VPN_CLIENT_ENABLE:-1}
     oom_kill_disable: true
     network_mode: host
     privileged: true
@@ -104,18 +111,11 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLA_ORG:-nuvla}/job-lite:3.2.7
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
-    entrypoint: /app/pause.py
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  on-stop:
-    <<: *common
-    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/on-stop:1.2.0
-    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
-    restart: always
-    command: pause
+    scale: ${NUVLAEDGE_JOB_ENABLE:-0}
+    entrypoint: my_init
+    command:
+      - /app/pause.py
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

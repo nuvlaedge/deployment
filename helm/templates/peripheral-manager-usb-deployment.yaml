@@ -24,8 +24,9 @@ spec:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: peripheral-manager-usb
-          image: "{{ .Values.images.peripheralManagerUSB.repository }}:{{ .Values.images.peripheralManagerUSB.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.images.peripheralManagerUSB.pullPolicy }}
+          command: ["usb"]
+          image: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           env:
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge.namespace" . }}
@@ -39,12 +40,17 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
             - mountPath: /dev
               name: dev
             - mountPath: /run/udev/control
               name: udev
               readOnly: true
       volumes:
+        - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - hostPath:
             path: /dev
           name: dev
