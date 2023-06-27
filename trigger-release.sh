@@ -44,7 +44,7 @@ sed -i '' -E "s/\\\${NE_IMAGE_TAG[^}]+}/\\\${NE_IMAGE_TAG:-$tag}/g" docker-compo
 sed -i '' "s/version:.*/version: $tag/g" helm/Chart.yaml
 sed -i '' "s/appVersion:.*/appVersion: $tag/g" helm/Chart.yaml
 
-git add docker-compose.yml helm/Chart.yaml #nuvlaedge-engine-installer/container-release.sh
+git add docker-compose*.yml helm/Chart.yaml #nuvlaedge-engine-installer/container-release.sh
 git commit -m "Update NuvlaEdge Engine version to $tag"
 git push
 
