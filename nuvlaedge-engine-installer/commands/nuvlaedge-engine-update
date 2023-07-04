@@ -27,7 +27,7 @@ then
   nuvlaedge-engine-printer "Setting environment for update, at ${env_file}" ${quiet} "INFO" "no"
 
   env_lines=$(echo ${environment} | sed 's/,/\\n/g')
-  nuvlaedge-engine-printer "New environment variables:\n${env_lines}" ${quiet} "DEBUG" "no"
+  #nuvlaedge-engine-printer "New environment variables:\n${env_lines}" ${quiet} "DEBUG" "no"
 
   echo -e "${env_lines}" | grep -v "affinity:container" > ${env_file}
 
