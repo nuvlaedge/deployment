@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.10.2}
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.10.3}
   stop_grace_period: 5s
   logging:
     options:
@@ -35,7 +35,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.10.2}
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.10.3}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -65,7 +65,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.10.2}
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.10.3}
       - NE_IMAGE_INSTALLER
       # Below variables are not directly used by agent but are here
       # to be sent to Nuvla so they are not lost when updating NE
