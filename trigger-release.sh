@@ -45,7 +45,7 @@ sed -i '' "s/version:.*/version: $tag/g" helm/Chart.yaml
 sed -i '' "s/appVersion:.*/appVersion: $tag/g" helm/Chart.yaml
 
 git add docker-compose*.yml helm/Chart.yaml #nuvlaedge-engine-installer/container-release.sh
-git commit -m "Update NuvlaEdge Engine version to $tag"
+git commit -m "Update NuvlaEdge version to $tag"
 git push
 
 git tag -a $tag -m "Triggering automatic release for NuvlaEdge Engine - $tag"
