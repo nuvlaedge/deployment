@@ -81,7 +81,7 @@ services:
   compute-api:
     <<: *common
     entrypoint: api
-    restart: on-failure
+    restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
     deploy:
       replicas: ${NUVLAEDGE_COMPUTE_API_ENABLE:-1}
