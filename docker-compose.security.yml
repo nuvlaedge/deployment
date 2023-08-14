@@ -15,9 +15,10 @@ x-common: &common
 services:
   security:
     <<: *common
-    image: ${NE_SECURITY_IMAGE_REGISTRY:-}${NE_SECURITY_IMAGE_ORGANIZATION:-nuvlaedge}/${NE_SECURITY_IMAGE_REPOSITORY:-security}:${NE_SECURITY_IMAGE_TAG:-2.3.0}
+    image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.10.4}
     restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-security
+    entrypoint: security-entrypoint.sh
     network_mode: host
     privileged: true
     environment:
