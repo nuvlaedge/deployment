@@ -23,7 +23,8 @@ spec:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
       containers:
         - name: security
-          image: "{{ .Values.nuvlaedge.security.registry }}{{ .Values.nuvlaedge.security.organization }}/{{ .Values.nuvlaedge.security.repository }}:{{ .Values.nuvlaedge.security.tag }}"
+          image: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
+          command: ["security-entrypoint.sh"]
           imagePullPolicy: {{ .Values.nuvlaedge.pullPolicy }}
           env:
             - name: EXTERNAL_CVE_VULNERABILITY_DB

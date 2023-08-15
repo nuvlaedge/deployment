@@ -32,7 +32,7 @@ spec:
             - name: NUVLAEDGE_UUID
               value: {{ .Values.NUVLAEDGE_UUID }}
             - name: NUVLAEDGE_IMAGE
-              value: {{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}
+              value: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
             - name: NUVLAEDGE_EXCLUDED_MONITORS
               value: {{ .Values.agentConfig.excluded_monitors }}
             - name: NUVLAEDGE_THREAD_MONITORS
