@@ -76,7 +76,7 @@ then
     fi
   fi
 
-  docker_compose_down_command="docker-compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} down --remove-orphans"
+  docker_compose_down_command="docker compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} down --remove-orphans"
 
   if [[ ${hard_reset} -eq 0 ]]
   then
@@ -114,7 +114,7 @@ then
   fi
 fi
 
-docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} up --remove-orphans -d"
+docker_compose_command="docker compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} up --remove-orphans -d"
 
 cd ${working_dir}
 

@@ -68,10 +68,10 @@ while [ "$1" != "" ]; do
     shift
 done
 
-which docker-compose >/dev/null
+which docker >/dev/null
 if [ $? -ne 0 ]
 then
-  echo "ERR: docker-compose is not installed. Cannot continue"
+  echo "ERR: docker is not installed. Cannot continue"
   exit 1
 fi
 
@@ -98,31 +98,31 @@ fi
 if [ "${action}" = "REMOVE" ]
 then
   echo "INFO: removing NuvlaEdge installation completely"
-  docker-compose -p nuvlaedge ${command_compose_files} ${command_env} down -v
+  docker compose -p nuvlaedge ${command_compose_files} ${command_env} down -v
   ([ ! -z "${env_file}" ] && rm "${env_file}")
 elif [ "${action}" = "HALT" ]
 then
   echo "INFO: halting NuvlaEdge. You can bring it back later by simply re-installing with the same parameters as before"
-  docker-compose -p nuvlaedge ${command_compose_files} ${command_env} down
+  docker compose -p nuvlaedge ${command_compose_files} ${command_env} down
 elif [ "${action}" = "INSTALL" ]
 then
   if [ "${strategy}" = "UPDATE" ]
   then
-    existing_projects=$(docker-compose -p nuvlaedge ${command_compose_files} ${command_env} ps -a -q)
+    existing_projects=$(docker compose -p nuvlaedge ${command_compose_files} ${command_env} ps -a -q)
     if [ ! -z "${existing_projects}" ]
     then
       echo "INFO: found an active NuvlaEdge installation. Updating it"
     else
       echo "INFO: no active NuvlaEdge installations found. Installing from scratch"
     fi
-    docker-compose -p nuvlaedge ${command_compose_files} ${command_env} up -d
+    docker compose -p nuvlaedge ${command_compose_files} ${command_env} up -d
   elif [ "${strategy}" = "OVERWRITE" ]
   then
     echo "WARNING: about to delete any existing NuvlaEdge installations...press Ctrl+c in the next 5 seconds to stop"
     sleep 5
-    docker-compose -p nuvlaedge ${command_compose_files} ${command_env} down -v --remove-orphans
+    docker compose -p nuvlaedge ${command_compose_files} ${command_env} down -v --remove-orphans
     echo "INFO: installing NuvlaEdge Engine from scratch"
-    docker-compose -p nuvlaedge ${command_compose_files} ${command_env} up -d
+    docker compose -p nuvlaedge ${command_compose_files} ${command_env} up -d
   else
     echo "WARNING: strategy ${strategy} not recognized. Use -h for help. Nothing to do"
   fi

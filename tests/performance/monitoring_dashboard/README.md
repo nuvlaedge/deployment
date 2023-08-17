@@ -7,7 +7,7 @@ Once up, import the Grafana dashboard as raw JSON, from the Grafana UI.
 To launch the monitoring stack, run:
 
 ```shell
-docker-compose -f <compose-file> up -d
+docker compose -f <compose-file> up -d
 # where the compose-file is one of the
 # docker-compose.<arch>.yml files available in this folder
 ```

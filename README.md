@@ -56,7 +56,7 @@ In this scenario, we assume you are using Nuvla at https://nuvla.io.
  4. If you are using your own Nuvla installation also `export NUVLA_ENDPOINT=` IP of the local Nuvla instance, **or** paste that IP in the `docker-compose.yml` file, under the NUVLA_ENDPOINT environment variable
  5. install the NuvlaEdge Engine
     ```bash
-    $ docker-compose -p nuvlaedge -f docker-compose.yml up
+    $ docker compose -p nuvlaedge -f docker-compose.yml up
     ```
     NOTE: add `-f docker-compose.usb.yml -f ... `, to the command above, in order to add the auto peripheral discovery components
 
