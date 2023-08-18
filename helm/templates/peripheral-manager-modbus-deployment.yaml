@@ -28,6 +28,10 @@ spec:
           env:
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge.namespace" . }}
+            - name: MY_HOST_NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           volumeMounts:
             - mountPath: /srv/nuvlaedge/shared
               name: nuvlaedge-db
