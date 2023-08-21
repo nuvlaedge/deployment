@@ -70,6 +70,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Validation folder structure
+        run: |
+          mkdir -p results/temp/xml results/temp/json
+          mkdir -p conf/targets/ || true
+          mkdir -p dist/ || true
+
       - name: Retrieve target configuration
         run: |
           wget \
@@ -90,10 +96,6 @@ jobs:
       - name: Install latest validation package
         run: |
           pip install dist/${{ env.VALIDATION_PACKAGE_NAME }}  --force-reinstall
-
-      - name: Setup results folder
-        run: |
-          mkdir -p results/temp/xml results/temp/json
 
       - name: Clear previous results
         run: |
