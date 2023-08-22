@@ -61,7 +61,7 @@ docker_compose_command="docker compose -p ${project} ${docker_compose_args} up -
 if [[ ${force_restart} -eq 1 ]]
 then
   nuvlaedge-engine-printer "Forcing the restart of the NuvlaEdge Engine components before rolling back" ${quiet} "WARNING" "no"
-  docker_compose_down_command="docker compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} down --remove-orphans"
+  docker_compose_down_command="docker --log-level ERROR compose --ansi never -p ${project} ${docker_compose_args} down --remove-orphans"
 
   nuvlaedge-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
 
