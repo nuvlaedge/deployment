@@ -11,9 +11,9 @@ nuvlaedgeVolumeHostPath: /var/lib/nuvlaedge
 nuvlaedge:
   image:
     registry: ""
-    organization: nuvladev
+    organization: sixsq
     repository: nuvlaedge
-    tag: "merge-cred-manager"
+    #tag: "latest"
   dataGateway:
     repository: eclipse-mosquitto
     tag: "2.0.15-openssl"
