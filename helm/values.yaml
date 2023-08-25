@@ -14,16 +14,6 @@ nuvlaedge:
     organization: sixsq
     repository: nuvlaedge
     #tag: "latest"
-  security:
-    registry: ""
-    organization: nuvlaedge
-    repository: security
-    tag: "2.3.0"
-  kubernetesCredentialsManager:
-    registry: ""
-    organization: nuvlaedge
-    repository: kubernetes-credentials-manager
-    tag: "1.1.1"
   dataGateway:
     repository: eclipse-mosquitto
     tag: "2.0.15-openssl"
