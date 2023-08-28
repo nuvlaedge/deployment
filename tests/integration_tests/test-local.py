@@ -16,7 +16,6 @@ from tempfile import NamedTemporaryFile
 sys.path.append('../')
 
 
-# NUVLAEDGE_DATA_GATEWAY_IMAGE="eclipse-mosquitto:2.0.15-openssl"
 NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY="testpubkey"
 VPN_INTERFACE_NAME="testvpn"
 HOST="testnuvlaedge"
@@ -51,7 +50,6 @@ def test_deploy_nuvlaedgees(request):
     request.config.cache.set('local_project_name', local_project_name)
 
     nb_env = f'NUVLAEDGE_UUID={nuvlaedge_id},HOST_HOME={HOST_HOME},SKIP_MINIMUM_REQUIREMENTS=True,'\
-            f'NUVLAEDGE_DATA_GATEWAY_IMAGE={NUVLAEDGE_DATA_GATEWAY_IMAGE},'\
             f'NUVLAEDGE_SSH_PUB_KEY={NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY},'\
             f'VPN_INTERFACE_NAME={VPN_INTERFACE_NAME},HOST={HOST}'
     try:
