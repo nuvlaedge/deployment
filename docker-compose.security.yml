@@ -16,7 +16,7 @@ x-common: &common
 services:
   security:
     <<: *common
-    entrypoint: security-entrypoint.sh
+    entrypoint: security-entrypoint
     restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-security
     network_mode: host
