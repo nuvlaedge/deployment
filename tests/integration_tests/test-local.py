@@ -16,7 +16,7 @@ from tempfile import NamedTemporaryFile
 sys.path.append('../')
 
 
-NUVLAEDGE_DATA_GATEWAY_IMAGE="eclipse-mosquitto:1.6.12"
+# NUVLAEDGE_DATA_GATEWAY_IMAGE="eclipse-mosquitto:2.0.15-openssl"
 NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY="testpubkey"
 VPN_INTERFACE_NAME="testvpn"
 HOST="testnuvlaedge"
