@@ -1,17 +1,18 @@
-FROM python:3.8-alpine3.12
+ARG ALPINE_MAJ_MIN_VERSION="3.18"
+ARG PYTHON_MAJ_MIN_VERSION="3.11"
+
+ARG BASE_IMAGE=python:${PYTHON_MAJ_MIN_VERSION}-alpine${ALPINE_MAJ_MIN_VERSION}
+
+FROM ${BASE_IMAGE}
 
 ARG workdir="/opt/nuvlaedge"
 
 WORKDIR ${workdir}
 
-COPY --from=nuvla/job-docker-compose-client:master /usr/local/bin/docker-compose /usr/local/bin/
-COPY --from=nuvla/job-docker-compose-client:master /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages
-
 COPY . .
-
 COPY target/ .
 
-RUN apk add jq
+RUN apk add --no-cache jq docker-cli docker-cli-compose
 
 ENV PATH="$PATH:${workdir}/common:${workdir}/commands" \
     WORKDIR="${workdir}" \

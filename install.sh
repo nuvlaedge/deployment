@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # NuvlaEdge Engine advanced installation script
-# This script is an alternative for the conventional one-command `docker-compose ... ` installation/halt/remove methods
+# This script is an alternative for the conventional one-command `docker compose ... ` installation/halt/remove methods
 # It provides extra checks and guidance for making sure that:
 #  1. there are no existing NuvlaEdge Engines already running
 #  2. handle existing installations before installing a new one
@@ -30,9 +30,9 @@ usage()
     echo "\t\t UPDATE - if NuvlaEdge Engine is already running, replace outdated components and start stopped ones. Otherwise, install"
     echo "\t\t OVERWRITE - if NuvlaEdge Engine is already running, shut it down and re-install. Otherwise, install"
     echo " --action=STRING\t\t\t\t(optional) What action to take. Must be on of: ${actions}. Default: ${action}"
-    echo "\t\t INSTALL - runs 'docker-compose up'"
-    echo "\t\t REMOVE - removes the NuvlaEdge Engine and all associated data. Same as 'docker-compose down -v"
-    echo "\t\t HALT - shuts down the NuvlaEdge Engine but keeps data, so it can be revived later. Same as 'docker-compose down"
+    echo "\t\t INSTALL - runs 'docker compose up'"
+    echo "\t\t REMOVE - removes the NuvlaEdge Engine and all associated data. Same as 'docker compose down -v"
+    echo "\t\t HALT - shuts down the NuvlaEdge Engine but keeps data, so it can be revived later. Same as 'docker compose down"
     echo ""
 }
 
