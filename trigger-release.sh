@@ -38,17 +38,17 @@ set -e
 
 sed -i '' -E "s/\\\${NE_IMAGE_TAG[^}]+}/\\\${NE_IMAGE_TAG:-$tag}/g" docker-compose*.yml
 
-#sed -i.old "s/DOCKER_IMAGE=.*/DOCKER_IMAGE=$tag/g" nuvlaedge-engine-installer/container-release.sh
-#rm nuvlaedge-engine-installer/container-release.sh.old
+#sed -i.old "s/DOCKER_IMAGE=.*/DOCKER_IMAGE=$tag/g" nuvlaedge-installer/container-release.sh
+#rm nuvlaedge-installer/container-release.sh.old
 
 sed -i '' "s/version:.*/version: $tag/g" helm/Chart.yaml
 sed -i '' "s/appVersion:.*/appVersion: $tag/g" helm/Chart.yaml
 
-git add docker-compose*.yml helm/Chart.yaml #nuvlaedge-engine-installer/container-release.sh
+git add docker-compose*.yml helm/Chart.yaml #nuvlaedge-installer/container-release.sh
 git commit -m "Update NuvlaEdge version to $tag"
 git push
 
-git tag -a $tag -m "Triggering automatic release for NuvlaEdge Engine - $tag"
+git tag -a $tag -m "Triggering automatic release for NuvlaEdge - $tag"
 git push origin $tag
 
 set +x

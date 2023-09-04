@@ -43,9 +43,9 @@ class Cleanup(object):
         time.sleep(5)
 
     def remove_local_nuvlaedge(self, project, image):
-        print(f'Removing local NuvlaEdge Engine installation with project: {project}')
+        print(f'Removing local NuvlaEdge installation with project: {project}')
         try:
-            self.docker_client.api.remove_container("nuvlaedge-engine-installer")
+            self.docker_client.api.remove_container("nuvlaedge-installer")
         except docker.errors.NotFound:
             pass
         except Exception as e:

@@ -57,21 +57,21 @@ def test_deploy_nuvlaedgees(request):
     try:
         docker_client.containers.run(nbe_installer_image,
                                     command=f"install --project={local_project_name} --daemon --environment={nb_env}",
-                                    name="nuvlaedge-engine-installer",
+                                    name="nuvlaedge-installer",
                                     volumes={
                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
                                                                 'mode': 'ro'}
                                     })
     except docker.errors.ContainerError as e:
-        logging.error(f'Cannot install local NuvlaEdge Engine. Reason: {str(e)}')
+        logging.error(f'Cannot install local NuvlaEdge. Reason: {str(e)}')
 
-    installer_container = docker_client.containers.get("nuvlaedge-engine-installer")
+    installer_container = docker_client.containers.get("nuvlaedge-installer")
 
     assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
-    logging.info(f'NuvlaEdge ({nuvlaedge_id}) Engine successfully installed with project name {local_project_name}')
+    logging.info(f'NuvlaEdge ({nuvlaedge_id}) successfully installed with project name {local_project_name}')
 
 
-def test_nuvlaedge_engine_containers_stability(request):
+def test_nuvlaedge_containers_stability(request):
     nb_containers = docker_client.containers.list(filters={'label': 'nuvlaedge.component=True'}, all=True)
 
     container_names = []
@@ -111,7 +111,7 @@ def test_ssh_key_bootstrap():
         assert NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY in ak.read()
 
 
-def test_nuvlaedge_engine_local_compute_api(request):
+def test_nuvlaedge_local_compute_api(request):
     volume = docker_client.api.inspect_volume(local_project_name + "_nuvlabox-db").get('Mountpoint')
     request.config.cache.set('nuvlaedge_volume_path', volume)
 
@@ -135,7 +135,7 @@ def test_nuvlaedge_engine_local_compute_api(request):
     logging.info(f'Compute API is up, running, secured and accessible by agent')
 
 
-def test_nuvlaedge_engine_local_datagateway():
+def test_nuvlaedge_local_datagateway():
     nuvlaedge_network = local_project_name + '-shared-network'
 
     docker_net = None
