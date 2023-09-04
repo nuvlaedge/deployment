@@ -12,11 +12,11 @@ working_dir=${working_dir:-$9}
 current_version=${current_version:-${10}}
 hard_reset=${hard_reset:-0}
 
-nuvlaedge-engine-printer "Updating NuvlaEdge Engine to version ${target_version}" ${quiet} "NONE" yes
+nuvlaedge-printer "Updating NuvlaEdge Engine to version ${target_version}" ${quiet} "NONE" yes
 
 if [[ -z ${project} ]]
 then
-  nuvlaedge-engine-printer "Update failed! Cannot update without a project name." 0 "ERROR" "no"
+  nuvlaedge-printer "Update failed! Cannot update without a project name." 0 "ERROR" "no"
   exit 1
 fi
 export COMPOSE_PROJECT_NAME="${project}"
@@ -24,33 +24,33 @@ export COMPOSE_PROJECT_NAME="${project}"
 if [[ ! -z "${environment}" ]]
 then
   env_file="${working_dir}/.env"
-  nuvlaedge-engine-printer "Setting environment for update, at ${env_file}" ${quiet} "INFO" "no"
+  nuvlaedge-printer "Setting environment for update, at ${env_file}" ${quiet} "INFO" "no"
 
   env_lines=$(echo ${environment} | sed 's/,/\\n/g')
-  #nuvlaedge-engine-printer "New environment variables:\n${env_lines}" ${quiet} "DEBUG" "no"
+  #nuvlaedge-printer "New environment variables:\n${env_lines}" ${quiet} "DEBUG" "no"
 
   echo -e "${env_lines}" | grep -v "affinity:container" > ${env_file}
 
   if [[ $? -ne 0 ]]
   then
-    nuvlaedge-engine-printer "Update failed! Unable to store enviroment ${env_lines} in ${env_file}." 0 "ERROR" "no"
+    nuvlaedge-printer "Update failed! Unable to store enviroment ${env_lines} in ${env_file}." 0 "ERROR" "no"
     exit 1
   fi
 fi
 
 source_code_url="${github_releases}/download/${target_version}"
 
-nuvlaedge-engine-printer "Downloading config files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
+nuvlaedge-printer "Downloading config files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
 
-download=$(nuvlaedge-engine-download-configs "${compose_files}" "${working_dir}" "${source_code_url}" 2>&1)
+download=$(nuvlaedge-download-configs "${compose_files}" "${working_dir}" "${source_code_url}" 2>&1)
 
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-engine-printer "Update failed! Unable to retrieve files ${compose_files}: ${download}" 0 "ERROR" "no"
+  nuvlaedge-printer "Update failed! Unable to retrieve files ${compose_files}: ${download}" 0 "ERROR" "no"
   exit 1
 fi
 
-nuvlaedge-engine-printer "Preparing to update NuvlaEdge Engine running as project ${project}" ${quiet} "NONE" "yes"
+nuvlaedge-printer "Preparing to update NuvlaEdge Engine running as project ${project}" ${quiet} "NONE" "yes"
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
 
@@ -63,13 +63,13 @@ then
     mkdir -p ${down_dir}
     source_code_url_current="${github_releases}/download/${current_version}"
 
-    nuvlaedge-engine-printer "Downloading current config files ${compose_files} from ${source_code_url} for shutdown" ${quiet} "INFO" "no"
+    nuvlaedge-printer "Downloading current config files ${compose_files} from ${source_code_url} for shutdown" ${quiet} "INFO" "no"
 
-    download=$(nuvlaedge-engine-download-configs "${compose_files}" "${down_dir}" "${source_code_url_current}" 2>&1)
+    download=$(nuvlaedge-download-configs "${compose_files}" "${down_dir}" "${source_code_url_current}" 2>&1)
 
     if [[ $? -ne 0 ]]
     then
-      nuvlaedge-engine-printer "Failed to retrieve current files ${compose_files} for shutdown: ${download}" 0 "ERROR" "no"
+      nuvlaedge-printer "Failed to retrieve current files ${compose_files} for shutdown: ${download}" 0 "ERROR" "no"
       cd ${working_dir}
     else
       cd ${down_dir}
@@ -80,15 +80,15 @@ then
 
   if [[ ${hard_reset} -eq 0 ]]
   then
-    nuvlaedge-engine-printer "Forcing the restart of the NuvlaEdge Engine components before updating" ${quiet} "WARNING" "no"
+    nuvlaedge-printer "Forcing the restart of the NuvlaEdge Engine components before updating" ${quiet} "WARNING" "no"
     delete_volume=0
   else
-    nuvlaedge-engine-printer "Forcing the hard reset (full re-installation) of the NuvlaEdge Engine components before updating" ${quiet} "WARNING" "no"
+    nuvlaedge-printer "Forcing the hard reset (full re-installation) of the NuvlaEdge Engine components before updating" ${quiet} "WARNING" "no"
     docker_compose_down_command="${docker_compose_down_command} -v"
     delete_volume=1
   fi
 
-  nuvlaedge-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
+  nuvlaedge-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
 
   if [[ ${quiet} -eq 1 ]]
   then
@@ -99,17 +99,17 @@ then
 
   if [[ $? -ne 0 ]]
   then
-    nuvlaedge-engine-printer "Force restart failed (trying again): ${out}" ${quiet} "WARNING" "no"
+    nuvlaedge-printer "Force restart failed (trying again): ${out}" ${quiet} "WARNING" "no"
     if [[ ${quiet} -eq 1 ]]
     then
-      out=$(nuvlaedge-engine-force-cleanup "${project}" "${working_dir}" $delete_volume 2>&1)
+      out=$(nuvlaedge-force-cleanup "${project}" "${working_dir}" $delete_volume 2>&1)
     else
-      out="\n$(nuvlaedge-engine-force-cleanup "${project}" "${working_dir}" $delete_volume)"
+      out="\n$(nuvlaedge-force-cleanup "${project}" "${working_dir}" $delete_volume)"
     fi
 
     if [[ $? -ne 0 ]]
     then
-      nuvlaedge-engine-printer "Unable to force restart during update. Continue anyway - ${out}" ${quiet} "ERROR" "no"
+      nuvlaedge-printer "Unable to force restart during update. Continue anyway - ${out}" ${quiet} "ERROR" "no"
     fi
   fi
 fi
@@ -118,7 +118,7 @@ docker_compose_command="docker --log-level ERROR compose --ansi never -p ${proje
 
 cd ${working_dir}
 
-nuvlaedge-engine-printer "Executing update command: ${docker_compose_command}" ${quiet} "INFO" "no"
+nuvlaedge-printer "Executing update command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
 if [[ ${quiet} -eq 1 ]]
 then
@@ -129,24 +129,24 @@ fi
 
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-engine-printer "Update failed when executing Docker Compose command ${docker_compose_command}.${out}" 0 "ERROR" "no"
+  nuvlaedge-printer "Update failed when executing Docker Compose command ${docker_compose_command}.${out}" 0 "ERROR" "no"
   exit 1
 fi
 
 wait=5
-nuvlaedge-engine-printer "Waiting ${wait} seconds and then checking updated NuvlaEdge Engine health..." ${quiet} "INFO" "no"
+nuvlaedge-printer "Waiting ${wait} seconds and then checking updated NuvlaEdge Engine health..." ${quiet} "INFO" "no"
 sleep ${wait}
 
 # set timeout for 10 minutes
 timer=600
-nuvlaedge-engine-printer "Checking NuvlaEdge Engine health (will timeout after ${timer} sec)..." ${quiet} "INFO" "no"
-health=$(nuvlaedge-engine-check-health ${timer} "${project}" 2>&1)
+nuvlaedge-printer "Checking NuvlaEdge Engine health (will timeout after ${timer} sec)..." ${quiet} "INFO" "no"
+health=$(nuvlaedge-check-health ${timer} "${project}" 2>&1)
 
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-engine-printer "Updated NuvlaEdge Engine is not healthy. Updated failed with: ${health}" 0 "ERROR" "no"
+  nuvlaedge-printer "Updated NuvlaEdge Engine is not healthy. Updated failed with: ${health}" 0 "ERROR" "no"
   exit 1
 fi
 
 # if we got here, then update was successful
-nuvlaedge-engine-printer "NuvlaEdge Engine update to version ${target_version} was successful!" 0 "" "no"
+nuvlaedge-printer "NuvlaEdge Engine update to version ${target_version} was successful!" 0 "" "no"

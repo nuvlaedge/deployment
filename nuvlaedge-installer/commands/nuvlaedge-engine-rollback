@@ -12,12 +12,12 @@ old_nb_dir=${old_nb_dir:-$7}
 
 if [[ -z ${project} ]]
 then
-  nuvlaedge-engine-printer "Rollback failed! Cannot restore NuvlaEdge without a project name." 0 "ERROR" "no"
+  nuvlaedge-printer "Rollback failed! Cannot restore NuvlaEdge without a project name." 0 "ERROR" "no"
   exit 1
 fi
 export COMPOSE_PROJECT_NAME="${project}"
 
-nuvlaedge-engine-printer "Initiating NuvlaEdge Engine rollback to previous version" ${quiet} "NONE" yes
+nuvlaedge-printer "Initiating NuvlaEdge rollback to previous version" ${quiet} "NONE" yes
 
 cd "${working_dir}"
 
@@ -25,11 +25,11 @@ cp -f ${old_nb_dir}/*yml .
 
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-engine-printer "Cannot access original config files at ${old_nb_dir}" 0 "ERROR" "no"
+  nuvlaedge-printer "Cannot access original config files at ${old_nb_dir}" 0 "ERROR" "no"
   exit 1
 fi
 
-nuvlaedge-engine-printer "Copied old config files into rollback path $(pwd): $(ls)" ${quiet} "INFO" "no"
+nuvlaedge-printer "Copied old config files into rollback path $(pwd): $(ls)" ${quiet} "INFO" "no"
 
 docker_compose_args=""
 for file in $(echo ${compose_files} | tr ',' ' ')
@@ -38,12 +38,12 @@ do
   then
     docker_compose_args="${docker_compose_args} -f ${file}"
   else
-    nuvlaedge-engine-printer "Cannot find config file ${file} in original installation directory ${working_dir}. Some of the old NuvlaEdge functionalities might be lost during this rollback" ${quiet} "WARNING" "no"
+    nuvlaedge-printer "Cannot find config file ${file} in original installation directory ${working_dir}. Some of the old NuvlaEdge functionalities might be lost during this rollback" ${quiet} "WARNING" "no"
   fi
 done
 
 env_file="$(pwd)/.env"
-nuvlaedge-engine-printer "Setting old environment for rollback, at ${env_file}" ${quiet} "INFO" "no"
+nuvlaedge-printer "Setting old environment for rollback, at ${env_file}" ${quiet} "INFO" "no"
 
 env_lines=$(echo ${old_environment} | sed 's/,/\\n/g')
 
@@ -51,7 +51,7 @@ echo -e "${env_lines}" | grep -v "affinity:container" > ${env_file}
 
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-engine-printer "Rollback failed! Unable to restore enviroment ${env_lines} in ${env_file}." 0 "ERROR" "no"
+  nuvlaedge-printer "Rollback failed! Unable to restore enviroment ${env_lines} in ${env_file}." 0 "ERROR" "no"
   exit 1
 fi
 
@@ -60,10 +60,10 @@ docker_compose_command="docker compose -p ${project} ${docker_compose_args} up -
 
 if [[ ${force_restart} -eq 1 ]]
 then
-  nuvlaedge-engine-printer "Forcing the restart of the NuvlaEdge Engine components before rolling back" ${quiet} "WARNING" "no"
+  nuvlaedge-printer "Forcing the restart of NuvlaEdge components before rolling back" ${quiet} "WARNING" "no"
   docker_compose_down_command="docker --log-level ERROR compose --ansi never -p ${project} ${docker_compose_args} down --remove-orphans"
 
-  nuvlaedge-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
+  nuvlaedge-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
 
   if [[ ${quiet} -eq 1 ]]
   then
@@ -74,7 +74,7 @@ then
 
   if [[ $? -ne 0 ]]
   then
-    nuvlaedge-engine-printer "Force restart failed (trying again): ${out}" ${quiet} "WARNING" "no"
+    nuvlaedge-printer "Force restart failed (trying again): ${out}" ${quiet} "WARNING" "no"
     if [[ ${quiet} -eq 1 ]]
     then
       out=$($docker_compose_down_command 2>&1)
@@ -84,12 +84,12 @@ then
 
     if [[ $? -ne 0 ]]
     then
-      nuvlaedge-engine-printer "Unable to force restart during rollback. Continue anyway - ${out}" ${quiet} "ERROR" "no"
+      nuvlaedge-printer "Unable to force restart during rollback. Continue anyway - ${out}" ${quiet} "ERROR" "no"
     fi
   fi
 fi
 
-nuvlaedge-engine-printer "Executing command: ${docker_compose_command}" ${quiet} "INFO" "no"
+nuvlaedge-printer "Executing command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
 if [[ ${quiet} -eq 1 ]]
 then
@@ -100,24 +100,24 @@ fi
 
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-engine-printer "Rollback failed when executing Docker Compose command ${docker_compose_command}: ${out}" 0 "ERROR" "no"
+  nuvlaedge-printer "Rollback failed when executing Docker Compose command ${docker_compose_command}: ${out}" 0 "ERROR" "no"
   exit 1
 fi
 
 wait=5
-nuvlaedge-engine-printer "Waiting ${wait} seconds and then checking updated NuvlaEdge Engine health..." ${quiet} "INFO" "no"
+nuvlaedge-printer "Waiting ${wait} seconds and then checking updated NuvlaEdge health..." ${quiet} "INFO" "no"
 sleep ${wait}
 
 # set timeout for 60 seconds
 timer=60
-nuvlaedge-engine-printer "Checking NuvlaEdge Engine health (will timeout after ${timer} sec)..." ${quiet} "INFO" "no"
-health=$(nuvlaedge-engine-check-health ${timer} "${project}" 2>&1)
+nuvlaedge-printer "Checking NuvlaEdge health (will timeout after ${timer} sec)..." ${quiet} "INFO" "no"
+health=$(nuvlaedge-check-health ${timer} "${project}" 2>&1)
 
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-engine-printer "NuvlaEdge Engine is not healthy. Rollback (after failed update) failed with: ${health}" 0 "ERROR" "no"
+  nuvlaedge-printer "NuvlaEdge is not healthy. Rollback (after failed update) failed with: ${health}" 0 "ERROR" "no"
   exit 1
 fi
 
 # if we got here, then update was successful
-nuvlaedge-engine-printer "NuvlaEdge Engine was rolled back successfully after a failed update" 0 "" "no"
+nuvlaedge-printer "NuvlaEdge was rolled back successfully after a failed update" 0 "" "no"

@@ -1,4 +1,4 @@
-# NuvlaEdge Engine installation in Kubernetes
+# NuvlaEdge installation on Kubernetes
 
 **This installation method is still in trial and should not be used for production**
 
@@ -13,7 +13,7 @@ Make sure you have:
 - Make sure you are using system admin credentials of the cluster on which you
   are making the deployment of NuvlaEdge software.
 
-## Install the NuvlaEdge Engine
+## Install NuvlaEdge
 
 First, go through the usual NuvlaEdge creation process via Nuvla.
 
@@ -23,7 +23,7 @@ Add Helm repo.
 helm repo add nuvlaedge https://nuvlaedge.github.io/deployment
 ```
 
-This installation places the NuvlaEdge Engine in a single node of the Kubernetes
+This installation places NuvlaEdge in a single node of the Kubernetes
 cluster (preferably a master). So before doing the installation, make sure you
 choose your TARGET_KUBERNETES_NODE_NAME. You can do this by
 running `kubectl get nodes` and choosing one of the master nodes. And then, run:
@@ -34,7 +34,7 @@ helm install nuvlaedge-<uuid_of_your_nuvlaedge> nuvlaedge/nuvlaedge --version <v
     --set kubernetesNode=<TARGET_KUBERNETES_NODE_NAME>
 ```
 
-This will install the core NuvlaEdge Engine components in your Kubernetes node,
+This will install the core NuvlaEdge components in your Kubernetes node,
 within the namespace "nuvlaedge-<uuid_of_your_nuvlaedge>".
 
 ### Approve NuvlaEdge manager certificate
@@ -47,7 +47,7 @@ for running certificate signing request approval command
 1. After the initial installation, to approve the certificate signing request
    for the certificate used to manage the NuvlaEdge instance please run the
    following command as system admin of the K8s cluster
-   
+
    kubectl certificate approve nuvlaedge-csr
 ```
 
@@ -78,7 +78,7 @@ job.batch/kubernetes-credentials-manager replaced
 $
 ```
 
-### Enable optional NuvlaEdge Engine components
+### Enable optional NuvlaEdge components
 
 The following components are optional:
  - security
