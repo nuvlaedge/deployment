@@ -1,0 +1,54 @@
+#!/bin/sh
+
+quiet=${quiet:-${1:-0}}
+project=${project:-${2:-"nuvlaedge"}}
+
+export COMPOSE_PROJECT_NAME="${project}"
+
+nuvlaedge-printer "Uninstalling NuvlaEdge Engine - ${project} - (permanently)" ${quiet} "INFO" yes
+
+docker_compose_command="docker --log-level ERROR compose --ansi never -p ${project} down -v --remove-orphans"
+
+nuvlaedge-printer "Executing uninstall command: ${docker_compose_command}" ${quiet} "INFO" "no"
+
+if [[ ${quiet} -eq 1 ]]
+then
+  out=$($docker_compose_command 2>&1)
+else
+  out="\n$($docker_compose_command)"
+fi
+
+if [[ $? -ne 0 ]]
+then
+  nuvlaedge-printer "Uninstall didn't work.${out}" 0 "WARNING" "no"
+  nuvlaedge-printer "Trying to uninstall a second time..." 0 "INFO" "no"
+  if [[ ${quiet} -eq 1 ]]
+  then
+    out=$($docker_compose_command 2>&1)
+  else
+    out="\n$($docker_compose_command)"
+  fi
+
+  if [[ $? -ne 0 ]]
+  then
+    nuvlaedge-printer "Uninstall failed when executing Docker Compose command ${docker_compose_command}.${out}" 0 "WARNING" "no"
+    if [[ ! -z "${working_dir}" ]]
+    then
+      nuvlaedge-printer "Forcing cleanup" ${quiet} "WARNING" "no"
+      if [[ ${quiet} -eq 1 ]]
+      then
+        out=$(nuvlaedge-force-cleanup "${project}" "${working_dir}" 1 2>&1)
+      else
+        out="\n$(nuvlaedge-force-cleanup "${project}" "${working_dir}" 1)"
+      fi
+    fi
+    if [[ $? -ne 0 ]]
+    then
+      nuvlaedge-printer "Cannot uninstall the existing NuvlaEdge Engine: ${out}" 0 "ERROR" "no"
+      exit 1
+    fi
+  fi
+fi
+
+# if we got here, then install was successful
+nuvlaedge-printer "NuvlaEdge Engine uninstalled successfully!" 0 "" "no"
