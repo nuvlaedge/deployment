@@ -57,6 +57,9 @@ services:
       - NUVLAEDGE_THREAD_MONITORS=${NUVLAEDGE_THREAD_MONITORS:-False}
       - NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY=${NUVLAEDGE_SSH_PUB_KEY:-}
       - NUVLAEDGE_JOB_ENGINE_LITE_IMAGE
+      - JOB_PULL_TIMEOUT
+      - JOB_DOCKER_TIMEOUT
+      - JOB_LOG_LEVEL
       - HOST_HOME=${HOME}
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
       - VPN_CONFIG_EXTRA
@@ -121,11 +124,11 @@ services:
 
   job-engine-lite:
     <<: *common
+    image: ${NUVLAEDGE_JOB_ENGINE_LITE_IMAGE:-${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.10.4}}
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     deploy:
       replicas: ${NUVLAEDGE_JOB_ENABLE:-0}
-    entrypoint: my_init
     command:
       - /app/pause.py
     volumes:
