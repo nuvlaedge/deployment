@@ -13,6 +13,7 @@ COPY . .
 COPY target/ .
 
 RUN apk add --no-cache jq docker-cli docker-cli-compose
+RUN pip install --no-cache-dir docker
 
 ENV PATH="$PATH:${workdir}/common:${workdir}/commands" \
     WORKDIR="${workdir}" \
