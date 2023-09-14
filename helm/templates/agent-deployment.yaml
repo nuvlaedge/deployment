@@ -48,7 +48,7 @@ spec:
             - name: NUVLA_ENDPOINT_INSECURE
               value: {{ .Values.NUVLA_ENDPOINT_INSECURE | default "False" | quote }}
             - name: NUVLAEDGE_JOB_ENGINE_LITE_IMAGE
-              value: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
+              value: {{ .Values.NUVLAEDGE_JOB_ENGINE_LITE_IMAGE | default (print .Values.nuvlaedge.image.registry .Values.nuvlaedge.image.organization "/" .Values.nuvlaedge.image.repository ":" (.Values.nuvlaedge.image.tag | default .Values.AppVersion)) | quote }}
             - name: NUVLAEDGE_VPN_COMPONENT_NAME
               value: {{ .Values.vpnClientComponentName }}
             - name: HOST_HOME
