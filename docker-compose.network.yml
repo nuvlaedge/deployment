@@ -13,12 +13,11 @@ x-common: &common
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=network"
 
-
 services:
   peripheral-manager-network:
     <<: *common
     entrypoint: network
-    restart: on-failure
+    restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-network
     network_mode: host
     volumes:

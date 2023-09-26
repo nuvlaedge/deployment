@@ -17,7 +17,7 @@ services:
   peripheral-manager-gpu:
     <<: *common
     entrypoint: gpu
-    restart: on-failure
+    restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-gpu
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared

@@ -13,13 +13,12 @@ x-common: &common
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=modbus"
 
-
 services:
   peripheral-manager-modbus:
     <<: *common
     entrypoint: modbus
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-modbus
-    restart: on-failure
+    restart: unless-stopped
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
     depends_on:

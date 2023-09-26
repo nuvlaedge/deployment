@@ -17,7 +17,7 @@ services:
   peripheral-manager-bluetooth:
     <<: *common
     entrypoint: bluetooth
-    restart: on-failure
+    restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-bluetooth
     network_mode: host
     volumes:

@@ -17,7 +17,7 @@ services:
   peripheral-manager-usb:
     <<: *common
     entrypoint: usb
-    restart: always
+    restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-usb
     network_mode: host
     volumes:
