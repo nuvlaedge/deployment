@@ -22,5 +22,6 @@ services:
     network_mode: host
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
     depends_on:
       - agent
