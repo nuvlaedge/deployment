@@ -12,6 +12,7 @@ x-common: &common
     - "nuvlaedge.deployment=production"
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=network"
+    - "nuvlaedge.module.name=network"
 
 services:
   peripheral-manager-network:

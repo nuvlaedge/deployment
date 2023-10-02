@@ -12,6 +12,7 @@ x-common: &common
     - "nuvlaedge.deployment=production"
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=usb"
+    - "nuvlaedge.module.name=usb"
 
 services:
   peripheral-manager-usb:

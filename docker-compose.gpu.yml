@@ -12,6 +12,7 @@ x-common: &common
     - "nuvlaedge.deployment=production"
     - "nuvlaedge.peripheral.component=True"
     - "nuvlaedge.peripheral.type=gpu"
+    - "nuvlaedge.module.name=gpu"
 
 services:
   peripheral-manager-gpu:
