@@ -87,7 +87,7 @@ services:
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
     deploy:
-      replicas: ${NUVLAEDGE_COMPUTE_API_ENABLE:-1}
+      replicas: ${NUVLAEDGE_COMPUTE_API_ENABLE:-0}
     oom_score_adj: -900
     pid: "host"
     environment:
