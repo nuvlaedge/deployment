@@ -109,6 +109,7 @@ def test_ssh_key_bootstrap():
         assert NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY in ak.read()
 
 
+@pytest.mark.skip(reason="compute-api is now disabled by default")
 def test_nuvlaedge_local_compute_api(request):
     volume = docker_client.api.inspect_volume(local_project_name + "_nuvlabox-db").get('Mountpoint')
     request.config.cache.set('nuvlaedge_volume_path', volume)
