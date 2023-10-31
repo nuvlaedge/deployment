@@ -145,28 +145,27 @@ def test_nuvlaedge_local_datagateway():
 
     assert nuvlaedge_network == docker_net.name, f'Network {nuvlaedge_network} does not exist'
 
-    check_dg = docker_client.containers.run('alpine',
-                                            command='sh -c "ping -c 1 data-gateway 2>&1 >/dev/null && echo OK"',
-                                            network=nuvlaedge_network,
-                                            remove=True)
-
-    assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway containers: {check_dg}'
-
-    logging.info(f'NuvlaEdge shared network ({nuvlaedge_network}) is functional')
-
-    def run_test_container():
-        cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1"'
+    def run_in_container(cmd):
         return docker_client.containers.run('alpine',
                                             command=cmd,
                                             network=nuvlaedge_network,
                                             remove=True)
-    try:
-        check_mqtt = run_test_container()
-    except:
-        logging.info(f'NuvlaEdge data-gateway not ready yet. Waiting 15 seconds and retry...')
-        time.sleep(15)
-        check_mqtt = run_test_container()
 
+    def retry_run_in_container(cmd):
+        try:
+            return run_in_container(cmd)
+        except:
+            logging.info(f'NuvlaEdge data-gateway not ready yet. Waiting 15 seconds and retry...')
+            time.sleep(15)
+            return run_in_container(cmd)
+            
+    check_dg = retry_run_in_container('sh -c "ping -c 1 data-gateway 2>&1 >/dev/null && echo OK"')
+    assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway containers: {check_dg}'
+
+    logging.info(f'NuvlaEdge shared network ({nuvlaedge_network}) is functional')
+
+    
+    check_mqtt = retry_run_in_container('sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1"')
     nb_status = json.loads(check_mqtt.decode())
     assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaEdge status failed: {nb_status}'
 
