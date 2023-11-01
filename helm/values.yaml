@@ -29,6 +29,8 @@ credManager:
   csr_name: nuvlaedge-csr
   # waiting time in seconds for approving the edge management credentials
   wait_approved_sec: 600
+  # time to live after job finished
+  ttlJobFinished: 5
 
 nameOverride: ""
 fullnameOverride: ""
