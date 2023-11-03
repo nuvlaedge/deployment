@@ -14,4 +14,4 @@ The NuvlaEdge has just been upgraded on your Kubernetes node {{ .Values.kubernet
 
 {{- end -}}
 
-You can now find your NuvlaEdge at {{ .Values.NUVLA_ENDPOINT | default "https://nuvla.io" }}/ui/edge/{{ .Values.NUVLAEDGE_UUID | replace "nuvlabox/" "" }}
+You can now find your NuvlaEdge at: {{printf "\n" }}{{ .Values.NUVLA_ENDPOINT | default "https://nuvla.io" }}/ui/edge/{{ .Values.NUVLAEDGE_UUID | replace "nuvlabox/" "" }}
