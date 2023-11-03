@@ -1,6 +1,6 @@
 {{- if not .Release.IsUpgrade -}}
 
-The NuvlaEdge has just been installed on your Kubernetes node {{ .Values.kubernetesNode }}, on Helm namespace {{ .Release.Namespace }}
+The NuvlaEdge has just been installed on your Kubernetes node {{ .Values.kubernetesNode }}, on Helm namespace {{ .Release.Namespace }} .
 
 1. After the initial installation, to approve the certificate signing request
    for the certificate used to manage the NuvlaEdge instance please run the
@@ -10,7 +10,7 @@ The NuvlaEdge has just been installed on your Kubernetes node {{ .Values.kuberne
 
 {{- else -}}
 
-The NuvlaEdge has just been upgraded on your Kubernetes node {{ .Values.kubernetesNode }}, on Helm namespace {{ .Release.Namespace }}
+The NuvlaEdge has just been upgraded on your Kubernetes node {{ .Values.kubernetesNode }}, on Helm namespace {{ .Release.Namespace }} .
 
 {{- end -}}
 
