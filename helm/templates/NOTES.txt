@@ -10,4 +10,4 @@ The NuvlaEdge has just been installed on your Kubernetes node {{ .Values.kuberne
 The NuvlaEdge has just been upgraded on your Kubernetes node {{ .Values.kubernetesNode }}, on namespace {{ .Release.Namespace }}.
 
 You can now find your NuvlaEdge at {{ .Values.NUVLA_ENDPOINT | default "https://nuvla.io" }}/ui/edge/{{ .Values.NUVLAEDGE_UUID | replace "nuvlabox/" "" }}
-{{- end --}}
+{{- end -}}
