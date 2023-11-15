@@ -21,6 +21,8 @@ services:
     restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-usb
     network_mode: host
+    environment:
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
     volumes:
       - /dev:/dev:ro
       - /run/udev/control:/run/udev/control:ro

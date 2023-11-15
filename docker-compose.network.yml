@@ -21,6 +21,8 @@ services:
     restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-network
     network_mode: host
+    environment:
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
     depends_on:

@@ -20,6 +20,8 @@ services:
     entrypoint: gpu
     restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-gpu
+    environment:
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /dev/:/host/dev/:ro
