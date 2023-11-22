@@ -67,6 +67,8 @@ spec:
                   fieldPath: spec.nodeName
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge.namespace" . }}
+            - name: JOB_IMAGE_PULL_POLICY
+              value: {{ .Values.JOB_IMAGE_PULL_POLICY | default "Always" | quote }}
           volumeMounts:
             - mountPath: /rootfs
               name: rootfs
