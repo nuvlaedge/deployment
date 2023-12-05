@@ -35,6 +35,8 @@ spec:
               name: nuvlaedge-db
             - mountPath: /run/dbus/system_bus_socket
               name: dbus-socket
+            - mountPath: /etc/dbus-1/system.d/bluetooth.conf
+              name: dbus-conf
       volumes:
         - name: nuvlaedge-db
           hostPath:
@@ -42,4 +44,7 @@ spec:
         - name: dbus-socket
           hostPath:
             path: /run/dbus/system_bus_socket
+        - name: dbus-conf
+          hostPath:
+            path: /etc/dbus-1/system.d/bluetooth.conf
 {{- end }}
