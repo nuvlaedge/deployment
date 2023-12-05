@@ -26,5 +26,6 @@ services:
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+      - /etc/dbus-1/system.d/bluetooth.conf:/etc/dbus-1/system.d/bluetooth.conf
     depends_on:
       - agent
