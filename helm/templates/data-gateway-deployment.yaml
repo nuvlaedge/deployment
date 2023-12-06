@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       component: data-gateway
+  revisionHistoryLimit: 1 
   template:
     metadata:
       labels:

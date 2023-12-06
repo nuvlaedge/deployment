@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       component: {{ .Values.vpnClientComponentName }}
+  revisionHistoryLimit: 1 
   template:
     metadata:
       labels:

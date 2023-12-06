@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       component: system-manager
+  revisionHistoryLimit: 1 
   template:
     metadata:
       labels:
