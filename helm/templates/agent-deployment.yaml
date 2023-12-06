@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       component: agent
-  revisionHistoryLimit: 1 # Default to 10 if not specified
+  revisionHistoryLimit: 0 # Default to 10 if not specified
   template:
     metadata:
       labels:
