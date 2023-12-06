@@ -10,6 +10,8 @@ nuvlaedgeVolumeHostPath: /var/lib/nuvlaedge
 
 deploymentRevHistLimit: 0
 
+deploymentSuffix: "-jsw-deployment"
+
 nuvlaedge:
   image:
     registry: ""
