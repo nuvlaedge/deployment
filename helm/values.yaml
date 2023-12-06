@@ -8,7 +8,7 @@ vpnClientComponentName: vpn-client
 
 nuvlaedgeVolumeHostPath: /var/lib/nuvlaedge
 
-deploymentRevHistLimit: 2
+deploymentRevHistLimit: 0
 
 nuvlaedge:
   image:

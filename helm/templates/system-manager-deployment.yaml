@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       component: system-manager
-  revisionHistoryLimit: 0
+  revisionHistoryLimit: {{ .Values.deploymentRevHistLimit }} 
   template:
     metadata:
       labels:

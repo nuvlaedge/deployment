@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       component: data-gateway
-  revisionHistoryLimit: 1 
+  revisionHistoryLimit: {{ .Values.deploymentRevHistLimit }} 
   template:
     metadata:
       labels:
