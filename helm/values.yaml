@@ -10,8 +10,6 @@ nuvlaedgeVolumeHostPath: /var/lib/nuvlaedge
 
 deploymentRevHistLimit: 0
 
-deploymentSuffix: ""
-
 nuvlaedge:
   image:
     registry: ""
