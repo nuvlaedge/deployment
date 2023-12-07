@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agent{{ .Values.deploymentSuffix }}
+  name: agent
   namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
     {{- include "nuvlaedge.labels" . | nindent 4 }}

@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vpn-client{{ .Values.deploymentSuffix }}
+  name: vpn-client
   namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
     {{- include "nuvlaedge.labels" . | nindent 4 }}
