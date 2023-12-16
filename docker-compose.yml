@@ -37,7 +37,7 @@ services:
       - NE_IMAGE_REPOSITORY
       - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.12.2}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
 
   agent:
@@ -78,8 +78,9 @@ services:
       - COMPUTE_API_PORT
       - LOG_MAX_SIZE
       - LOG_MAX_FILE
+      - DOCKER_SOCKET_PATH
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
 
@@ -95,7 +96,7 @@ services:
     environment:
       - HOST=${HOSTNAME:-nuvlaedge}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
       - "0.0.0.0:${COMPUTE_API_PORT:-}:5000"
@@ -134,4 +135,4 @@ services:
     command:
       - /app/pause.py
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
