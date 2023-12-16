@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: data-gateway-deployment
+  name: data-gateway
   namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
     {{- include "nuvlaedge.labels" . | nindent 4 }}
@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       component: data-gateway
+  revisionHistoryLimit: {{ .Values.deploymentRevHistLimit }} 
   template:
     metadata:
       labels:

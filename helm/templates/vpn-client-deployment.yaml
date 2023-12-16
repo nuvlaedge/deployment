@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vpn-client-deployment
+  name: vpn-client
   namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
     {{- include "nuvlaedge.labels" . | nindent 4 }}
@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       component: {{ .Values.vpnClientComponentName }}
+  revisionHistoryLimit: {{ .Values.deploymentRevHistLimit }} 
   template:
     metadata:
       labels:

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: system-manager-deployment
+  name: system-manager
   namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
     {{- include "nuvlaedge.labels" . | nindent 4 }}
@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       component: system-manager
+  revisionHistoryLimit: {{ .Values.deploymentRevHistLimit }} 
   template:
     metadata:
       labels:

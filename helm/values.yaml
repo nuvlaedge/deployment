@@ -8,6 +8,8 @@ vpnClientComponentName: vpn-client
 
 nuvlaedgeVolumeHostPath: /var/lib/nuvlaedge
 
+deploymentRevHistLimit: 0
+
 nuvlaedge:
   image:
     registry: ""

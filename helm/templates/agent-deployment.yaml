@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agent-deployment
+  name: agent
   namespace: {{ include "nuvlaedge.namespace" . }}
   labels:
     {{- include "nuvlaedge.labels" . | nindent 4 }}
@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       component: agent
+  revisionHistoryLimit: {{ .Values.deploymentRevHistLimit }} # Default to 10 if not specified
   template:
     metadata:
       labels:
