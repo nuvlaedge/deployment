@@ -5,8 +5,8 @@ x-common: &common
   stop_grace_period: 5s
   logging:
     options:
-      max-size: "250k"
-      max-file: "10"
+      max-size: "${LOG_MAX_SIZE:-250k}"
+      max-file: "${LOG_MAX_FILE:-10}"
   labels:
     - "nuvlaedge.component=True"
     - "nuvlaedge.deployment=production"
@@ -76,6 +76,8 @@ services:
       - NUVLAEDGE_VPN_CLIENT_ENABLE
       - NUVLAEDGE_JOB_ENABLE
       - COMPUTE_API_PORT
+      - LOG_MAX_SIZE
+      - LOG_MAX_FILE
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
