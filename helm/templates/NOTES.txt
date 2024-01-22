@@ -4,9 +4,13 @@ The NuvlaEdge has just been installed on your Kubernetes node {{ .Values.kuberne
 
 1. After the initial installation, to approve the certificate signing request
    for the certificate used to manage the NuvlaEdge instance please run the
-   following command as system admin of the K8s cluster
+   following command as system admin of the K8s cluster:{{printf "\n\n" }}
 
-   kubectl certificate approve {{ .Values.credManager.csr_name }}{{printf "\n" }}
+   {{- if .Values.SET_MULTIPLE -}}
+     kubectl certificate approve {{ .Values.credManager.csr_name }}{{ printf "-" }}{{ include "nuvlaedge.uuid" . }}{{printf "\n\n" }}
+   {{- else -}}
+     kubectl certificate approve {{ .Values.credManager.csr_name }}{{printf "\n\n" }}
+   {{- end -}}
 
 {{- else -}}
 
