@@ -18,6 +18,11 @@ volumes:
     labels:
       - "nuvlaedge.volume=True"
       - "nuvlaedge.deployment=production"
+  nuvlaedge-logs:
+    driver: local
+    labels:
+      - "nuvlaedge.volume=True"
+      - "nuvlaedge.deployment=production"
 
 services:
   system-manager:
@@ -39,6 +44,7 @@ services:
     volumes:
       - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-logs:/var/log/nuvlaedge
 
   agent:
     <<: *common
@@ -83,6 +89,7 @@ services:
       - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
+      - nuvlaedge-logs:/var/log/nuvlaedge
 
   compute-api:
     <<: *common
