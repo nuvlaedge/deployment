@@ -76,6 +76,7 @@ services:
       - NE_IMAGE_REPOSITORY
       - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.13.1}
       - NE_IMAGE_INSTALLER
+      - AGENT_DEBUG=${AGENT_DEBUG:-False}
       # Below variables are not directly used by agent but are here
       # to be sent to Nuvla so they are not lost when updating NE
       - NUVLAEDGE_COMPUTE_API_ENABLE
