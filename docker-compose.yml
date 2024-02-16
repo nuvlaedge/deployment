@@ -1,12 +1,12 @@
 version: "3.7"
 
 x-common: &common
-  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.13.1}
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.0}
   stop_grace_period: 5s
   logging:
     options:
-      max-size: "${LOG_MAX_SIZE:-250k}"
-      max-file: "${LOG_MAX_FILE:-10}"
+      max-size: "250k"
+      max-file: "10"
   labels:
     - "nuvlaedge.component=True"
     - "nuvlaedge.deployment=production"
@@ -18,11 +18,17 @@ volumes:
     labels:
       - "nuvlaedge.volume=True"
       - "nuvlaedge.deployment=production"
+  nuvlaedge-data:
+    driver: local
+    labels:
+      - "nuvlaedge.volume=True"
+      - "nuvlaedge.deployment=production"
   nuvlaedge-logs:
     driver: local
     labels:
       - "nuvlaedge.volume=True"
       - "nuvlaedge.deployment=production"
+      - "nuvlaedge.logs=True"
 
 services:
   system-manager:
@@ -40,11 +46,11 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.13.1}
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.0}
     volumes:
-      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlaedge-data:/var/lib/nuvlaedge/
       - nuvlabox-db:/srv/nuvlaedge/shared
-      - nuvlaedge-logs:/var/log/nuvlaedge
 
   agent:
     <<: *common
@@ -74,23 +80,23 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.13.1}
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.0}
       - NE_IMAGE_INSTALLER
-      - AGENT_DEBUG=${AGENT_DEBUG:-False}
       # Below variables are not directly used by agent but are here
       # to be sent to Nuvla so they are not lost when updating NE
       - NUVLAEDGE_COMPUTE_API_ENABLE
       - NUVLAEDGE_VPN_CLIENT_ENABLE
       - NUVLAEDGE_JOB_ENABLE
       - COMPUTE_API_PORT
-      - LOG_MAX_SIZE
-      - LOG_MAX_FILE
-      - DOCKER_SOCKET_PATH
+      - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
+      - NUVLAEDGE_LOGGING_DIRECTORY
+      - DISABLE_FILE_LOGGING=${DISABLE_FILE_LOGGING:-False}
     volumes:
-      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-      - /:/rootfs:ro
+      - nuvlaedge-data:/var/lib/nuvlaedge/
       - nuvlaedge-logs:/var/log/nuvlaedge
+      - /:/rootfs:ro
 
   compute-api:
     <<: *common
@@ -104,8 +110,9 @@ services:
     environment:
       - HOST=${HOSTNAME:-nuvlaedge}
     volumes:
-      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-data:/var/lib/nuvlaedge/
     ports:
       - "0.0.0.0:${COMPUTE_API_PORT:-}:5000"
     healthcheck:
@@ -129,13 +136,13 @@ services:
     environment:
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
     volumes:
-      - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-data:/var/lib/nuvlaedge/
     depends_on:
       - agent
 
   job-engine-lite:
     <<: *common
-    image: ${NUVLAEDGE_JOB_ENGINE_LITE_IMAGE:-${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.13.1}}
+    image: ${NUVLAEDGE_JOB_ENGINE_LITE_IMAGE:-${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.0}}
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     deploy:
@@ -143,4 +150,4 @@ services:
     command:
       - /app/pause.py
     volumes:
-      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
