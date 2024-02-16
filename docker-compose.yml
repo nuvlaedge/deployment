@@ -49,7 +49,7 @@ services:
       - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.0}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - nuvlaedge-data:/var/lib/nuvlaedge/
+      - nuvlaedge-data:/var/lib/nuvlaedge
       - nuvlabox-db:/srv/nuvlaedge/shared
 
   agent:
@@ -94,7 +94,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-      - nuvlaedge-data:/var/lib/nuvlaedge/
+      - nuvlaedge-data:/var/lib/nuvlaedge
       - nuvlaedge-logs:/var/log/nuvlaedge
       - /:/rootfs:ro
 
@@ -112,7 +112,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-      - nuvlaedge-data:/var/lib/nuvlaedge/
+      - nuvlaedge-data:/var/lib/nuvlaedge
     ports:
       - "0.0.0.0:${COMPUTE_API_PORT:-}:5000"
     healthcheck:
@@ -136,7 +136,8 @@ services:
     environment:
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
     volumes:
-      - nuvlaedge-data:/var/lib/nuvlaedge/
+      - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-data:/var/lib/nuvlaedge
     depends_on:
       - agent
 
