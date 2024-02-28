@@ -76,6 +76,8 @@ spec:
               readOnly: true
             - mountPath: /srv/nuvlaedge/shared
               name: nuvlaedge-db
+            - mountPath: /var/lib/nuvlaedge
+              name: nuvlaedge-data
             - mountPath: /var/log/nuvlaedge
               name: nuvlaedge-logs
 
@@ -87,7 +89,10 @@ spec:
             path: /
         - name: nuvlaedge-logs
           hostPath:
-            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}/logs
+            path: {{ .Values.nuvlaedgeLogsVolumePath }}/{{ include "nuvlaedge.namespace" . }}
         - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.legacyVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
+        - name: nuvlaedge-data
           hostPath:
             path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}

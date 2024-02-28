@@ -27,5 +27,6 @@ services:
       - /dev:/dev:ro
       - /run/udev/control:/run/udev/control:ro
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-data:/var/lib/nuvlaedge
     depends_on:
       - agent

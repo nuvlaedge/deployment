@@ -29,5 +29,6 @@ services:
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-data:/var/lib/nuvlaedge
     depends_on:
       - agent

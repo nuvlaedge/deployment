@@ -33,10 +33,15 @@ spec:
           volumeMounts:
             - mountPath: /srv/nuvlaedge/shared
               name: nuvlaedge-db
+            - mountPath: /var/lib/nuvlaedge
+              name: nuvlaedge-data
             - mountPath: /run/dbus/system_bus_socket
               name: dbus-socket
       volumes:
         - name: nuvlaedge-db
+          hostPath:
+            path: {{ .Values.legacyVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
+        - name: nuvlaedge-data
           hostPath:
             path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - name: dbus-socket

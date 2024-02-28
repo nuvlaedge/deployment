@@ -25,6 +25,7 @@ services:
       - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-data:/var/lib/nuvlaedge
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
     depends_on:
       - agent
