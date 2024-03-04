@@ -5,8 +5,8 @@ x-common: &common
   stop_grace_period: 5s
   logging:
     options:
-      max-size: "250k"
-      max-file: "10"
+      max-size: "${LOG_MAX_SIZE:-250k}"
+      max-file: "${LOG_MAX_FILE:-10}"
   labels:
     - "nuvlaedge.component=True"
     - "nuvlaedge.deployment=production"
@@ -48,7 +48,7 @@ services:
       - NE_IMAGE_REPOSITORY
       - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.0}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlaedge-data:/var/lib/nuvlaedge
       - nuvlabox-db:/srv/nuvlaedge/shared
 
@@ -88,11 +88,14 @@ services:
       - NUVLAEDGE_VPN_CLIENT_ENABLE
       - NUVLAEDGE_JOB_ENABLE
       - COMPUTE_API_PORT
+      - LOG_MAX_SIZE
+      - LOG_MAX_FILE
+      - DOCKER_SOCKET_PATH
       - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
       - NUVLAEDGE_LOGGING_DIRECTORY
       - DISABLE_FILE_LOGGING=${DISABLE_FILE_LOGGING:-False}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - nuvlaedge-data:/var/lib/nuvlaedge
       - nuvlaedge-logs:/var/log/nuvlaedge
@@ -110,7 +113,7 @@ services:
     environment:
       - HOST=${HOSTNAME:-nuvlaedge}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - nuvlaedge-data:/var/lib/nuvlaedge
     ports:
@@ -151,4 +154,4 @@ services:
     command:
       - /app/pause.py
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock

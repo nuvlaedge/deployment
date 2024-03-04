@@ -8,7 +8,6 @@ vpnClientComponentName: vpn-client
 
 nuvlaedgeLogsVolumePath: /var/log/nuvlaedge
 nuvlaedgeVolumeHostPath: /var/lib/nuvlaedge
-legacyVolumeHostPath: /srv/nuvlaedge/shared
 
 deploymentRevHistLimit: 0
 

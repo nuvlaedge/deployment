@@ -92,7 +92,7 @@ spec:
             path: {{ .Values.nuvlaedgeLogsVolumePath }}/{{ include "nuvlaedge.namespace" . }}
         - name: nuvlaedge-db
           hostPath:
-            path: {{ .Values.legacyVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - name: nuvlaedge-data
           hostPath:
-            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}/data
