@@ -24,6 +24,7 @@ services:
       - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
     volumes:
       - nuvlabox-db:/srv/nuvlaedge/shared
+      - nuvlaedge-data:/var/lib/nuvlaedge
       - /dev/:/host/dev/:ro
       - /etc/:/host/etc/:ro
       - /usr/lib/:/host/usr/lib/:ro

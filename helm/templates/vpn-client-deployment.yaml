@@ -43,6 +43,8 @@ spec:
               name: dev-tun
             - mountPath: /srv/nuvlaedge/shared
               name: nuvlaedge-db
+            - mountPath: /var/lib/nuvlaedge
+              name: nuvlaedge-data
 
       volumes:
         - name: dev-tun
@@ -52,4 +54,7 @@ spec:
         - name: nuvlaedge-db
           hostPath:
             path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
+        - name: nuvlaedge-data
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}/data
 {{- end }}
