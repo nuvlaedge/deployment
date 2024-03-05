@@ -18,17 +18,19 @@ volumes:
     labels:
       - "nuvlaedge.volume=True"
       - "nuvlaedge.deployment=production"
+      - "nuvlaedge.volume.type=legacy-db"
   nuvlaedge-data:
     driver: local
     labels:
       - "nuvlaedge.volume=True"
       - "nuvlaedge.deployment=production"
+      - "nuvlaedge.volume.type=data"
   nuvlaedge-logs:
     driver: local
     labels:
       - "nuvlaedge.volume=True"
       - "nuvlaedge.deployment=production"
-      - "nuvlaedge.logs=True"
+      - "nuvlaedge.volume.type=logging"
 
 services:
   system-manager:
