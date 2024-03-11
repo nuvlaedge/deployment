@@ -306,6 +306,7 @@ case ${command} in
     done
     check_args_update
     #banner_intro ${quiet}
+    # Save previous docker-compose files in .version folder. Each version will have its own folder
     output=$(nuvlaedge-update 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]
@@ -327,6 +328,10 @@ case ${command} in
                       if [[ $? -ne 0 ]]
                       then
                         exit 1
+                      else
+                        nuvlaedge-update-configs "${working_dir}" "${old_nb_dir}" "${compose_files}"
+                        nuvlaedge-printer "NuvlaEdge update finally succeeded after a full re-installation!" ${quiet} "INFO" "no"
+                        exit 0
                       fi;;
                 *) exit 1;;
               esac
@@ -347,6 +352,7 @@ case ${command} in
             exit 1
           else
             # succeeded the second time
+            nuvlaedge-update-configs "${working_dir}" "${old_nb_dir}" "${compose_files}"
             nuvlaedge-printer "NuvlaEdge update finally succeeded on retry!" ${quiet} "INFO" "no"
             exit 0
           fi
@@ -358,7 +364,10 @@ case ${command} in
       esac
     else
       # update successful
-      # print final message and finish
+      # Save original files to .original folder
+      # Replace original files from the updated version
+      nuvlaedge-update-configs "${working_dir}" "${old_nb_dir}" "${compose_files}"
+
       exit 0
     fi
     ;;
