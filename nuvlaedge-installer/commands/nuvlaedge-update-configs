@@ -75,7 +75,7 @@ def parse_args() -> tuple[Path, Path, Path, list[str]]:
     working_dir = sanitise_path(sys.argv[1])
     tmp_dir = sanitise_path(sys.argv[2])
     files = sys.argv[3].split(',')
-    backup_dir = sanitise_path(working_dir / ".original", create_if_missing=True)
+    backup_dir = sanitise_path(tmp_dir / ".original", create_if_missing=True)
 
     return working_dir, tmp_dir, backup_dir, files
 
