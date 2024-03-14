@@ -33,7 +33,7 @@ then
 
   if [[ $? -ne 0 ]]
   then
-    nuvlaedge-printer "Update failed! Unable to store enviroment ${env_lines} in ${env_file}." 0 "ERROR" "no"
+    nuvlaedge-printer "Update failed! Unable to store environment ${env_lines} in ${env_file}." 0 "ERROR" "no"
     exit 1
   fi
 fi
