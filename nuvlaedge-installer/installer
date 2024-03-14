@@ -316,7 +316,8 @@ case ${command} in
         rollback)
           nuvlaedge-printer "NuvlaEdge update failed. Rollback to previous version" 0 "WARNING" "no"
           nuvlaedge-printer "ROLLBACK" ${quiet} "" "yes"
-          output=$(nuvlaedge-rollback 2>&1 | tee /dev/fd/2)
+          export target_version=${current_version}
+          output=$(nuvlaeedge-update 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
             if [[ ! -z "${NUVLAEDGE_API_KEY}" ]] && [[ ! -z "${NUVLAEDGE_API_SECRET}" ]]
@@ -329,7 +330,6 @@ case ${command} in
                       then
                         exit 1
                       else
-                        nuvlaedge-update-configs "${working_dir}" "${old_nb_dir}" "${compose_files}"
                         nuvlaedge-printer "NuvlaEdge update finally succeeded after a full re-installation!" ${quiet} "INFO" "no"
                         exit 0
                       fi;;
@@ -352,7 +352,6 @@ case ${command} in
             exit 1
           else
             # succeeded the second time
-            nuvlaedge-update-configs "${working_dir}" "${old_nb_dir}" "${compose_files}"
             nuvlaedge-printer "NuvlaEdge update finally succeeded on retry!" ${quiet} "INFO" "no"
             exit 0
           fi
@@ -366,7 +365,6 @@ case ${command} in
       # update successful
       # Save original files to .original folder
       # Replace original files from the updated version
-      nuvlaedge-update-configs "${working_dir}" "${old_nb_dir}" "${compose_files}"
 
       exit 0
     fi

@@ -20,6 +20,7 @@ INTERVAL=10
 
 initial_restart_count = {}
 
+
 @contextmanager
 def timeout(deadline):
     # Register a function to raise a TimeoutError on the signal.
