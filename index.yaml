@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   nuvlaedge:
   - apiVersion: v2
+    appVersion: 2.13.2
+    created: "2024-04-02T21:43:03.419005051Z"
+    description: NuvlaEdge Helm chart for Kubernetes
+    digest: 1780a90d781c20b7cb2222e4bd6ce6f499da1c3603a0ca6c9b96426298f0bd4d
+    name: nuvlaedge
+    type: application
+    urls:
+    - https://github.com/nuvlaedge/deployment/releases/download/2.13.2/nuvlaedge-2.13.2.tgz
+    version: 2.13.2
+  - apiVersion: v2
     appVersion: 2.13.1
     created: "2024-01-22T15:13:54.889463376Z"
     description: NuvlaEdge Helm chart for Kubernetes
@@ -151,4 +161,4 @@ entries:
     urls:
     - https://github.com/nuvlaedge/deployment/releases/download/2.8.2/nuvlaedge-2.8.2.tgz
     version: 2.8.2
-generated: "2024-01-22T15:13:54.888763723Z"
+generated: "2024-04-02T21:43:03.418322183Z"
