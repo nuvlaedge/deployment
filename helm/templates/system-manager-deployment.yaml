@@ -41,12 +41,18 @@ spec:
               readOnly: true
             - mountPath: /srv/nuvlaedge/shared
               name: nuvlaedge-db
+            - mountPath: /var/lib/nuvlaedge
+              name: nuvlaedge-data
+
 
       ## VOLUMES
       volumes:
         - name: rootfs
           hostPath:
             path: /
+        - name: nuvlaedge-data
+          hostPath:
+            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}/data
         - name: nuvlaedge-db
           hostPath:
             path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
