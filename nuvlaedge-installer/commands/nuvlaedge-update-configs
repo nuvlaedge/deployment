@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+
+"""
+Used to back up the NuvlaEdge docker compose configuration, makes a copy of the configuration files in a backup folder
+checking the integrity of those files by calculating their sha256sum.
+
+The script looks for configuration files with the suffix .yml both in the working directory and the temporary directory.
+
+It receives the following arguments:
+- The list of docker-compose files to be backed up
+- The working directory where the NuvlaEdge configuration is located
+- The temporary directory where the new installation files have been downloaded
+- (Optionally, the name of the backup folder)
+"""
+import hashlib
+import shutil
+import sys
+from pathlib import Path
+from argparse import ArgumentParser, Namespace
+
+
+def path_exists(path: Path) -> bool:
+    return path.is_dir()
+
+
+def find_configuration_files(work_dir: Path, files: list[str]) -> list[Path]:
+    file_paths: list = []
+    for file in files:
+        if not work_dir.joinpath(file).exists():
+            print(f"Error: file {file} does not exist in {work_dir}")
+            sys.exit(1)
+        file_paths.append(work_dir.joinpath(file).absolute())
+    return file_paths
+
+
+def sha256sum(file: Path) -> str:
+    sha256_hash = hashlib.sha256()
+
+    with file.open('rb') as f:
+        # Read and update hash in chunks of 4K
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+
+    return sha256_hash.hexdigest()
+
+
+def parse_args() -> tuple[Path, Path, Path, list[str]]:
+    """
+    Parse the command line arguments and sanitize them
+
+    Returns:
+        - A tuple with the working directory, the temporary directory and the backup directory
+    """
+    if len(sys.argv) < 4:
+        print("Usage: nuvlaedge-backup-config <compose_files> <work_path> <new_files_path>")
+        exit(1)
+
+    def sanitise_path(path: str | Path, create_if_missing: bool = False) -> Path:
+        if isinstance(path, str):
+            path = Path(path)
+
+        if path.is_dir():
+            return path.absolute()
+
+        if not path.is_dir() and not create_if_missing:
+            print(f"Error: {working_dir} is not a directory")
+            sys.exit(1)
+
+        if not path.is_dir() and not path.exists() and create_if_missing:
+            path.mkdir(parents=True)
+            return path.absolute()
+
+        return path
+
+    working_dir = sanitise_path(sys.argv[1])
+    tmp_dir = sanitise_path(sys.argv[2])
+    files = sys.argv[3].split(',')
+    backup_dir = sanitise_path(tmp_dir / ".original", create_if_missing=True)
+
+    return working_dir, tmp_dir, backup_dir, files
+
+
+def copy_files(orig_files: list[Path], target_dir: Path, retry: bool = False, move: bool = True) -> bool:
+    success = True
+    failed_files = []
+    copy_func = shutil.move if move else shutil.copy
+
+    for file in orig_files:
+        original_sha = sha256sum(file)
+        copy_func(file, target_dir)
+        new_sha = sha256sum(target_dir / file.name)
+
+        if not move and original_sha != new_sha:
+            success = False
+            failed_files.append(file)
+            print(f"Error: sha256sum of {file} does not match the original file")
+
+    if not move and not success and retry:
+        print("Error: sha256sum of the copied files does not match the original files, retrying once")
+        return copy_files(failed_files, target_dir, False)
+
+    return success
+
+
+def main():
+    # Argument in position 0 contains the directory where the old nuvlaedge configuration files are located.
+    # Argument in position 1 contains the directory where the new nuvlaedge configuration files are located.
+    # Argument in position 2 contains the list of files to be backed up
+    # contain the new files and the backup_dir will contain the old files.
+    working_dir, host_dir, backup_dir, files = parse_args()
+
+    orig_config_files = find_configuration_files(work_dir=host_dir, files=files)
+    if not any(backup_dir.iterdir()):
+        if not copy_files(orig_config_files, backup_dir, True, move=False):
+            print("Error: could not copy the original files to the backup directory")
+            sys.exit(1)
+
+    new_config_files = find_configuration_files(work_dir=working_dir, files=files)
+    if not copy_files(new_config_files, host_dir, True, move=True):
+        print("Error: could not copy the new files to the working directory, "
+              "rolling back old files into working directory")
+
+        if not copy_files([backup_dir / file.name for file in orig_config_files],
+                          host_dir, True, move=True):
+            print("Panic: could not rollback old files into working directory")
+            sys.exit(1)
+
+    print("Info: Successfully backed up the NuvlaEdge configuration files")
+    sys.exit(0)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        print(f"ERROR: Error in nuvlaedge-backup-config: {e}")
+        sys.exit(1)
+
