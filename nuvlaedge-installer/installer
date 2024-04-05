@@ -176,26 +176,6 @@ check_args_update()
     exit 1
   fi
 
-  if [[ "${on_update_failure}" == "rollback" ]]
-  then
-    export old_nb_dir="${rootfs}${working_dir}"
-    ls ${old_nb_dir}/*yml 2&>1 > /dev/null
-
-    if [[ $? -ne 0 ]]
-    then
-      # try to find them in 2nd bind mount, if available
-      export old_nb_dir="${rootfs_working_dir}"
-      ls ${old_nb_dir}/*yml 2&>1 > /dev/null
-      if [[ $? -ne 0 ]]
-      then
-        echo -e "update ERROR: installer cannot find original compose files for rollback at ${working_dir}"
-        exit 1
-      fi
-    fi
-
-    mkdir -p ${working_dir} || (echo -e "update ERROR: cannot reproduce installation dir at ${working_dir}" && exit 1)
-  fi
-
   if [[ -z "$old_environment" ]]
   then
     export old_environment=$(nuvlaedge-current-env ${project} 2>&1)
