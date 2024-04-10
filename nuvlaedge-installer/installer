@@ -176,6 +176,8 @@ check_args_update()
     exit 1
   fi
 
+  mkdir -p ${working_dir} || (echo -e "update ERROR: cannot reproduce installation dir at ${working_dir}" && exit 1)
+
   if [[ -z "$old_environment" ]]
   then
     export old_environment=$(nuvlaedge-current-env ${project} 2>&1)
