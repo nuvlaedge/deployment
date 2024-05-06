@@ -37,7 +37,7 @@ spec:
             - name: NUVLAEDGE_EXCLUDED_MONITORS
               value: {{ .Values.agentConfig.excluded_monitors }}
             - name: NUVLAEDGE_THREAD_MONITORS
-              value: {{ .Values.NUVLAEDGE_THREAD_MONITORS }}
+              value: {{ .Values.NUVLAEDGE_THREAD_MONITORS | default "False" }}
             - name: NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY
               value: {{ .Values.NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY }}
             - name: NUVLAEDGE_API_KEY
