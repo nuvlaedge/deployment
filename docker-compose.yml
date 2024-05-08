@@ -11,7 +11,6 @@ x-common: &common
     - "nuvlaedge.component=True"
     - "nuvlaedge.deployment=production"
 
-
 volumes:
   nuvlabox-db:
     driver: local
@@ -84,6 +83,9 @@ services:
       - NE_IMAGE_REPOSITORY
       - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.2}
       - NE_IMAGE_INSTALLER
+      - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
+      - NUVLAEDGE_LOGGING_DIRECTORY
+      - DISABLE_FILE_LOGGING=${DISABLE_FILE_LOGGING:-False}
       # Below variables are not directly used by agent but are here
       # to be sent to Nuvla so they are not lost when updating NE
       - NUVLAEDGE_COMPUTE_API_ENABLE
@@ -93,9 +95,6 @@ services:
       - LOG_MAX_SIZE
       - LOG_MAX_FILE
       - DOCKER_SOCKET_PATH
-      - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
-      - NUVLAEDGE_LOGGING_DIRECTORY
-      - DISABLE_FILE_LOGGING=${DISABLE_FILE_LOGGING:-False}
     volumes:
       - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
