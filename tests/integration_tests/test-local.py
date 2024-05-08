@@ -137,8 +137,8 @@ def test_nuvlaedge_local_compute_api(request):
 def test_nuvlaedge_local_datagateway():
     nuvlaedge_network = local_project_name + '-shared-network'
 
-    print(f'Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...', flush=True)
-    logging.info(f'Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...')
+    print(f'P: Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...', flush=True)
+    logging.info(f'L: Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...')
     sys.stdout.flush()
     sys.stderr.flush()
     
@@ -177,7 +177,7 @@ def test_nuvlaedge_local_datagateway():
     sys.stdout.flush()
     sys.stderr.flush()
     
-    check_mqtt = retry_run_in_container('sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1"')
+    check_mqtt = retry_run_in_container('sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1 -W 90"')
     nb_status = json.loads(check_mqtt.decode())
     assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaEdge status failed: {nb_status}'
 
