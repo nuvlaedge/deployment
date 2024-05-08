@@ -67,7 +67,7 @@ jobs:
         env:
           NUVLAEDGE_ID: ${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest --timeout=300 -s -vv -x --html=nuvlaedge.test-local.output.html --self-contained-html test-local.py
+          python -m pytest --timeout=300 -vv -x --html=nuvlaedge.test-local.output.html --self-contained-html test-local.py
 
       - if: always()
         name: Keep test results
