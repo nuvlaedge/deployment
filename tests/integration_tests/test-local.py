@@ -15,7 +15,6 @@ from tempfile import NamedTemporaryFile
 
 sys.path.append('../')
 
-
 NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY="testpubkey"
 VPN_INTERFACE_NAME="testvpn"
 HOST="testnuvlaedge"
@@ -137,10 +136,7 @@ def test_nuvlaedge_local_compute_api(request):
 def test_nuvlaedge_local_datagateway():
     nuvlaedge_network = local_project_name + '-shared-network'
 
-    print(f'P: Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...', flush=True)
-    logging.info(f'L: Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...')
-    sys.stdout.flush()
-    sys.stderr.flush()
+    logging.info(f'Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...')
     
     docker_net = None
     try:
@@ -164,24 +160,17 @@ def test_nuvlaedge_local_datagateway():
             time.sleep(15)
             return run_in_container(cmd)
 
-    print(f'Trying to reach NuvlaEdge shared network ({nuvlaedge_network}) ...', flush=True)
-    logging.info(f'Trying to reach NuvlaEdge shared network ({nuvlaedge_network}) ...')
-    sys.stdout.flush()
-    sys.stderr.flush()
+    logging.info(f'Trying to reach Data Gateway container ({check_dg}) ...')
     
     check_dg = retry_run_in_container('sh -c "ping -c 1 -w 60 data-gateway 2>&1 >/dev/null && echo OK"')
-    assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway containers: {check_dg}'
+    assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway container: {check_dg}'
 
-    print(f'NuvlaEdge shared network ({nuvlaedge_network}) is functional', flush=True)
-    logging.info(f'NuvlaEdge shared network ({nuvlaedge_network}) is functional')
-    sys.stdout.flush()
-    sys.stderr.flush()
+    logging.info(f'Data Gateway ({nuvlaedge_network}) reached')
     
     check_mqtt = retry_run_in_container('sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1 -W 90"')
     nb_status = json.loads(check_mqtt.decode())
     assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaEdge status failed: {nb_status}'
 
-    print('NuvlaEdge MQTT messaging is working', flush=True)
     logging.info('NuvlaEdge MQTT messaging is working')
 
 
@@ -189,7 +178,6 @@ def test_cis_benchmark(request):
     containers = request.config.cache.get('containers', [])
     images = request.config.cache.get('images', [])
 
-    print('Test CIS benchmark', flush=True)
     logging.info('Test CIS benchmark')
     
     log_file = '/tmp/cis_log'
