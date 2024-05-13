@@ -92,8 +92,8 @@ def download_compose_files(version, compose_filenames, workdir, keep_files=[],
 
 
 def main():
-    prog = sys.argv[0] if len(sys.args) >= 1 else __file__
-    if len(sys.args) != 4:
+    prog = sys.argv[0] if len(sys.argv) >= 1 else __file__
+    if len(sys.argv) != 4:
         raise Exception(f'Wrong number of arguments. Usage: {prog} compose_filenames_csv dest_dir nuvlaedge_version') 
 
     _, compose_filenames_csv, dest_dir, nuvlaedge_version = sys.argv
@@ -103,7 +103,7 @@ def main():
     nuvla_api_endpoint = nuvla_endpoint.rstrip('/').rstrip('/api') + "/api"
     nuvla_api_key      = os.getenv('NUVLAEDGE_API_KEY')
     nuvla_api_secret   = os.getenv('NUVLAEDGE_API_SECRET')
-    nuvla_api_insecure = is_true(new_conf.get('NUVLA_ENDPOINT_INSECURE'), default=False)
+    nuvla_api_insecure = is_true(os.getenv('NUVLA_ENDPOINT_INSECURE'), default=False)
 
     api = None
     if nuvla_api_key and nuvla_api_secret:
