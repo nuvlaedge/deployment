@@ -43,6 +43,7 @@ jobs:
           snyk version
           sudo apt-get install -y python3-pytest
           pip install -r requirements.txt
+          pip install pytest-timeout
           docker swarm init
 
       - name: Test vulnerabilities
@@ -66,7 +67,7 @@ jobs:
         env:
           NUVLAEDGE_ID: ${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest -vv -x --html=nuvlaedge.test-local.output.html --self-contained-html test-local.py
+          python -m pytest --timeout=300 -vv -x --html=nuvlaedge.test-local.output.html --self-contained-html test-local.py
 
       - if: always()
         name: Keep test results

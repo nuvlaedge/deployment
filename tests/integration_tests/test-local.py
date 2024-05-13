@@ -15,7 +15,6 @@ from tempfile import NamedTemporaryFile
 
 sys.path.append('../')
 
-
 NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY="testpubkey"
 VPN_INTERFACE_NAME="testvpn"
 HOST="testnuvlaedge"
@@ -137,6 +136,8 @@ def test_nuvlaedge_local_compute_api(request):
 def test_nuvlaedge_local_datagateway():
     nuvlaedge_network = local_project_name + '-shared-network'
 
+    logging.info(f'Retrieving NuvlaEdge shared network ({nuvlaedge_network}) ...')
+    
     docker_net = None
     try:
         docker_net = docker_client.networks.get(nuvlaedge_network)
@@ -158,14 +159,15 @@ def test_nuvlaedge_local_datagateway():
             logging.info(f'NuvlaEdge data-gateway not ready yet. Waiting 15 seconds and retry...')
             time.sleep(15)
             return run_in_container(cmd)
-            
-    check_dg = retry_run_in_container('sh -c "ping -c 1 data-gateway 2>&1 >/dev/null && echo OK"')
-    assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway containers: {check_dg}'
 
-    logging.info(f'NuvlaEdge shared network ({nuvlaedge_network}) is functional')
-
+    logging.info(f'Trying to reach Data Gateway container ({check_dg}) ...')
     
-    check_mqtt = retry_run_in_container('sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1"')
+    check_dg = retry_run_in_container('sh -c "ping -c 1 -w 60 data-gateway 2>&1 >/dev/null && echo OK"')
+    assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway container: {check_dg}'
+
+    logging.info(f'Data Gateway ({nuvlaedge_network}) reached')
+    
+    check_mqtt = retry_run_in_container('sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1 -W 90"')
     nb_status = json.loads(check_mqtt.decode())
     assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaEdge status failed: {nb_status}'
 
@@ -176,6 +178,8 @@ def test_cis_benchmark(request):
     containers = request.config.cache.get('containers', [])
     images = request.config.cache.get('images', [])
 
+    logging.info('Test CIS benchmark')
+    
     log_file = '/tmp/cis_log'
     cmd = f'-l {log_file} -c container_images,container_runtime -i {",".join(containers)} -t {",".join(images)}'
     docker_client.containers.run('docker/docker-bench-security',
