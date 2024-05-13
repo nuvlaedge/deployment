@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+import requests
+import sys
+import inspect
+
+func = inspect.currentframe().f_code
+nuvla_api_endpoint = 'https://nuvla.io/api'
+
+
+try:
+    comma_sep_config_files = sys.argv[1]
+    save_dir = sys.argv[2]
+    target_version = sys.argv[3]
+
+    release_endpoint = f'{nuvla_api_endpoint}/nuvlabox-release'
+
+    req_params = {
+        'filter': f"release='{release_endpoint}'",
+        'select': 'compose-files',
+        'last': 1
+    }
+
+    r = requests.get('{}/nuvlabox-release'.format(nuvla_api_endpoint), params=req_params).json()['resources']
+
+    if not len(r):
+        raise Exception('Error: NuvlaEdge release "{}" not found on "{}"'.format(target_version, nuvla_api_endpoint))
+
+    ne_release = r[0]
+    compose_files = {r['name']: r['file'] for r in ne_release['compose-files']}
+
+    final_compose_files = []
+    for filename in comma_sep_config_files.split(','):
+        filepath = f"{save_dir}/{filename}"
+
+        if filename not in compose_files:
+            raise Exception(f'Error: Config file "{filename}" not found in NuvlaEdge release "{target_version}"')
+
+        with open(filepath, 'w') as f:
+            f.write(compose_files[filename])
+
+        final_compose_files.append(filepath)
+
+    if len(final_compose_files) != len(comma_sep_config_files.split(',')):
+        raise Exception('Error: Not all files were saved')
+
+except Exception as e:
+    # making sure that only the error message is printed and not the whole exception
+    sys.exit(f'Critical error in {func.co_filename}: {str(e)}')
