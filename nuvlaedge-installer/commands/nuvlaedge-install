@@ -31,16 +31,27 @@ fi
 
 if [[ ! -z ${target_version} ]] && [[ "${target_version}" != "master" ]] && [[ "${target_version}" != "main" ]]
 then
-  source_code_url="${github_releases}/download/${target_version}"
+  # First, try downloading compose files from Nuvla
+  nuvlaedge-printer "Downloading compose files ${compose_files} from Nuvla for version ${target_version}" "INFO" "no"
 
-  nuvlaedge-printer "Downloading config files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
+  download=$(nuvlaedge-download-nuvla-configs "${compose_files}" "${save_dir}" "${target_version}" 2>&1)
 
-  download=$(nuvlaedge-download-configs "${compose_files}" "${save_dir}" "${source_code_url}" 2>&1)
-
+  # If fails, try Github release assets
   if [[ $? -ne 0 ]]
   then
-    nuvlaedge-printer "Install failed! Unable to retrieve files ${compose_files} from ${source_code_url}: ${download}" 0 "ERROR" "no"
-    exit 1
+    nuvlaedge-printer "Failed downloading compose files from Nuvla: ${download}" 0 "WARNING" "no"
+
+    source_code_url="${github_releases}/download/${target_version}"
+
+    nuvlaedge-printer "Downloading compose files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
+
+    download=$(nuvlaedge-download-configs "${compose_files}" "${save_dir}" "${source_code_url}" 2>&1)
+
+    if [[ $? -ne 0 ]]
+    then
+      nuvlaedge-printer "Install failed! Unable to retrieve compose files ${compose_files} from ${source_code_url}: ${download}" 0 "ERROR" "no"
+      exit 1
+    fi
   fi
 fi
 
