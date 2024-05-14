@@ -38,16 +38,25 @@ then
   fi
 fi
 
-source_code_url="${github_releases}/download/${target_version}"
+# First, try downloading config files from Nuvla
+nuvlaedge-printer "Downloading compose files ${compose_files} from Nuvla for version ${target_version}" "INFO" "no"
+download=$(nuvlaedge-download-nuvla-configs "${compose_files}" "${working_dir}" "${target_version}" 2>&1)
 
-nuvlaedge-printer "Downloading config files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
-
-download=$(nuvlaedge-download-configs "${compose_files}" "${working_dir}" "${source_code_url}" 2>&1)
-
+# If fails, try Github release assets
 if [[ $? -ne 0 ]]
 then
-  nuvlaedge-printer "Update failed! Unable to retrieve files ${compose_files}: ${download}" 0 "ERROR" "no"
-  exit 1
+  nuvlaedge-printer "Failed downloading compose files from Nuvla: ${download}" 0 "WARNING" "no"
+  source_code_url="${github_releases}/download/${target_version}"
+
+  nuvlaedge-printer "Downloading compose files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
+
+  download=$(nuvlaedge-download-configs "${compose_files}" "${working_dir}" "${source_code_url}" 2>&1)
+
+  if [[ $? -ne 0 ]]
+  then
+    nuvlaedge-printer "Update failed! Unable to retrieve compose files ${compose_files}: ${download}" 0 "ERROR" "no"
+    exit 1
+  fi
 fi
 
 nuvlaedge-printer "Preparing to update NuvlaEdge Engine running as project ${project}" ${quiet} "NONE" "yes"
@@ -61,15 +70,20 @@ then
   then
     down_dir="/tmp/down"
     mkdir -p ${down_dir}
-    source_code_url_current="${github_releases}/download/${current_version}"
-
-    nuvlaedge-printer "Downloading current config files ${compose_files} from ${source_code_url} for shutdown" ${quiet} "INFO" "no"
-
-    download=$(nuvlaedge-download-configs "${compose_files}" "${down_dir}" "${source_code_url_current}" 2>&1)
+    download=$(nuvlaedge-download-nuvla-configs "${compose_files}" "${down_dir}" "${current_version}" 2>&1)
 
     if [[ $? -ne 0 ]]
     then
-      nuvlaedge-printer "Failed to retrieve current files ${compose_files} for shutdown: ${download}" 0 "ERROR" "no"
+      source_code_url_current="${github_releases}/download/${current_version}"
+
+      nuvlaedge-printer "Downloading compose config files ${compose_files} from ${source_code_url_current} for shutdown" ${quiet} "INFO" "no"
+
+      download=$(nuvlaedge-download-configs "${compose_files}" "${down_dir}" "${source_code_url_current}" 2>&1)
+    fi
+
+    if [[ $? -ne 0 ]]
+    then
+      nuvlaedge-printer "Failed to retrieve current cmpose files ${compose_files} for shutdown: ${download}" 0 "ERROR" "no"
       cd ${working_dir}
     else
       cd ${down_dir}

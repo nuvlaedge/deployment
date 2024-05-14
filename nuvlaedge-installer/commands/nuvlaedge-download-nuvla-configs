@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import inspect
+
+import requests
+
+func = inspect.currentframe().f_code
+
+nuvla_io_endpoint = 'https://nuvla.io'
+
+
+def is_true(s, **kwargs):
+    """ Check if 's' string represent True else False
+
+    :param s: String to check
+    :param default: If the check cannot be done return this value or raise ValueError if not provided.
+
+    :returns True if 's' string represent True else False
+    """
+    try:
+        return s if isinstance(s, bool) \
+            else bool(s and s.lower() in ['true', '1', 't', 'y', 'yes'])
+    except:
+        message = f'Cannot check if "{s}" is True'
+        if 'default' not in kwargs:
+            raise ValueError(message)
+        else:
+            return kwargs['default']
+
+
+def nuvla_login(api_endpoint, api_key, api_secret, insecure=False):
+    session = requests.Session()
+    session.verify = not insecure
+    login_endpoint = api_endpoint + "/session"
+    payload = {
+        "template": {
+            "href": "session-template/api-key",
+            "key": api_key,
+            "secret": api_secret
+        }
+    }
+    print("Nuvla login at {}...".format(login_endpoint))
+    response = session.post(login_endpoint, json=payload)
+    response.raise_for_status()
+    return session
+
+
+def download_compose_files(version, compose_filenames, workdir, keep_files=[],
+                           nuvla_api_endpoint=f'{nuvla_io_endpoint}/api', api=None):
+    """ Prepares the working environment for installing NuvlaEdge
+
+    :param version: version number of NuvlaEdge to install
+    :param compose_filenames: list of release assets to download
+    :param workdir: path where the compose files are to be saved
+    :param keep_files: list of files that are not supposed to be modified during this preparation
+    :param nuvla_api_endpoint: Nuvla API endpoint (default: https://nuvla.io/api)
+    :param api: authenticated requests session. do not use session if not provided
+
+    :returns list of paths to compose files
+    """
+
+    if not api:
+        api = requests.Session()
+
+    params = {
+        'filter': "release='{}'".format(version),
+        'select': 'compose-files',
+        'last': 1
+    }
+    r = api.get('{}/nuvlabox-release'.format(nuvla_api_endpoint), params=params).json()['resources']
+
+    if not len(r):
+        raise Exception('Error: NuvlaEdge release "{}" not found on "{}"'.format(version, nuvla_api_endpoint))
+
+    ne_release = r[0]
+    compose_files = {r['name']: r['file'] for r in ne_release['compose-files']}
+
+    final_compose_filepaths = []
+    for filename in compose_filenames:
+        filepath = "{}/{}".format(workdir, filename)
+
+        if filename not in compose_files:
+            raise Exception('Error: compose file "{}" not found in "{}"'.format(filename, compose_files.keys()))
+
+        with open(filepath, 'w') as f:
+            f.write(compose_files[filename])
+        final_compose_filepaths.append(filepath)
+
+    return final_compose_filepaths
+
+
+def main():
+    prog = sys.argv[0] if len(sys.argv) >= 1 else __file__
+    if len(sys.argv) != 4:
+        raise Exception(f'Wrong number of arguments. Usage: {prog} compose_filenames_csv dest_dir nuvlaedge_version') 
+
+    _, compose_filenames_csv, dest_dir, nuvlaedge_version = sys.argv
+
+    compose_filenames  = compose_filenames_csv.split(',')
+    nuvla_endpoint     = os.getenv('NUVLA_ENDPOINT', nuvla_io_endpoint)
+    nuvla_api_endpoint = nuvla_endpoint.rstrip('/').rstrip('/api') + "/api"
+    nuvla_api_key      = os.getenv('NUVLAEDGE_API_KEY')
+    nuvla_api_secret   = os.getenv('NUVLAEDGE_API_SECRET')
+    nuvla_api_insecure = is_true(os.getenv('NUVLA_ENDPOINT_INSECURE'), default=False)
+
+    api = None
+    if nuvla_api_key and nuvla_api_secret:
+        api = nuvla_login(nuvla_api_endpoint, nuvla_api_key, nuvla_api_secret, nuvla_api_insecure)
+
+    download_compose_files(nuvlaedge_version, compose_filenames, dest_dir,
+                           nuvla_api_endpoint=nuvla_api_endpoint, 
+                           api=api)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        # making sure that only the error message is printed and not the whole exception
+        sys.exit(f'Critical error in {func.co_filename}: {str(e)}')
