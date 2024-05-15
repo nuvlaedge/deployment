@@ -39,7 +39,7 @@ then
 fi
 
 # First, try downloading config files from Nuvla
-nuvlaedge-printer "Downloading compose files ${compose_files} from Nuvla for version ${target_version}" "INFO" "no"
+nuvlaedge-printer "Downloading compose files ${compose_files} from Nuvla for version ${target_version}" ${quiet} "INFO" "no"
 download=$(nuvlaedge-download-nuvla-configs "${compose_files}" "${working_dir}" "${target_version}" 2>&1)
 
 # If fails, try Github release assets
