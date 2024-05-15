@@ -12,7 +12,8 @@ working_dir=${working_dir:-$9}
 current_version=${current_version:-${10}}
 hard_reset=${hard_reset:-0}
 
-nuvlaedge-printer "Updating NuvlaEdge Engine to version ${target_version}" ${quiet} "NONE" yes
+echo ""
+nuvlaedge-printer "Updating NuvlaEdge Engine to version ${target_version}" ${quiet} "" yes
 
 if [[ -z ${project} ]]
 then
@@ -59,7 +60,7 @@ then
   fi
 fi
 
-nuvlaedge-printer "Preparing to update NuvlaEdge Engine running as project ${project}" ${quiet} "NONE" "yes"
+nuvlaedge-printer "Preparing to update NuvlaEdge Engine running as project ${project}" ${quiet} "" "yes"
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
 
