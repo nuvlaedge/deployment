@@ -160,7 +160,7 @@ def test_nuvlaedge_local_datagateway():
             time.sleep(15)
             return run_in_container(cmd)
 
-    logging.info(f'Trying to reach Data Gateway container ({check_dg}) ...')
+    logging.info(f'Trying to reach Data Gateway container...')
     
     check_dg = retry_run_in_container('sh -c "ping -c 1 -w 60 data-gateway 2>&1 >/dev/null && echo OK"')
     assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway container: {check_dg}'
