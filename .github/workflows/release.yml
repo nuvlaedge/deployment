@@ -13,10 +13,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Helm
-        uses: Azure/setup-helm@v3
+        uses: Azure/setup-helm@v4
 
       - name: Create helm package
         run: helm package helm
