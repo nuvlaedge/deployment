@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.3}
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.4}
   stop_grace_period: 5s
   logging:
     options:
@@ -47,7 +47,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.3}
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.4}
     volumes:
       - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
       - nuvlaedge-data:/var/lib/nuvlaedge
@@ -81,7 +81,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.3}
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.4}
       - NE_IMAGE_INSTALLER
       - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
       - NUVLAEDGE_LOGGING_DIRECTORY
@@ -151,7 +151,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: ${NUVLAEDGE_JOB_ENGINE_LITE_IMAGE:-${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.3}}
+    image: ${NUVLAEDGE_JOB_ENGINE_LITE_IMAGE:-${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.4}}
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     deploy:
