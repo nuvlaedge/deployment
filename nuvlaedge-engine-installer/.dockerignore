@@ -1,3 +1,0 @@
-container-*.sh
-target
-!target/docker-compose.*
