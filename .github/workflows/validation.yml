@@ -112,6 +112,7 @@ jobs:
           --nuvlaedge_branch ${{ github.event.inputs.nuvlaedge_branch || 'None' }}
           --nuvlaedge_version ${{ github.event.inputs.nuvlaedge_version || 'latest' }} 
           --deployment_branch ${{ env.BRANCH_NAME }}
+          --log_level ${{ github.event.inputs.log_level || 'INFO' }}
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
