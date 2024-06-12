@@ -298,6 +298,7 @@ case ${command} in
         rollback)
           nuvlaedge-printer "NuvlaEdge update failed. Rollback to previous version" 0 "WARNING" "no"
           nuvlaedge-printer "ROLLBACK" ${quiet} "" "yes"
+          export environment=${old_environment}
           export target_version=${current_version}
           export NE_IMAGE_TAG=${current_version}
           output=$(nuvlaedge-update 2>&1 | tee /dev/fd/2)
