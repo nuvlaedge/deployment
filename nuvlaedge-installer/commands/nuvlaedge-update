@@ -135,6 +135,8 @@ cd ${working_dir}
 
 nuvlaedge-printer "Executing update command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
+docker_compose_command="env -u NUVLAEDGE_API_KEY -u NUVLAEDGE_API_SECRET ${docker_compose_command}"
+
 if [[ ${quiet} -eq 1 ]]
 then
   out=$($docker_compose_command 2>&1)
