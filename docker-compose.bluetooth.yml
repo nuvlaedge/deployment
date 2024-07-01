@@ -4,6 +4,7 @@ x-common: &common
   image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.4}
   stop_grace_period: 5s
   logging:
+    driver: "json-file"
     options:
       max-size: "${LOG_MAX_SIZE:-250k}"
       max-file: "${LOG_MAX_FILE:-10}"
@@ -24,7 +25,6 @@ services:
     environment:
       - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
     volumes:
-      - nuvlabox-db:/srv/nuvlaedge/shared
       - nuvlaedge-data:/var/lib/nuvlaedge
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
     depends_on:

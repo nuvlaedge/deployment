@@ -4,6 +4,7 @@ x-common: &common
   image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.4}
   stop_grace_period: 5s
   logging:
+    driver: "json-file"
     options:
       max-size: "${LOG_MAX_SIZE:-250k}"
       max-file: "${LOG_MAX_FILE:-10}"
@@ -28,7 +29,6 @@ services:
       - EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL=${EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL:-86400}
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
     volumes:
-      - nuvlabox-db:/srv/nuvlaedge/shared
       - nuvlaedge-data:/var/lib/nuvlaedge
     depends_on:
       - agent
