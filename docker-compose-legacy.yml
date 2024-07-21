@@ -3,8 +3,6 @@ version: "3.7"
 
 x-common: &common
   image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.4}
-  restart: always
-  oom_score_adj: -900
   stop_grace_period: 5s
   logging:
     driver: "json-file"
@@ -17,6 +15,13 @@ x-common: &common
 
 
 volumes:
+
+  nuvlabox-db:
+    driver: local
+    labels:
+      - "nuvlaedge.volume=True"
+      - "nuvlaedge.deployment=production"
+      - "nuvlaedge.volume.type=legacy-db"
 
   nuvlaedge-data:
     driver: local
@@ -33,14 +38,22 @@ volumes:
       - "nuvlaedge.volume.type=logging"
 
 
+networks:
+
+  default:
+    name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-network
+
+
 services:
 
   agent:
     <<: *common
     entrypoint: agent
+    restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
-    network_mode: ${NUVLAEDGE_AGENT_NET_MODE:-host}
+    oom_score_adj: -900
+    network_mode: ${NUVLAEDGE_AGENT_NET_MODE:-}
     privileged: ${NUVLAEDGE_AGENT_PRIVILEGED:-true}
     environment:
       - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
@@ -69,7 +82,7 @@ services:
       - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
       - NUVLAEDGE_LOGGING_DIRECTORY
       - DISABLE_FILE_LOGGING=${DISABLE_FILE_LOGGING:-False}
-      - NUVLAEDGE_AGENT_NET_MODE=${NUVLAEDGE_AGENT_NET_MODE:-host}
+      - NUVLAEDGE_AGENT_NET_MODE=${NUVLAEDGE_AGENT_NET_MODE:-}
       - NUVLAEDGE_DATA_GATEWAY_NAME=${NUVLAEDGE_DATA_GATEWAY_NAME:-data-gateway}
       - NUVLAEDGE_DATA_GATEWAY_ENABLED=${NUVLAEDGE_DATA_GATEWAY_ENABLED:-True}
       # Below variables are not directly used by agent but are here
@@ -89,22 +102,92 @@ services:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
     volumes:
       - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlaedge/shared
       - nuvlaedge-data:/var/lib/nuvlaedge
       - nuvlaedge-logs:/var/log/nuvlaedge
       - /:/rootfs:ro
 
+  system-manager:
+    <<: *common
+    entrypoint: system-manager
+    restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
+    deploy:
+      replicas: ${NUVLAEDGE_SYSTEM_MANAGER_ENABLE:-0}
+    environment:
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
+      - NUVLAEDGE_DATA_GATEWAY_NAME=${NUVLAEDGE_DATA_GATEWAY_NAME:-data-gateway}
+      - NUVLAEDGE_DATA_GATEWAY_ENABLED=${NUVLAEDGE_DATA_GATEWAY_ENABLED:-True}
+      - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:2.0.15-openssl}
+      - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
+      - NE_IMAGE_REGISTRY
+      - NE_IMAGE_ORGANIZATION
+      - NE_IMAGE_REPOSITORY
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.14.4}
+    volumes:
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - nuvlaedge-data:/var/lib/nuvlaedge
+
   vpn-client:
     <<: *common
     entrypoint: openvpn-client
+    restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
-    network_mode: host
-    privileged: ${NUVLAEDGE_VPN_PRIVILEGED:-true}
     deploy:
       replicas: ${NUVLAEDGE_VPN_CLIENT_ENABLE:-1}
+    oom_score_adj: -900
+    network_mode: host
+    privileged: ${NUVLAEDGE_VPN_PRIVILEGED:-true}
     devices:
       - /dev/net/tun
     environment:
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
     volumes:
       - nuvlaedge-data:/var/lib/nuvlaedge
+
+  compute-api:
+    <<: *common
+    entrypoint: api
+    restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
+    deploy:
+      replicas: ${NUVLAEDGE_COMPUTE_API_ENABLE:-0}
+    pid: "host"
+    environment:
+      - HOST=${HOSTNAME:-nuvlaedge}
+    volumes:
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+      - nuvlaedge-data:/var/lib/nuvlaedge
+    ports:
+      - "0.0.0.0:${COMPUTE_API_PORT:-}:5000"
+    healthcheck:
+      test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
+      interval: 20s
+      timeout: 10s
+      start_period: 30s
+
+  job-engine-lite:
+    <<: *common
+    image: ${NUVLAEDGE_JOB_ENGINE_LITE_IMAGE:-${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.14.4}}
+    restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
+    deploy:
+      replicas: ${NUVLAEDGE_JOB_ENABLE:-0}
+    command:
+      - /app/pause.py
+    volumes:
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+
+  data-gateway:
+    image: ${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:2.0.15-openssl}
+    entrypoint: "sh -c 'sleep 10; cp /mosquitto-no-auth.conf /mosquitto/config/mosquitto.conf 2>/dev/null; exec /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf'"
+    restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-${NUVLAEDGE_DATA_GATEWAY_NAME:-data-gateway}
+    deploy:
+      replicas: ${NUVLAEDGE_DATA_GATEWAY_ENABLE:-0}
+    labels:
+      - "nuvlaedge.component=True"
+      - "nuvlaedge.data-gateway=True"
+      - "nuvlaedge.deployment=production"
 
