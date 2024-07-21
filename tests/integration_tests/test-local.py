@@ -133,6 +133,7 @@ def test_nuvlaedge_local_compute_api(request):
     logging.info(f'Compute API is up, running, secured and accessible by agent')
 
 
+@pytest.mark.skip(reason="datagateway is now disabled by default")
 def test_nuvlaedge_local_datagateway():
     nuvlaedge_network = local_project_name + '-shared-network'
 
