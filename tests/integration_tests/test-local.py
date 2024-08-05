@@ -63,8 +63,13 @@ def test_deploy_nuvlaedgees(request):
         logging.error(f'Cannot install local NuvlaEdge. Reason: {str(e)}')
 
     installer_container = docker_client.containers.get("nuvlaedge-installer")
+    exit_code = installer_container.attrs['State']['ExitCode']
 
-    assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
+    if exit_code != 0:
+        logging.error(f'nuvlaedge-installer container failed with exit code {exit_code} and the following logs: \n{installer_container.logs()}')
+    
+    assert exit_code == 0, 'NBE installer failed'
+    
     logging.info(f'NuvlaEdge ({nuvlaedge_id}) successfully installed with project name {local_project_name}')
 
 
