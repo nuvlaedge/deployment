@@ -325,7 +325,7 @@ case ${command} in
           fi
           # rollback successful
           nuvlaedge-printer "NuvlaEdge update failed. But was able to rollback to previous version" ${quiet} "WARNING" "no"
-          exit 0
+          exit 1
           ;;
         retry)
           nuvlaedge-printer "NuvlaEdge update failed once. Trying a second time..." ${quiet} "WARNING" "no"
