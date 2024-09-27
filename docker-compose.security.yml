@@ -30,5 +30,6 @@ services:
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
     volumes:
       - nuvlaedge-data:/var/lib/nuvlaedge
+      - /etc/machine-id:/rootfs/etc/machine-id:ro
     depends_on:
       - agent
