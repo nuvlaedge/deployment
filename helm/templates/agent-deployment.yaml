@@ -33,17 +33,17 @@ spec:
             - name: NUVLAEDGE_IMAGE
               value: "{{ .Values.nuvlaedge.image.registry }}{{ .Values.nuvlaedge.image.organization }}/{{ .Values.nuvlaedge.image.repository }}:{{ .Values.nuvlaedge.image.tag | default .Chart.AppVersion }}"
             - name: NUVLAEDGE_EXCLUDED_MONITORS
-              value: {{ .Values.NUVLAEDGE_EXCLUDED_MONITORS | .Values.agentConfig.excluded_monitors }}
+              value: {{ .Values.NUVLAEDGE_EXCLUDED_MONITORS | default .Values.agentConfig.excluded_monitors }}
             - name: NUVLAEDGE_THREAD_MONITORS
               value: {{ .Values.NUVLAEDGE_THREAD_MONITORS | default "False" | quote }}
             - name: NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY
               value: {{ .Values.NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY }}
             - name: NUVLAEDGE_EXEC_JOBS_IN_AGENT
-              value: {{ .Values.NUVLAEDGE_EXEC_JOBS_IN_AGENT }}
+              value: {{ .Values.NUVLAEDGE_EXEC_JOBS_IN_AGENT | default "True" | quote }}
             - name: NUVLAEDGE_LOG_LEVEL
-              value: {{ .Values.NUVLAEDGE_LOG_LEVEL | .Values.agentConfig.log_level }}
+              value: {{ .Values.NUVLAEDGE_LOG_LEVEL | default .Values.agentConfig.log_level }}
             - name: NUVLAEDGE_DEBUG
-              value: {{ .Values.NUVLAEDGE_DEBUG }}
+              value: {{ .Values.NUVLAEDGE_DEBUG | default "False" | quote }}
             - name: NUVLAEDGE_API_KEY
               value: {{ .Values.NUVLAEDGE_API_KEY }}
             - name: NUVLAEDGE_API_SECRET
