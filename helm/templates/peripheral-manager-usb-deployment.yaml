@@ -42,8 +42,6 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/nuvlaedge
               name: nuvlaedge-data
-            - mountPath: /srv/nuvlaedge/shared
-              name: nuvlaedge-db
             - mountPath: /dev
               name: dev
             - mountPath: /run/udev/control
@@ -53,9 +51,6 @@ spec:
         - name: nuvlaedge-data
           hostPath:
             path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}/data
-        - name: nuvlaedge-db
-          hostPath:
-            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - hostPath:
             path: /dev
           name: dev

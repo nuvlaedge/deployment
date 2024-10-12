@@ -33,14 +33,9 @@ spec:
                 fieldRef:
                   fieldPath: status.hostIP
           volumeMounts:
-            - mountPath: /srv/nuvlaedge/shared
-              name: nuvlaedge-db
             - mountPath: /var/lib/nuvlaedge
               name: nuvlaedge-data
       volumes:
-        - name: nuvlaedge-db
-          hostPath:
-            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - name: nuvlaedge-data
           hostPath:
             path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}/data

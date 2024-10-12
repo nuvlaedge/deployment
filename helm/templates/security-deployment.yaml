@@ -38,8 +38,6 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/nuvlaedge
               name: nuvlaedge-data
-            - mountPath: /srv/nuvlaedge/shared
-              name: nuvlaedge-db
             - mountPath: /rootfs/etc/machine-id
               name: machine-id
 
@@ -47,9 +45,6 @@ spec:
         - name: nuvlaedge-data
           hostPath:
             path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}/data
-        - name: nuvlaedge-db
-          hostPath:
-            path: {{ .Values.nuvlaedgeVolumeHostPath }}/{{ include "nuvlaedge.namespace" . }}
         - name: machine-id
           hostPath:
             path: /etc/machine-id
