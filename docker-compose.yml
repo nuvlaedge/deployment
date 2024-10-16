@@ -99,6 +99,8 @@ services:
     entrypoint: openvpn-client
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
     network_mode: host
+    cap_add:
+      - NET_ADMIN
     privileged: ${NUVLAEDGE_VPN_PRIVILEGED:-true}
     deploy:
       replicas: ${NUVLAEDGE_VPN_CLIENT_ENABLE:-1}
