@@ -2,7 +2,7 @@ version: "3.7"
 
 
 x-common: &common
-  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.16.2}-slim-docker
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.17.1}-slim-docker
   restart: always
   oom_score_adj: -900
   stop_grace_period: 5s
@@ -65,7 +65,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.16.2}-slim-docker
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.17.1}-slim-docker
       - NE_IMAGE_INSTALLER
       - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
       - NUVLAEDGE_LOGGING_DIRECTORY
