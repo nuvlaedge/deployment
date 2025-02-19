@@ -46,6 +46,7 @@ jobs:
     outputs:
       boards: ${{ steps.set-boards.outputs.boards }}
       tests: ${{ steps.set-tests.outputs.tests }}
+      latest_validation: ${{ steps.get_latest_release.outputs.latest_release_tag }}
     steps:
       - id: set-boards
         run: |
@@ -55,6 +56,18 @@ jobs:
         run: |
           echo "tests=${{ vars.VALIDATION_TESTS }}" >> $GITHUB_OUTPUT
 
+      - name: Get latest release tag
+        id: get_latest_release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            
+            const latestRelease = await github.rest.repos.getLatestRelease({
+              owner: 'nuvlaedge',
+              repo: 'validation',
+            });
+            core.setOutput('latest_release_tag', latestRelease.data.tag_name);
+
   run-validation:
     needs: setup-matrix
     strategy:
@@ -63,47 +76,31 @@ jobs:
         validation-type: ${{ fromJSON(needs.setup-matrix.outputs.tests) }}
       fail-fast: false
     runs-on: ${{ matrix.board-config }}
+    env:
+      VALIDATION_IMAGE_NAME: "nuvladev/nuvlaedge-validation:${{ needs.setup-matrix.outputs.latest_validation }}"
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name || vars.GITHUB_REF_NAME }}
 
     steps:
-      - name: Setup Python environment
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Setup Validation folder structure
+      - name: Image cleanup
         run: |
-          mkdir -p results/temp/xml results/temp/json
-          mkdir -p conf/targets/ || true
-          mkdir -p dist/ || true
+          for i in {1..5}; do
+            docker image prune -f && break || sleep 3
+          done
 
-      - name: Retrieve target configuration
-        run: |
-          wget \
-          -O conf/targets/${{ matrix.board-config }}.toml \
-          https://github.com/nuvlaedge/validation/releases/latest/download/${{ matrix.board-config }}.toml
+      - name: Pull Validation Image
+        run: docker pull $VALIDATION_IMAGE_NAME
 
-      - name: Remove previous validation package
-        run: |
-          rm -f ${{ env.VALIDATION_PACKAGE_NAME }} || true
-          rm -f dist/${{ env.VALIDATION_PACKAGE_NAME }} || true
+      - name: Reset results directory
+        run: sudo rm -rf /home/runner/actions-runner/results/temp && sudo mkdir -p /home/runner/actions-runner/results/temp
 
-      - name: Download Validation Framework dependency
-        run: |
-          wget \
-          -O dist/${{ env.VALIDATION_PACKAGE_NAME }} \
-          https://github.com/nuvlaedge/validation/releases/latest/download/${{ env.VALIDATION_PACKAGE_NAME }}
-
-      - name: Install latest validation package
-        run: |
-          pip install dist/${{ env.VALIDATION_PACKAGE_NAME }}  --force-reinstall
-
-      - name: Clear previous results
-        run: |
-          rm results/temp/xml/*.xml || true
-
-      - name: Run Validation on board ${{ matrix.board-config }}
+      - name: Run Validation
         run: >
-          validation
+          docker run 
+          --rm 
+          -v /home/sixsq/.validation_keys:/root/.ssh
+          -v runner_${{ matrix.board-config }}-vol:/results 
+          -v ./logs/:/tmp/nuvlaedge_validator/logs
+          ${{ env.VALIDATION_IMAGE_NAME }} 
           --target ${{ matrix.board-config }}.toml
           --key ${{ secrets.VALIDATION_NUVLA_API_KEY }}
           --secret ${{ secrets.VALIDATION_NUVLA_API_SECRET }}
@@ -114,9 +111,16 @@ jobs:
           --deployment_branch ${{ env.BRANCH_NAME }}
           --log_level ${{ github.event.inputs.log_level || 'INFO' }}
 
+      - name: Save logs as artifacts if requested or failed
+        if: ${{ steps.validate.outcome }} != 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'nuvlaedge_logs_${{ matrix.board-config }}-${{ matrix.validation-type }}'
+          path: /tmp/nuvlaedge_validator/
+
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
         if: always()
         with:
           check_name: "| ${{ matrix.board-config }} --- ${{ matrix.validation-type }} |"
-          junit_files: "results/temp/xml/*.xml"
+          junit_files: "/home/runner/actions-runner/results/temp/xml/*.xml"
