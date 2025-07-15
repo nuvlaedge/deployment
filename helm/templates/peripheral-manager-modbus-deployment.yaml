@@ -20,6 +20,12 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
+      {{- if .Values.allowControlPlane }}
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+      {{- end }}
       containers:
         - name: peripheral-manager-modbus
           command: ["modbus"]

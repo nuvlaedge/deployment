@@ -19,6 +19,12 @@ spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
       nodeSelector:
         kubernetes.io/hostname: {{ .Values.kubernetesNode }}
+      {{- if .Values.allowControlPlane }}
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+      {{- end }}
       containers:
         # AGENT
         - name: agent
