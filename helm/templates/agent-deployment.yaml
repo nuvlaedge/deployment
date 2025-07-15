@@ -50,6 +50,8 @@ spec:
               value: {{ .Values.NUVLAEDGE_LOG_LEVEL | default .Values.agentConfig.log_level }}
             - name: NUVLAEDGE_DEBUG
               value: {{ .Values.NUVLAEDGE_DEBUG | default "False" | quote }}
+            - name: DEBUG_THREADS
+              value: {{ .Values.DEBUG_THREADS | default "False" | quote }}
             - name: NUVLAEDGE_API_KEY
               value: {{ .Values.NUVLAEDGE_API_KEY }}
             - name: NUVLAEDGE_API_SECRET
