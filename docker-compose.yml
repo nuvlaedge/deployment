@@ -2,7 +2,7 @@ version: "3.7"
 
 
 x-common: &common
-  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.19.2}
+  image: ${NE_IMAGE_REGISTRY:-}${NE_IMAGE_ORGANIZATION:-sixsq}/${NE_IMAGE_REPOSITORY:-nuvlaedge}:${NE_IMAGE_TAG:-2.19.3}
   restart: always
   oom_score_adj: -900
   stop_grace_period: 5s
@@ -65,7 +65,7 @@ services:
       - NE_IMAGE_REGISTRY
       - NE_IMAGE_ORGANIZATION
       - NE_IMAGE_REPOSITORY
-      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.19.2}
+      - NE_IMAGE_TAG=${NE_IMAGE_TAG:-2.19.3}
       - NE_IMAGE_INSTALLER
       - DEBUG_THREADS
       - NUVLAEDGE_DEBUG=${NUVLAEDGE_DEBUG:-False}
